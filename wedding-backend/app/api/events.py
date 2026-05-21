@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
-from sqlalchemy import select, func, and_, delete
+from sqlalchemy import select, func, and_, delete, extract
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
@@ -77,8 +77,8 @@ async def list_events(
         year, m = month.split("-")
         query = query.where(
             and_(
-                func.year(Event.date) == int(year),
-                func.month(Event.date) == int(m),
+                extract("year", Event.date) == int(year),
+                extract("month", Event.date) == int(m),
             )
         )
     if date_start:

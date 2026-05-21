@@ -12,6 +12,7 @@ from app.models.customer import CustomerStatus
 from app.models.order import OrderStatus
 from app.models.supplier import SupplierType
 from app.models.user import User, TeamEnum
+from app.models.event import EventStatus
 from app.middleware.auth import get_current_user
 from app.utils.cache import redis_client
 import json

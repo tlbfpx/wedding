@@ -1,140 +1,140 @@
 ## 1. 后端项目初始化
 
-- [ ] 1.1 初始化 wedding-backend 项目：创建 FastAPI 应用骨架，配置 CORS、异常处理器、日志
-- [ ] 1.2 配置 SQLAlchemy 2.0 async + asyncmy 连接 MySQL，创建 database.py（引擎/Session）
-- [ ] 1.3 配置 Alembic 数据库迁移，执行初始迁移
-- [ ] 1.4 配置 Redis 连接（aioredis），封装缓存工具函数
-- [ ] 1.5 创建 requirements.txt（fastapi, uvicorn, sqlalchemy, asyncmy, alembic, pydantic, python-jose, bcrypt, aioredis, apscheduler, python-multipart, reportlab）
-- [ ] 1.6 创建 .env 配置管理（数据库 URL、Redis URL、JWT Secret、文件上传路径等）
+- [x] 1.1 初始化 wedding-backend 项目：创建 FastAPI 应用骨架，配置 CORS、异常处理器、日志
+- [x] 1.2 配置 SQLAlchemy 2.0 async + asyncmy 连接 MySQL，创建 database.py（引擎/Session）
+- [x] 1.3 配置 Alembic 数据库迁移，执行初始迁移
+- [x] 1.4 配置 Redis 连接（aioredis），封装缓存工具函数
+- [x] 1.5 创建 requirements.txt（fastapi, uvicorn, sqlalchemy, asyncmy, alembic, pydantic, python-jose, bcrypt, aioredis, apscheduler, python-multipart, reportlab）
+- [x] 1.6 创建 .env 配置管理（数据库 URL、Redis URL、JWT Secret、文件上传路径等）
 
 ## 2. 公共基础模块
 
-- [ ] 2.1 实现 User / Role ORM 模型及 Alembic 迁移
-- [ ] 2.2 实现 OperationLog ORM 模型及中间件（自动记录 POST/PUT/DELETE 请求）
-- [ ] 2.3 实现统一分页响应模型（items, total, page, page_size, total_pages）
-- [ ] 2.4 实现统一错误响应格式（error.code, error.message, error.details）
-- [ ] 2.5 实现乐观锁工具（updated_at 比对，返回 409 on conflict）
-- [ ] 2.6 创建 seed 脚本：admin 用户、7 个角色及权限、6 个客户来源
+- [x] 2.1 实现 User / Role ORM 模型及 Alembic 迁移
+- [x] 2.2 实现 OperationLog ORM 模型及中间件（自动记录 POST/PUT/DELETE 请求）
+- [x] 2.3 实现统一分页响应模型（items, total, page, page_size, total_pages）
+- [x] 2.4 实现统一错误响应格式（error.code, error.message, error.details）
+- [x] 2.5 实现乐观锁工具（updated_at 比对，返回 409 on conflict）
+- [x] 2.6 创建 seed 脚本：admin 用户、7 个角色及权限、6 个客户来源
 
 ## 3. 认证模块（auth）
 
-- [ ] 3.1 实现 JWT 工具函数：生成 access token (2h) 和 refresh token (7d)
-- [ ] 3.2 实现 `/api/v1/auth/login`：验证用户名密码，检查账户锁定（5 次失败锁 30 分钟）
-- [ ] 3.3 实现 `/api/v1/auth/refresh`：刷新 access token
-- [ ] 3.4 实现 `/api/v1/auth/logout`：Token 加入 Redis 黑名单
-- [ ] 3.5 实现 `/api/v1/auth/me`：返回当前用户信息及权限
-- [ ] 3.6 实现认证中间件：校验 JWT，检查黑名单，注入当前用户到请求上下文
-- [ ] 3.7 实现权限中间件：根据 Role.permissions JSON 校验模块级/数据级/操作级权限
+- [x] 3.1 实现 JWT 工具函数：生成 access token (2h) 和 refresh token (7d)
+- [x] 3.2 实现 `/api/v1/auth/login`：验证用户名密码，检查账户锁定（5 次失败锁 30 分钟）
+- [x] 3.3 实现 `/api/v1/auth/refresh`：刷新 access token
+- [x] 3.4 实现 `/api/v1/auth/logout`：Token 加入 Redis 黑名单
+- [x] 3.5 实现 `/api/v1/auth/me`：返回当前用户信息及权限
+- [x] 3.6 实现认证中间件：校验 JWT，检查黑名单，注入当前用户到请求上下文
+- [x] 3.7 实现权限中间件：根据 Role.permissions JSON 校验模块级/数据级/操作级权限
 - [ ] 3.8 编写认证模块单元测试
 
 ## 4. 客户管理模块（customer-management）
 
-- [ ] 4.1 实现 Customer / FollowUp / CustomerSource ORM 模型及迁移
-- [ ] 4.2 实现 Customer Pydantic schemas（创建/更新/响应/列表）
-- [ ] 4.3 实现 `POST /api/v1/customers`：创建客户，phone 唯一性校验
-- [ ] 4.4 实现 `GET /api/v1/customers`：分页列表，支持 keyword/status/source_id/assigned_sale_id/日期筛选
-- [ ] 4.5 实现 `GET /api/v1/customers/{id}`：详情 + 最近 10 条跟进记录
-- [ ] 4.6 实现 `PUT /api/v1/customers/{id}`：编辑客户，乐观锁
-- [ ] 4.7 实现 `POST /api/v1/customers/{id}/follow-ups`：新增跟进记录
-- [ ] 4.8 实现 `POST /api/v1/customers/{id}/transfer`：客户转移
-- [ ] 4.9 实现公海池：`POST recycle`、`GET customer-pool`、`POST claim`
+- [x] 4.1 实现 Customer / FollowUp / CustomerSource ORM 模型及迁移
+- [x] 4.2 实现 Customer Pydantic schemas（创建/更新/响应/列表）
+- [x] 4.3 实现 `POST /api/v1/customers`：创建客户，phone 唯一性校验
+- [x] 4.4 实现 `GET /api/v1/customers`：分页列表，支持 keyword/status/source_id/assigned_sale_id/日期筛选
+- [x] 4.5 实现 `GET /api/v1/customers/{id}`：详情 + 最近 10 条跟进记录
+- [x] 4.6 实现 `PUT /api/v1/customers/{id}`：编辑客户，乐观锁
+- [x] 4.7 实现 `POST /api/v1/customers/{id}/follow-ups`：新增跟进记录
+- [x] 4.8 实现 `POST /api/v1/customers/{id}/transfer`：客户转移
+- [x] 4.9 实现公海池：`POST recycle`、`GET customer-pool`、`POST claim`
 - [ ] 4.10 实现 APScheduler 定时任务：每日检查 15 天无跟进客户自动回收
 - [ ] 4.11 实现数据级权限过滤：sale 看 own，主管看 all，策划 read-only
 - [ ] 4.12 编写客户管理模块单元测试
 
 ## 5. 供应商管理模块（supplier-management）
 
-- [ ] 5.1 实现 Supplier / SupplierService / SupplierEvaluation ORM 模型及迁移
-- [ ] 5.2 实现供应商 Pydantic schemas
-- [ ] 5.3 实现供应商 CRUD（`GET/POST/PUT /api/v1/suppliers`），筛选 type/status/keyword/rating
-- [ ] 5.4 实现供应商详情（含服务项目 + 最近 5 条评价）
-- [ ] 5.5 实现服务报价管理（`GET/POST/PUT /api/v1/suppliers/{id}/services`）
-- [ ] 5.6 实现供应商评价（`POST /api/v1/suppliers/{id}/evaluations`），自动重算 rating 均值
+- [x] 5.1 实现 Supplier / SupplierService / SupplierEvaluation ORM 模型及迁移
+- [x] 5.2 实现供应商 Pydantic schemas
+- [x] 5.3 实现供应商 CRUD（`GET/POST/PUT /api/v1/suppliers`），筛选 type/status/keyword/rating
+- [x] 5.4 实现供应商详情（含服务项目 + 最近 5 条评价）
+- [x] 5.5 实现服务报价管理（`GET/POST/PUT /api/v1/suppliers/{id}/services`）
+- [x] 5.6 实现供应商评价（`POST /api/v1/suppliers/{id}/evaluations`），自动重算 rating 均值
 - [ ] 5.7 编写供应商管理模块单元测试
 
 ## 6. 订单管理模块（order-management）
 
-- [ ] 6.1 实现 Order / OrderItem / Payment / Contract / Approval ORM 模型及迁移
-- [ ] 6.2 实现订单 Pydantic schemas
-- [ ] 6.3 实现订单号自动生成（WD + 日期 + 序列号）
-- [ ] 6.4 实现 `POST /api/v1/orders`：创建订单，自动计算 total_amount
-- [ ] 6.5 实现 `GET /api/v1/orders`：分页列表，筛选 status/sale_id/planner_id/keyword/日期
-- [ ] 6.6 实现 `GET /api/v1/orders/{id}`：详情含 items + payments + contract
-- [ ] 6.7 实现 `PUT /api/v1/orders/{id}`：编辑订单（仅 intention 状态可编辑）
-- [ ] 6.8 实现 `PUT /api/v1/orders/{id}/status`：状态流转校验，signed 后不可逆向
-- [ ] 6.9 实现收款登记（`POST /api/v1/orders/{id}/payments`），校验不超过 total
-- [ ] 6.10 实现报价单 PDF 导出（`GET /api/v1/orders/{id}/quote-pdf`），使用 reportlab
-- [ ] 6.11 实现折扣审批触发：discount < 0.90 自动创建 Approval
+- [x] 6.1 实现 Order / OrderItem / Payment / Contract / Approval ORM 模型及迁移
+- [x] 6.2 实现订单 Pydantic schemas
+- [x] 6.3 实现订单号自动生成（WD + 日期 + 序列号）
+- [x] 6.4 实现 `POST /api/v1/orders`：创建订单，自动计算 total_amount
+- [x] 6.5 实现 `GET /api/v1/orders`：分页列表，筛选 status/sale_id/planner_id/keyword/日期
+- [x] 6.6 实现 `GET /api/v1/orders/{id}`：详情含 items + payments + contract
+- [x] 6.7 实现 `PUT /api/v1/orders/{id}`：编辑订单（仅 intention 状态可编辑）
+- [x] 6.8 实现 `PUT /api/v1/orders/{id}/status`：状态流转校验，signed 后不可逆向
+- [x] 6.9 实现收款登记（`POST /api/v1/orders/{id}/payments`），校验不超过 total
+- [x] 6.10 实现报价单 PDF 导出（`GET /api/v1/orders/{id}/quote-pdf`），使用 reportlab
+- [x] 6.11 实现折扣审批触发：discount < 0.90 自动创建 Approval
 - [ ] 6.12 实现数据级权限过滤：sale 看 own，主管看 all
 - [ ] 6.13 编写订单管理模块单元测试
 
 ## 7. 审批流程模块（approval-workflow）
 
-- [ ] 7.1 实现 `GET /api/v1/approvals`：审批列表，筛选 status/type/applicant_id
-- [ ] 7.2 实现 `POST /api/v1/approvals`：手动发起审批
-- [ ] 7.3 实现 `PUT /api/v1/approvals/{id}`：审批操作（approve/reject），执行关联动作
-- [ ] 7.4 审批通过后自动执行：折扣生效/退款确认/订单取消
+- [x] 7.1 实现 `GET /api/v1/approvals`：审批列表，筛选 status/type/applicant_id
+- [x] 7.2 实现 `POST /api/v1/approvals`：手动发起审批
+- [x] 7.3 实现 `PUT /api/v1/approvals/{id}`：审批操作（approve/reject），执行关联动作
+- [x] 7.4 审批通过后自动执行：折扣生效/退款确认/订单取消
 - [ ] 7.5 编写审批流程模块单元测试
 
 ## 8. 排期管理模块（schedule-management）
 
-- [ ] 8.1 实现 Event / EventResource / StaffSchedule / Venue ORM 模型及迁移
-- [ ] 8.2 实现排期 Pydantic schemas
-- [ ] 8.3 实现场地 CRUD（`GET/POST/PUT /api/v1/venues`）
-- [ ] 8.4 实现场地档期查询（`GET /api/v1/venues/{id}/availability`）
-- [ ] 8.5 实现活动 CRUD（`GET/POST/PUT /api/v1/events`），按月/日期范围查询
-- [ ] 8.6 实现冲突检测：同场地同日期、同人员同日期，编辑时排除自身
-- [ ] 8.7 实现 Redis 分布式锁：创建/编辑活动时锁定 venue_id + date
-- [ ] 8.8 实现资源分配（`POST/DELETE /api/v1/events/{id}/resources`）
-- [ ] 8.9 实现人员排班查询（`GET /api/v1/staff-schedule`）
-- [ ] 8.10 实现独立冲突查询端点（`GET /api/v1/conflicts`）
+- [x] 8.1 实现 Event / EventResource / StaffSchedule / Venue ORM 模型及迁移
+- [x] 8.2 实现排期 Pydantic schemas
+- [x] 8.3 实现场地 CRUD（`GET/POST/PUT /api/v1/venues`）
+- [x] 8.4 实现场地档期查询（`GET /api/v1/venues/{id}/availability`）
+- [x] 8.5 实现活动 CRUD（`GET/POST/PUT /api/v1/events`），按月/日期范围查询
+- [x] 8.6 实现冲突检测：同场地同日期、同人员同日期，编辑时排除自身
+- [x] 8.7 实现 Redis 分布式锁：创建/编辑活动时锁定 venue_id + date
+- [x] 8.8 实现资源分配（`POST/DELETE /api/v1/events/{id}/resources`）
+- [x] 8.9 实现人员排班查询（`GET /api/v1/staff-schedule`）
+- [x] 8.10 实现独立冲突查询端点（`GET /api/v1/conflicts`）
 - [ ] 8.11 编写排期管理模块单元测试
 
 ## 9. 文件上传模块（file-upload）
 
-- [ ] 9.1 实现文件上传端点（`POST /api/v1/orders/{id}/contract`），校验类型和大小
-- [ ] 9.2 实现文件存储到 `uploads/contracts/{order_id}/` 目录
-- [ ] 9.3 实现文件访问代理（需认证），通过 API 返回文件流
+- [x] 9.1 实现文件上传端点（`POST /api/v1/orders/{id}/contract`），校验类型和大小
+- [x] 9.2 实现文件存储到 `uploads/contracts/{order_id}/` 目录
+- [x] 9.3 实现文件访问代理（需认证），通过 API 返回文件流
 - [ ] 9.4 编写文件上传模块单元测试
 
 ## 10. 数据看板模块（dashboard）
 
-- [ ] 10.1 实现 `GET /api/v1/dashboard/overview`：订单量/营业额/待跟进/排期数，支持 period 参数
-- [ ] 10.2 实现 `GET /api/v1/dashboard/sales-ranking`：销售排行（个人/团队）
-- [ ] 10.3 实现 `GET /api/v1/dashboard/conversion-funnel`：客户转化漏斗
-- [ ] 10.4 实现 `GET /api/v1/dashboard/finance-summary`：应收/已收/逾期统计
-- [ ] 10.5 实现 `GET /api/v1/dashboard/schedule-heatmap`：排期热力图（每日活动数）
-- [ ] 10.6 实现 `GET /api/v1/dashboard/supplier-ranking`：供应商满意度排名
-- [ ] 10.7 实现 Redis 缓存（5 分钟 TTL），按 endpoint + 参数生成 cache key
+- [x] 10.1 实现 `GET /api/v1/dashboard/overview`：订单量/营业额/待跟进/排期数，支持 period 参数
+- [x] 10.2 实现 `GET /api/v1/dashboard/sales-ranking`：销售排行（个人/团队）
+- [x] 10.3 实现 `GET /api/v1/dashboard/conversion-funnel`：客户转化漏斗
+- [x] 10.4 实现 `GET /api/v1/dashboard/finance-summary`：应收/已收/逾期统计
+- [x] 10.5 实现 `GET /api/v1/dashboard/schedule-heatmap`：排期热力图（每日活动数）
+- [x] 10.6 实现 `GET /api/v1/dashboard/supplier-ranking`：供应商满意度排名
+- [x] 10.7 实现 Redis 缓存（5 分钟 TTL），按 endpoint + 参数生成 cache key
 - [ ] 10.8 实现看板数据级权限：admin 全部，主管本团队
 - [ ] 10.9 编写数据看板模块单元测试
 
 ## 11. 系统管理模块（system-management）
 
-- [ ] 11.1 实现员工管理（`GET/POST/PUT /api/v1/users`），密码 bcrypt 加密
-- [ ] 11.2 实现角色管理（`GET/PUT /api/v1/roles`），permissions JSON 校验
-- [ ] 11.3 实现操作日志查询（`GET /api/v1/operation-logs`）
+- [x] 11.1 实现员工管理（`GET/POST/PUT /api/v1/users`），密码 bcrypt 加密
+- [x] 11.2 实现角色管理（`GET/PUT /api/v1/roles`），permissions JSON 校验
+- [x] 11.3 实现操作日志查询（`GET /api/v1/operation-logs`）
 - [ ] 11.4 编写系统管理模块单元测试
 
 ## 12. 前端项目初始化
 
-- [ ] 12.1 使用 Vite 初始化 Vue 3 + TypeScript 项目
-- [ ] 12.2 安装并配置 Naive UI 组件库
-- [ ] 12.3 配置 Pinia 状态管理（auth store）
-- [ ] 12.4 配置 Vue Router + 路由权限守卫
-- [ ] 12.5 配置 Axios 实例：base URL、Token 拦截器、刷新 Token 逻辑、错误处理
-- [ ] 12.6 创建布局组件（MainLayout：侧边栏 + 顶栏 + 内容区）
+- [x] 12.1 使用 Vite 初始化 Vue 3 + TypeScript 项目
+- [x] 12.2 安装并配置 Naive UI 组件库
+- [x] 12.3 配置 Pinia 状态管理（auth store）
+- [x] 12.4 配置 Vue Router + 路由权限守卫
+- [x] 12.5 配置 Axios 实例：base URL、Token 拦截器、刷新 Token 逻辑、错误处理
+- [x] 12.6 创建布局组件（MainLayout：侧边栏 + 顶栏 + 内容区）
 
 ## 13. 前端 — 登录页
 
-- [ ] 13.1 实现登录页面（用户名/密码表单 + 错误提示）
-- [ ] 13.2 实现 Token 存储（LocalStorage + HttpOnly Cookie）和自动刷新
+- [x] 13.1 实现登录页面（用户名/密码表单 + 错误提示）
+- [x] 13.2 实现 Token 存储（LocalStorage + HttpOnly Cookie）和自动刷新
 
 ## 14. 前端 — 工作台（Dashboard）
 
-- [ ] 14.1 实现工作台页面：统计卡片（订单/营业额/待跟进/排期）
-- [ ] 14.2 实现待办事项列表（收款/跟进/审批/执行提醒）
-- [ ] 14.3 实现近期排期展示
+- [x] 14.1 实现工作台页面：统计卡片（订单/营业额/待跟进/排期）
+- [x] 14.2 实现待办事项列表（收款/跟进/审批/执行提醒）
+- [x] 14.3 实现近期排期展示
 
 ## 15. 前端 — 客户管理
 
@@ -178,9 +178,9 @@
 
 ## 20. Docker 部署
 
-- [ ] 20.1 编写后端 Dockerfile（Python 基础镜像 + 依赖安装）
-- [ ] 20.2 编写前端 Dockerfile（Node 构建 + Nginx 托管）
-- [ ] 20.3 编写 nginx.conf（SPA 路由 + API 代理）
-- [ ] 20.4 编写 docker-compose.yml（frontend + backend + mysql + redis 4 容器）
-- [ ] 20.5 配置 MySQL 数据持久化（Volume）和 uploads 目录 Volume
+- [x] 20.1 编写后端 Dockerfile（Python 基础镜像 + 依赖安装）
+- [x] 20.2 编写前端 Dockerfile（Node 构建 + Nginx 托管）
+- [x] 20.3 编写 nginx.conf（SPA 路由 + API 代理）
+- [x] 20.4 编写 docker-compose.yml（frontend + backend + mysql + redis 4 容器）
+- [x] 20.5 配置 MySQL 数据持久化（Volume）和 uploads 目录 Volume
 - [ ] 20.6 验证完整部署流程（docker-compose up → 登录 → 各模块功能正常）

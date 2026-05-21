@@ -250,13 +250,14 @@ async def transition_status(
             f"订单状态 {order.status.value} 不能转换为 {body.status.value}",
         )
 
+    old_status = order.status.value
     order.status = body.status
     await db.commit()
     await db.refresh(order)
 
     await log_operation(db, user.id, request, {
         "order_id": order_id,
-        "status_from": order.status.value,
+        "status_from": old_status,
         "status_to": body.status.value,
     })
     return _order_to_dict(order)
