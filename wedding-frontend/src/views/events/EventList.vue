@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, h } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   NPageHeader,
@@ -16,7 +16,6 @@ import {
   NSelect,
   NTag,
   NEmpty,
-  NPopconfirm,
   NList,
   NListItem,
   NThing,
@@ -25,9 +24,17 @@ import {
   type FormRules,
   type SelectOption,
 } from 'naive-ui'
-import { getEvents, createEvent, getConflicts } from '@/api/events'
-import type { Event, Conflict } from '@/api/events'
-import type { NumberDate } from 'naive-ui/es/date-picker/src/interface'
+import { getEvents, createEvent } from '@/api/events'
+import type { Event } from '@/api/events'
+
+interface Conflict {
+  resource_type: string
+  resource_name: string
+  event_id: number
+  event_title: string
+  conflict_start: string
+  conflict_end: string
+}
 
 const router = useRouter()
 const message = useMessage()

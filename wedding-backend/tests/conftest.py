@@ -164,7 +164,7 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     dashboard_api.redis_client = mock_redis
 
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+    async with AsyncClient(transport=transport, base_url="http://testserver", follow_redirects=True) as client:
         yield client
 
     # Restore original redis references
