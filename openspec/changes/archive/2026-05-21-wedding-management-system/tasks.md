@@ -183,4 +183,4 @@
 - [x] 20.3 编写 nginx.conf（SPA 路由 + API 代理）
 - [x] 20.4 编写 docker-compose.yml（frontend + backend + mysql + redis 4 容器）
 - [x] 20.5 配置 MySQL 数据持久化（Volume）和 uploads 目录 Volume
-- [ ] 20.6 验证完整部署流程（docker-compose up → 登录 → 各模块功能正常）
+- [x] 20.6 验证完整部署流程（docker-compose up → 登录 → 各模块功能正常）
