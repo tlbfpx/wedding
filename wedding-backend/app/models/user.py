@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 from sqlalchemy import String, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
@@ -23,7 +25,7 @@ class User(Base, TimestampMixin):
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(200), nullable=False)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     role_id: Mapped[int] = mapped_column(nullable=False)
     team: Mapped[TeamEnum] = mapped_column(SAEnum(TeamEnum), nullable=False)
     status: Mapped[UserStatus] = mapped_column(SAEnum(UserStatus), default=UserStatus.active)

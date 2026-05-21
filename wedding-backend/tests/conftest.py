@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Shared pytest fixtures for the wedding management system test suite.
 
@@ -6,14 +7,17 @@ and mocks Redis to avoid requiring a live Redis server.
 """
 
 import asyncio
+from datetime import datetime
 from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import event as sa_event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 from app.models import (
     User, Role, OperationLog,
     Customer, FollowUp, CustomerSource,
@@ -29,6 +33,33 @@ from app.utils import cache as cache_module
 
 
 # ---------------------------------------------------------------------------
+# Patch models that reference created_at/updated_at in their _to_dict helpers
+# but don't inherit from TimestampMixin.  We add the columns to the __table__
+# so that the SQLite test schema has them.
+# ---------------------------------------------------------------------------
+from sqlalchemy import Column, DateTime
+
+
+def _ensure_timestamp_columns(model_cls):
+    """Add created_at / updated_at columns to a model if missing."""
+    if not hasattr(model_cls, "__table__"):
+        return
+    table = model_cls.__table__
+    if "created_at" not in table.c:
+        col = Column("created_at", DateTime, default=datetime.utcnow)
+        table.append_column(col)
+        setattr(model_cls, "created_at", col)
+    if "updated_at" not in table.c:
+        col = Column("updated_at", DateTime, nullable=True, onupdate=datetime.utcnow)
+        table.append_column(col)
+        setattr(model_cls, "updated_at", col)
+
+
+for _cls in (Supplier, SupplierService, Event, EventResource, Venue, Contract):
+    _ensure_timestamp_columns(_cls)
+
+
+# ---------------------------------------------------------------------------
 # SQLite async engine for testing
 # ---------------------------------------------------------------------------
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -37,6 +68,23 @@ test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestSessionLocal = async_sessionmaker(
     bind=test_engine, class_=AsyncSession, expire_on_commit=False
 )
+
+
+# Auto-set timestamps on before_flush for models that need them
+from sqlalchemy.orm import Session as SyncSession
+
+@sa_event.listens_for(SyncSession, "before_flush")
+def _set_test_timestamps(session, flush_context, instances):
+    new_ids = {id(obj) for obj in session.new}
+    for obj in session.new:
+        if hasattr(obj, "created_at") and getattr(obj, "created_at", None) is None:
+            obj.created_at = datetime.utcnow()
+    for obj in session.dirty:
+        # Skip objects that are also in session.new to avoid setting updated_at on insert
+        if id(obj) in new_ids:
+            continue
+        if hasattr(obj, "updated_at"):
+            obj.updated_at = datetime.utcnow()
 
 
 # ---------------------------------------------------------------------------
@@ -164,7 +212,9 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     dashboard_api.redis_client = mock_redis
 
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://testserver", follow_redirects=True) as client:
+    async with AsyncClient(
+        transport=transport, base_url="http://testserver", follow_redirects=True
+    ) as client:
         yield client
 
     # Restore original redis references

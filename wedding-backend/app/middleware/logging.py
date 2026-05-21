@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 from fastapi import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +39,7 @@ async def log_operation(
     db: AsyncSession,
     user_id: int,
     request: Request,
-    detail: dict | None = None,
+    detail: Optional[dict] = None,
 ):
     if request.method not in WRITE_METHODS:
         return

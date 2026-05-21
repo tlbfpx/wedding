@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Tests for system management endpoints: /api/v1/users/*
 """

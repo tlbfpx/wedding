@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Tests for file upload endpoints (contract upload on orders).
 """

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, datetime
 from typing import Optional
 
@@ -108,6 +109,55 @@ async def list_events(
         total_pages=(total + page_size - 1) // page_size,
     )
 
+
+# ── Static routes BEFORE parameterized /{event_id} ──────────────────────────
+
+@router.get("/staff-schedule")
+async def query_staff_schedule(
+    date_param: Optional[date] = Query(None, alias="date"),
+    staff_id: Optional[int] = Query(None),
+    event_id: Optional[int] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    query = select(StaffSchedule)
+
+    if date_param:
+        query = query.where(StaffSchedule.date == date_param)
+    if staff_id:
+        query = query.where(StaffSchedule.staff_id == staff_id)
+    if event_id:
+        query = query.where(StaffSchedule.event_id == event_id)
+
+    result = await db.execute(query.order_by(StaffSchedule.date))
+    schedules = result.scalars().all()
+    return [_staff_schedule_to_dict(s) for s in schedules]
+
+
+@router.get("/conflicts")
+async def check_conflicts(
+    venue_id: Optional[int] = Query(None),
+    date: date = Query(...),
+    staff_ids: Optional[str] = Query(None, description="Comma-separated staff IDs"),
+    exclude_event_id: Optional[int] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    parsed_staff_ids = None
+    if staff_ids:
+        parsed_staff_ids = [int(sid.strip()) for sid in staff_ids.split(",") if sid.strip()]
+
+    conflicts = await _detect_conflicts(
+        db=db,
+        venue_id=venue_id,
+        date=date,
+        staff_ids=parsed_staff_ids,
+        exclude_event_id=exclude_event_id,
+    )
+    return {"has_conflicts": bool(conflicts), "conflicts": conflicts}
+
+
+# ── Parameterized routes ────────────────────────────────────────────────────
 
 @router.get("/{event_id}")
 async def get_event(
@@ -274,55 +324,6 @@ async def remove_resource(
 
     await log_operation(db, user.id, request, {"event_id": event_id, "removed_resource_id": resource_id})
     return {"message": "资源已移除"}
-
-
-# ── Staff Schedule Route ─────────────────────────────────────────────────────
-
-@router.get("/staff-schedule")
-async def query_staff_schedule(
-    date_param: Optional[date] = Query(None, alias="date"),
-    staff_id: Optional[int] = Query(None),
-    event_id: Optional[int] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    query = select(StaffSchedule)
-
-    if date_param:
-        query = query.where(StaffSchedule.date == date_param)
-    if staff_id:
-        query = query.where(StaffSchedule.staff_id == staff_id)
-    if event_id:
-        query = query.where(StaffSchedule.event_id == event_id)
-
-    result = await db.execute(query.order_by(StaffSchedule.date))
-    schedules = result.scalars().all()
-    return [_staff_schedule_to_dict(s) for s in schedules]
-
-
-# ── Conflict Check Route ─────────────────────────────────────────────────────
-
-@router.get("/conflicts")
-async def check_conflicts(
-    venue_id: Optional[int] = Query(None),
-    date: date = Query(...),
-    staff_ids: Optional[str] = Query(None, description="Comma-separated staff IDs"),
-    exclude_event_id: Optional[int] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    parsed_staff_ids = None
-    if staff_ids:
-        parsed_staff_ids = [int(sid.strip()) for sid in staff_ids.split(",") if sid.strip()]
-
-    conflicts = await _detect_conflicts(
-        db=db,
-        venue_id=venue_id,
-        date=date,
-        staff_ids=parsed_staff_ids,
-        exclude_event_id=exclude_event_id,
-    )
-    return {"has_conflicts": bool(conflicts), "conflicts": conflicts}
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────

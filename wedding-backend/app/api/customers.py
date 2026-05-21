@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime, date
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select, func, and_
@@ -171,7 +172,8 @@ async def update_customer(
     if not customer:
         raise AppException(404, "NOT_FOUND", "客户不存在")
 
-    if body.version != customer.updated_at.timestamp() if customer.updated_at else int(customer.created_at.timestamp()):
+    current_version = int(customer.updated_at.timestamp()) if customer.updated_at else int(customer.created_at.timestamp())
+    if body.version != current_version:
         raise AppException(409, "VERSION_CONFLICT", "数据已被其他人修改，请刷新后重试")
 
     update_data = body.model_dump(exclude_unset=True, exclude={"version"})

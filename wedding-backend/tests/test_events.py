@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Tests for event endpoints: /api/v1/events/* and /api/v1/venues/*
 """
@@ -92,12 +93,13 @@ async def test_venue_conflict_detection(async_client: AsyncClient, auth_headers)
     assert resp.json()["error"]["code"] == "CONFLICT_DETECTED"
 
 
+
 async def test_staff_conflict_detection(async_client: AsyncClient, auth_headers, test_user):
     """
     The conflict-check endpoint detects staff scheduling conflicts.
     """
     event = await _create_event(async_client, auth_headers)
-    event_date = str(date.today() + timedelta(days=30))
+    event_date_obj = date.today() + timedelta(days=30)
 
     # Add a staff schedule for the event
     from app.models.event import StaffSchedule, ScheduleStatus
@@ -108,7 +110,7 @@ async def test_staff_conflict_detection(async_client: AsyncClient, auth_headers,
             staff_id=test_user.id,
             event_id=event["id"],
             role="策划师",
-            date=event_date,
+            date=event_date_obj,
             status=ScheduleStatus.assigned,
         )
         session.add(schedule)
@@ -118,7 +120,7 @@ async def test_staff_conflict_detection(async_client: AsyncClient, auth_headers,
     resp = await async_client.get(
         "/api/v1/events/conflicts",
         headers=auth_headers,
-        params={"date": event_date, "staff_ids": str(test_user.id)},
+        params={"date": str(event_date_obj), "staff_ids": str(test_user.id)},
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -184,7 +186,7 @@ async def test_remove_resource(async_client: AsyncClient, auth_headers):
 async def test_staff_schedule_query(async_client: AsyncClient, auth_headers, test_user):
     """GET /api/v1/events/staff-schedule queries schedules."""
     event = await _create_event(async_client, auth_headers)
-    event_date = str(date.today() + timedelta(days=30))
+    event_date_obj = date.today() + timedelta(days=30)
 
     from app.models.event import StaffSchedule, ScheduleStatus
     from tests.conftest import TestSessionLocal
@@ -194,7 +196,7 @@ async def test_staff_schedule_query(async_client: AsyncClient, auth_headers, tes
             staff_id=test_user.id,
             event_id=event["id"],
             role="司仪",
-            date=event_date,
+            date=event_date_obj,
             status=ScheduleStatus.confirmed,
         )
         session.add(schedule)

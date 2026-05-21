@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 from fastapi import HTTPException
 from pydantic import BaseModel
 
@@ -5,7 +7,7 @@ from pydantic import BaseModel
 class ErrorDetail(BaseModel):
     code: str
     message: str
-    details: str | None = None
+    details: Optional[str] = None
 
 
 class ErrorResponse(BaseModel):
@@ -13,6 +15,6 @@ class ErrorResponse(BaseModel):
 
 
 class AppException(HTTPException):
-    def __init__(self, status_code: int, code: str, message: str, details: str | None = None):
+    def __init__(self, status_code: int, code: str, message: str, details: Optional[str] = None):
         self.error = ErrorDetail(code=code, message=message, details=details)
         super().__init__(status_code=status_code, detail=self.error.model_dump())

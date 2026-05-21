@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Tests for authentication endpoints: /api/v1/auth/*
 """

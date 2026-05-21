@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Tests for order endpoints: /api/v1/orders/*
 """
