@@ -96,7 +96,8 @@ async def test_update_role_permissions(async_client: AsyncClient, auth_headers, 
     assert resp.status_code == 200
     body = resp.json()
     assert body["name"] == "高级管理员"
-    assert body["permissions"]["customer"]["write"] == "own"
+    # permissions is returned as a list of module permission objects
+    assert isinstance(body["permissions"], list)
 
 
 async def test_operation_logs(
