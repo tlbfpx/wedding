@@ -1,8 +1,8 @@
 # 婚庆管理系统 - 产品需求文档
 
-> **版本**: v2.0 - 迭代 2 新增
+> **版本**: v3.0 - 迭代 3 RBAC + 迭代 4 Dashboard 完善
 > **日期**: 2026-05-22
-> **说明**: 本文档基于现有代码逆向梳理，含迭代 2 新增功能（FR-013~FR-015）。
+> **说明**: 本文档基于现有代码逆向梳理，含迭代 2 新增功能（FR-013~FR-015）、迭代 3 RBAC 权限拦截（FR-016）、迭代 4 Dashboard 前端集成。
 
 ---
 
@@ -30,7 +30,7 @@
 
 | 序号 | 模块 | 功能清单 | 当前状态 |
 |------|------|----------|----------|
-| 1 | 工作台 | 数据概览（订单数/营业额/待跟进客户/排期数）、待办事项、近期排期 | 已实现 |
+| 1 | 工作台 | 数据概览（订单数/营业额/待跟进客户/排期数）、销售排行、客户转化漏斗、财务汇总、排期热力图、供应商排行、待办事项、近期排期 | 已实现 |
 | 2 | 客户管理 | 客户列表、新增/编辑客户、客户详情、跟进记录、客户转移、客户回收 | 已实现 |
 | 3 | 公海池 | 公海客户列表、客户认领 | 已实现 |
 | 4 | 排期管理 | 日历视图、新建活动、活动详情、资源管理、人员安排、冲突检测 | 已实现 |
@@ -42,9 +42,10 @@
 | 10 | 审批管理 | 审批列表、折扣审批/退款审批/取消审批、审批通过/驳回 | 已实现 |
 | 11 | 操作日志 | 操作日志列表、按模块/操作/用户/日期筛选 | 已实现 |
 | 12 | 登录认证 | 用户登录、Token 刷新、登出、账户锁定保护 | 已实现 |
-| 13 | 数据报表导出 | 订单报表/客户报表/财务报表导出 Excel | 待开发 | [FR-013](prd/FR-013-data-report-export.md) |
-| 14 | 消息通知 | 审批/排期/跟进提醒站内通知，未读计数 | 待开发 | [FR-014](prd/FR-014-notification-system.md) |
-| 15 | 数据导入 | 客户/供应商批量 Excel/CSV 导入 | 待开发 | [FR-015](prd/FR-015-data-import.md) |
+| 13 | 数据报表导出 | 订单报表/客户报表/财务报表导出 Excel | 已实现 | [FR-013](prd/FR-013-data-report-export.md) |
+| 14 | 消息通知 | 审批/排期/跟进提醒站内通知，未读计数 | 已实现 | [FR-014](prd/FR-014-notification-system.md) |
+| 15 | 数据导入 | 客户/供应商批量 Excel/CSV 导入 | 已实现 | [FR-015](prd/FR-015-data-import.md) |
+| 16 | RBAC 权限拦截 | 基于 `require_permission(module, action)` 的细粒度接口权限控制，管理员自动绕过 | 已实现 |
 
 ---
 
@@ -79,6 +80,11 @@
 
 **功能点列表：**
 - 数据概览卡片：本月订单数、营业额、待跟进客户数、本月排期数
+- 销售排行：按销售额排名，支持按团队筛选
+- 客户转化漏斗：按客户状态统计转化情况
+- 财务汇总：营业额/已付/应收，含支付方式分布
+- 排期热力图：按月显示排期密度
+- 供应商排行：按评分和评价数量排名
 - 待办事项列表（当前为静态数据）
 - 近期排期列表（最近 5 条活动）
 
@@ -90,17 +96,15 @@
 2. 概览数据按月/季/年维度统计（后端支持 period 参数）
 3. 后端对概览数据做 Redis 缓存（5 分钟过期）
 
-**权限要求：** 所有已登录用户
+**权限要求：** `require_permission("dashboard", "read")` — 需要 `dashboard:read` 权限
 
-**后端 API：**
+**后端 API（共 6 个）：**
 - `GET /api/dashboard/overview` - 概览数据（支持月/季/年维度）
 - `GET /api/dashboard/sales-ranking` - 销售排行
 - `GET /api/dashboard/conversion-funnel` - 客户转化漏斗
 - `GET /api/dashboard/finance-summary` - 财务汇总（含支付方式分布）
 - `GET /api/dashboard/schedule-heatmap` - 排期热力图
 - `GET /api/dashboard/supplier-ranking` - 供应商排行
-
-> 注：前端 Dashboard 页面当前仅使用 overview 和 events 列表接口，销售排行、转化漏斗、财务汇总、热力图、供应商排行等 API 已实现但前端未集成。
 
 ---
 
@@ -134,7 +138,9 @@
 4. 客户可转移给其他销售或回收到公海池
 5. 回收时记录回收时间，清空负责销售
 
-**权限要求：** 所有已登录用户可查看；创建/编辑/跟进/转移/回收需销售权限
+**权限要求：**
+- 查看客户列表/详情：`require_permission("crm", "read")` — 需要 `crm:read` 权限
+- 创建/编辑/跟进/转移/回收：`require_permission("crm", "write")` — 需要 `crm:write` 权限
 
 **后端 API：**
 - `GET /api/customers` - 客户列表（分页、筛选）
@@ -161,7 +167,9 @@
 2. 点击认领后，客户指派给当前销售，状态变为"跟进中"
 3. 已被认领的客户无法再次认领
 
-**权限要求：** 销售角色
+**权限要求：**
+- 查看公海池：`require_permission("crm", "read")` — 需要 `crm:read` 权限
+- 认领客户：`require_permission("crm", "write")` — 需要 `crm:write` 权限
 
 **后端 API：**
 - `GET /api/customer-pool` - 公海池列表
@@ -197,7 +205,9 @@
 4. 活动创建后可通过详情页逐步推进状态
 5. 活动可关联订单（order_id，一对一关系）
 
-**权限要求：** 所有已登录用户可查看；创建/编辑需策划权限
+**权限要求：**
+- 查看活动/排班/冲突检测/资源：`require_permission("schedule", "read")` — 需要 `schedule:read` 权限
+- 创建/编辑活动/资源管理：`require_permission("schedule", "write")` — 需要 `schedule:write` 权限
 
 **后端 API：**
 - `GET /api/events` - 活动列表（支持按月、日期范围、状态、策划师、场地筛选）
@@ -230,7 +240,9 @@
 2. 在创建排期时选择场地，系统自动检测场地占用冲突
 3. 在场地管理页面可直接查看指定日期范围的已有排期
 
-**权限要求：** 所有已登录用户可查看；新增/编辑需管理或策划权限
+**权限要求：**
+- 查看场地/可用性检查：`require_permission("schedule", "read")` — 需要 `schedule:read` 权限
+- 新增/编辑场地：`require_permission("schedule", "write")` — 需要 `schedule:write` 权限
 
 **后端 API：**
 - `GET /api/venues` - 场地列表
@@ -275,7 +287,9 @@
 4. 订单执行中可继续添加付款记录
 5. 取消订单需提交取消审批
 
-**权限要求：** 销售可创建/编辑意向订单；状态流转和付款需相应权限；取消需审批
+**权限要求：**
+- 查看订单/报价单 PDF：`require_permission("order", "read")` — 需要 `order:read` 权限
+- 创建/编辑/状态流转/付款/合同上传：`require_permission("order", "write")` — 需要 `order:write` 权限
 
 **后端 API：**
 - `GET /api/orders` - 订单列表
@@ -315,7 +329,9 @@
 3. 订单完成后可对供应商进行评价
 4. 评价后自动计算并更新供应商平均评分
 
-**权限要求：** 所有已登录用户可查看；创建/编辑需管理或策划权限
+**权限要求：**
+- 查看供应商/服务项目/评价：`require_permission("supplier", "read")` — 需要 `supplier:read` 权限
+- 创建/编辑供应商/服务项目/评价：`require_permission("supplier", "write")` — 需要 `supplier:write` 权限
 
 **后端 API：**
 - `GET /api/suppliers` - 供应商列表
@@ -350,7 +366,9 @@
 2. 可随时修改员工信息、角色、状态
 3. 停用的员工无法登录系统
 
-**权限要求：** 管理员
+**权限要求：**
+- 查看员工列表：`require_permission("system", "read")` — 需要 `system:read` 权限
+- 创建/编辑/重置密码：`require_permission("system", "write")` — 需要 `system:write` 权限
 
 **后端 API：**
 - `GET /api/users` - 员工列表
@@ -374,7 +392,9 @@
 2. 修改角色权限，保存后立即生效
 3. 用户登录时获取其角色对应的权限列表
 
-**权限要求：** 管理员
+**权限要求：**
+- 查看角色列表：`require_permission("system", "read")` — 需要 `system:read` 权限
+- 编辑角色权限：`require_permission("system", "write")` — 需要 `system:write` 权限
 
 **后端 API：**
 - `GET /api/users/roles` - 角色列表
@@ -408,7 +428,9 @@
 3. 通过审批后自动执行关联操作（更新订单状态或金额）
 4. 已处理的审批不可重复操作
 
-**权限要求：** 所有用户可提交审批；审批通过/驳回需主管或管理员权限
+**权限要求：**
+- 查看审批列表：`require_permission("order", "read")` — 需要 `order:read` 权限
+- 提交/审批通过/驳回：`require_permission("order", "write")` — 需要 `order:write` 权限
 
 **后端 API：**
 - `GET /api/approvals` - 审批列表
@@ -431,10 +453,104 @@
 1. 系统通过 `log_operation` 中间件自动记录所有写操作的日志
 2. 管理员可按条件筛选查看操作历史
 
-**权限要求：** 管理员
+**权限要求：** `require_permission("system", "read")` — 需要 `system:read` 权限
 
 **后端 API：**
 - `GET /api/users/operation-logs` - 操作日志列表
+
+---
+
+### 4.13 数据报表导出
+
+**功能点列表：**
+- 订单报表导出 Excel：按日期范围导出订单数据
+- 客户报表导出 Excel：按日期范围导出客户数据
+- 财务报表导出 Excel：按日期范围导出财务数据（含付款明细）
+
+**页面/入口：**
+- `/reports` - 报表页面
+
+**权限要求：** `require_permission("report", "read")` — 需要 `report:read` 权限
+
+**后端 API：**
+- `GET /api/reports/orders` - 订单报表导出
+- `GET /api/reports/customers` - 客户报表导出
+- `GET /api/reports/finance` - 财务报表导出
+
+---
+
+### 4.14 消息通知
+
+**功能点列表：**
+- 通知列表：分页浏览，按已读/未读筛选
+- 未读计数：实时获取未读通知数量
+- 标记已读：单条标记已读或全部标记已读
+- 通知类型：审批提醒、排期提醒、跟进提醒
+
+**页面/入口：**
+- 通知入口位于顶部导航栏（铃铛图标 + 未读计数角标）
+
+**权限要求：** 所有已登录用户（使用 `get_current_user` 认证，无需特定权限）
+
+**后端 API：**
+- `GET /api/notifications` - 通知列表
+- `GET /api/notifications/unread-count` - 未读计数
+- `POST /api/notifications/:id/read` - 标记已读
+- `POST /api/notifications/read-all` - 全部标记已读
+
+---
+
+### 4.15 数据导入
+
+**功能点列表：**
+- 客户批量导入：上传 Excel/CSV 文件批量导入客户数据
+- 供应商批量导入：上传 Excel/CSV 文件批量导入供应商数据
+- 导入结果反馈：返回成功/失败条数及失败原因
+
+**页面/入口：**
+- 客户管理页面内嵌导入功能
+- 供应商管理页面内嵌导入功能
+
+**权限要求：** `require_permission("system", "write")` — 需要 `system:write` 权限
+
+**后端 API：**
+- `POST /api/imports/customers` - 客户批量导入
+- `POST /api/imports/suppliers` - 供应商批量导入
+
+---
+
+### 4.16 RBAC 权限拦截
+
+**功能点列表：**
+- 基于 `require_permission(module, action)` 装饰器的细粒度接口权限控制
+- 权限格式：`{module}:{action}`（如 `crm:read`、`order:write`）
+- 管理员（system.write = "all"）自动绕过所有权限检查，scope 返回 "all"
+- 权限缓存：角色权限通过 Redis 缓存（5 分钟过期）
+- 权限粒度支持：布尔值（true/false）、字符串（"all"/"team"/"none"）、字典（{"read": "all", "write": "own"}）
+
+**权限映射表：**
+
+| 模块 | module 参数 | read 权限 | write 权限 |
+|------|------------|-----------|------------|
+| 客户管理 / 公海池 | crm | crm:read | crm:write |
+| 订单管理 | order | order:read | order:write |
+| 供应商管理 | supplier | supplier:read | supplier:write |
+| 排期管理 / 场地管理 | schedule | schedule:read | schedule:write |
+| 工作台 | dashboard | dashboard:read | - |
+| 数据报表 | report | report:read | - |
+| 数据导入 | system | - | system:write |
+| 员工管理 | system | system:read | system:write |
+| 角色权限 | system | system:read | system:write |
+| 操作日志 | system | system:read | - |
+| 审批管理 | order | order:read | order:write |
+| 消息通知 | - | 所有已登录用户 | - |
+
+**核心业务流程：**
+1. 用户请求携带 JWT Token，中间件解析用户身份
+2. 从 Redis 缓存或数据库加载用户角色对应的权限配置
+3. 管理员（system.write = "all"）直接放行，返回 scope = "all"
+4. 非管理员用户检查对应模块的 action 权限
+5. 权限不足返回 403 错误
 
 ---
 
