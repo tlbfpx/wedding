@@ -5,6 +5,7 @@ from app.models.customer import Customer, FollowUp, CustomerSource
 from app.models.supplier import Supplier, SupplierService, SupplierEvaluation
 from app.models.order import Order, OrderItem, Payment, Contract, Approval
 from app.models.event import Event, EventResource, StaffSchedule, Venue
+from app.models.notification import Notification, NotificationType
 
 __all__ = [
     "Base", "User", "Role", "OperationLog",
@@ -12,4 +13,5 @@ __all__ = [
     "Supplier", "SupplierService", "SupplierEvaluation",
     "Order", "OrderItem", "Payment", "Contract", "Approval",
     "Event", "EventResource", "StaffSchedule", "Venue",
+    "Notification", "NotificationType",
 ]
