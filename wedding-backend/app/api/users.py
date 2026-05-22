@@ -6,7 +6,6 @@ import bcrypt
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 import json
 
 from app.database import get_db
@@ -16,33 +15,9 @@ from app.middleware.auth import get_current_user
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
+from app.schemas.user import UserCreate, UserUpdate, RoleUpdate
 
 router = APIRouter()
-
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
-class UserCreate(BaseModel):
-    username: str
-    password: str
-    name: str
-    phone: Optional[str] = None
-    role_id: int
-    team: TeamEnum
-
-
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    phone: Optional[str] = None
-    role_id: Optional[int] = None
-    team: Optional[TeamEnum] = None
-    status: Optional[UserStatus] = None
-    password: Optional[str] = None
-
-
-class RoleUpdate(BaseModel):
-    name: Optional[str] = None
-    permissions: Optional[list[str]] = None
 
 
 # ── User Routes ──────────────────────────────────────────────────────────────
