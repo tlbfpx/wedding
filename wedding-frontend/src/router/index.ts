@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const MainLayout = () => import('@/layouts/MainLayout.vue')
 
@@ -8,6 +9,12 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/permission-denied',
+    name: 'PermissionDenied',
+    component: () => import('@/views/system/PermissionDenied.vue'),
     meta: { requiresAuth: false },
   },
   {
@@ -132,15 +139,56 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const token = localStorage.getItem('token')
+  const authStore = useAuthStore()
 
+  // Redirect to login if not authenticated
   if (to.meta.requiresAuth !== false && !token) {
     next({ path: '/login', query: { redirect: to.fullPath } })
     return
   }
 
+  // Redirect to home if already logged in and trying to access login
   if (to.path === '/login' && token) {
     next({ path: '/' })
     return
+  }
+
+  // If authenticated, ensure user data is loaded before permission check
+  if (token && !authStore.user) {
+    try {
+      await authStore.fetchUser()
+    } catch {
+      // If fetch fails, clear auth and redirect to login
+      authStore.clearAuth()
+      next({ path: '/login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
+  // Check route-level permission if route has module meta
+  const routeModule = to.meta.module as string | undefined
+  if (routeModule) {
+    // Module name mapping: frontend names to backend keys
+    const moduleMap: Record<string, string> = {
+      'customers': 'crm',
+      'events': 'schedule',
+      'orders': 'order',
+      'suppliers': 'supplier',
+      'users': 'system',
+      'roles': 'system',
+    }
+
+    // Try both frontend module name and backend key
+    const requiredPermission = `${routeModule}:read`
+    const backendKey = moduleMap[routeModule]
+    const backendPermission = backendKey ? `${backendKey}:read` : ''
+
+    if (!authStore.hasPermission(requiredPermission) &&
+        (!backendPermission || !authStore.hasPermission(backendPermission))) {
+      // Redirect to permission denied page
+      next({ path: '/permission-denied' })
+      return
+    }
   }
 
   next()
