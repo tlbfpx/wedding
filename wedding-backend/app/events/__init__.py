@@ -20,11 +20,11 @@ class EventBus:
             self._handlers[event_type] = []
         self._handlers[event_type].append(handler)
 
-    async def publish(self, event: DomainEvent):
+    async def publish(self, event: DomainEvent, context: dict = None):
         handlers = self._handlers.get(event.event_type, [])
         for handler in handlers:
             try:
-                await handler(event)
+                await handler(event, context)
             except Exception:
                 logger.exception("Event handler error: %s, handler: %s", event.event_type, handler.__name__)
                 raise
