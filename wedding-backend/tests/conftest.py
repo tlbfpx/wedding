@@ -24,12 +24,14 @@ from app.models import (
     Supplier, SupplierService, SupplierEvaluation,
     Order, OrderItem, Payment, Contract, Approval,
     Event, EventResource, StaffSchedule, Venue,
+    Notification,
 )
 from app.models.user import TeamEnum, UserStatus
 from app.utils.auth import create_access_token, create_refresh_token
 from app.main import app
 from app.database import get_db
 from app.utils import cache as cache_module
+from app.events.handlers import register_event_handlers
 
 
 # ---------------------------------------------------------------------------
@@ -189,6 +191,10 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     Provide an httpx AsyncClient wired to the FastAPI app with overridden
     dependencies for database and Redis.
     """
+    # Register event handlers (httpx ASGITransport does not trigger FastAPI
+    # startup events, so we must do this explicitly).
+    register_event_handlers()
+
     # Override database dependency
     app.dependency_overrides[get_db] = override_get_db
 
