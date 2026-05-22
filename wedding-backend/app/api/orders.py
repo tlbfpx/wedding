@@ -69,7 +69,7 @@ class PaymentCreate(BaseModel):
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_orders(
     status: Optional[OrderStatus] = Query(None),
     sale_id: Optional[int] = Query(None),
@@ -150,7 +150,7 @@ async def get_order(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_order(
     body: OrderCreate,
     request: Request,

@@ -47,7 +47,7 @@ class RoleUpdate(BaseModel):
 
 # ── User Routes ──────────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_users(
     team: Optional[TeamEnum] = Query(None),
     status: Optional[UserStatus] = Query(None),
@@ -87,7 +87,7 @@ async def list_users(
     )
 
 
-@router.post("/")
+@router.post("")
 async def create_user(
     body: UserCreate,
     request: Request,

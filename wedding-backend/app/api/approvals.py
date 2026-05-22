@@ -35,7 +35,7 @@ class ApprovalDecision(BaseModel):
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_approvals(
     status: Optional[ApprovalStatus] = Query(None),
     type: Optional[ApprovalType] = Query(None),
@@ -71,7 +71,7 @@ async def list_approvals(
     )
 
 
-@router.post("/")
+@router.post("")
 async def create_approval(
     body: ApprovalCreate,
     request: Request,

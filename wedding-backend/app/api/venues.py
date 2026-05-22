@@ -43,7 +43,7 @@ class VenueUpdate(BaseModel):
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_venues(
     keyword: Optional[str] = Query(None),
     capacity_min: Optional[int] = Query(None),
@@ -79,7 +79,7 @@ async def list_venues(
     )
 
 
-@router.post("/")
+@router.post("")
 async def create_venue(
     body: VenueCreate,
     request: Request,

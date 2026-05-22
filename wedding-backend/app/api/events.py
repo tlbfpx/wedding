@@ -59,7 +59,7 @@ class ConflictCheck(BaseModel):
 
 # ── Event Routes ─────────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_events(
     month: Optional[str] = Query(None, description="YYYY-MM format"),
     date_start: Optional[date] = Query(None),
@@ -187,7 +187,7 @@ async def get_event(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_event(
     body: EventCreate,
     request: Request,

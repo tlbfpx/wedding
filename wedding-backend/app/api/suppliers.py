@@ -64,7 +64,7 @@ class EvaluationCreate(BaseModel):
 
 # ── Supplier Routes ──────────────────────────────────────────────────────────
 
-@router.get("/")
+@router.get("")
 async def list_suppliers(
     type: Optional[SupplierType] = Query(None),
     cooperation_status: Optional[CooperationStatus] = Query(None),
@@ -138,7 +138,7 @@ async def get_supplier(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_supplier(
     body: SupplierCreate,
     request: Request,
