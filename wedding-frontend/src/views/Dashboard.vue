@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import {
   NCard,
   NGrid,
@@ -13,6 +13,7 @@ import {
   NTag,
   NDataTable,
   NProgress,
+  NSelect,
 } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import {
@@ -46,6 +47,19 @@ const financeLoading = ref(true)
 const heatmapLoading = ref(true)
 const supplierLoading = ref(true)
 const eventsLoading = ref(true)
+
+// Period selector
+const periodOptions = [
+  { label: '本月', value: 'month' },
+  { label: '本季度', value: 'quarter' },
+  { label: '本年', value: 'year' },
+]
+const selectedPeriod = ref<string>('month')
+
+const periodLabel = computed(() => {
+  const map: Record<string, string> = { month: '本月', quarter: '本季度', year: '本年' }
+  return map[selectedPeriod.value] || '本月'
+})
 
 // Data
 const overview = ref<OverviewData | null>(null)
@@ -201,19 +215,18 @@ const paymentMethodLabels: Record<string, string> = {
   other: '其他',
 }
 
-onMounted(async () => {
-  const monthParam = currentMonth.value
+async function fetchPeriodData() {
+  overviewLoading.value = true
+  salesLoading.value = true
+  financeLoading.value = true
+  const period = selectedPeriod.value
   const results = await Promise.allSettled([
-    getOverview(),
-    getSalesRanking(),
-    getConversionFunnel(),
-    getFinanceSummary(),
-    getScheduleHeatmap({ month: monthParam }),
-    getSupplierRanking(),
-    getEventList({ page_size: 5 }),
+    getOverview({ period }),
+    getSalesRanking({ period }),
+    getFinanceSummary({ period }),
   ])
 
-  const [overviewRes, salesRes, funnelRes, financeRes, heatmapRes, supplierRes, eventsRes] = results
+  const [overviewRes, salesRes, financeRes] = results
 
   if (overviewRes.status === 'fulfilled') {
     overview.value = overviewRes.value
@@ -225,15 +238,31 @@ onMounted(async () => {
   }
   salesLoading.value = false
 
-  if (funnelRes.status === 'fulfilled') {
-    funnelData.value = funnelRes.value
-  }
-  funnelLoading.value = false
-
   if (financeRes.status === 'fulfilled') {
     financeData.value = financeRes.value
   }
   financeLoading.value = false
+}
+
+async function fetchStaticData() {
+  funnelLoading.value = true
+  heatmapLoading.value = true
+  supplierLoading.value = true
+  eventsLoading.value = true
+  const monthParam = currentMonth.value
+  const results = await Promise.allSettled([
+    getConversionFunnel(),
+    getScheduleHeatmap({ month: monthParam }),
+    getSupplierRanking(),
+    getEventList({ page_size: 5 }),
+  ])
+
+  const [funnelRes, heatmapRes, supplierRes, eventsRes] = results
+
+  if (funnelRes.status === 'fulfilled') {
+    funnelData.value = funnelRes.value
+  }
+  funnelLoading.value = false
 
   if (heatmapRes.status === 'fulfilled') {
     heatmapData.value = heatmapRes.value
@@ -249,11 +278,30 @@ onMounted(async () => {
     recentEvents.value = eventsRes.value.items
   }
   eventsLoading.value = false
+}
+
+// Watch period changes and refetch period-dependent data
+watch(selectedPeriod, () => {
+  fetchPeriodData()
+})
+
+onMounted(() => {
+  fetchPeriodData()
+  fetchStaticData()
 })
 </script>
 
 <template>
   <div>
+    <!-- Period selector -->
+    <NSpace justify="end" style="margin-bottom: 16px">
+      <NSelect
+        v-model:value="selectedPeriod"
+        :options="periodOptions"
+        style="width: 120px"
+      />
+    </NSpace>
+
     <!-- Top statistic cards -->
     <NGrid :x-gap="16" :y-gap="16" :cols="4">
       <NGi>
@@ -267,7 +315,7 @@ onMounted(async () => {
       <NGi>
         <NCard>
           <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else label="本月订单" :value="overview?.orders.count ?? 0">
+          <NStatistic v-else :label="`${periodLabel}订单`" :value="overview?.orders.count ?? 0">
             <template #suffix>单</template>
           </NStatistic>
         </NCard>
@@ -275,7 +323,7 @@ onMounted(async () => {
       <NGi>
         <NCard>
           <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else label="本月营收" :value="formatAmount(overview?.orders.total_amount ?? 0)" />
+          <NStatistic v-else :label="`${periodLabel}营收`" :value="formatAmount(overview?.orders.total_amount ?? 0)" />
         </NCard>
       </NGi>
       <NGi>
