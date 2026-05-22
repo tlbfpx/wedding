@@ -160,6 +160,15 @@ class OrderService:
         for key, value in update_data.items():
             setattr(order, key, value)
 
+        # Recalculate total_amount when discount changes
+        if update_data.get("discount") is not None:
+            items_result = await self.db.execute(
+                select(OrderItem).where(OrderItem.order_id == order_id)
+            )
+            items = items_result.scalars().all()
+            subtotal = sum(Decimal(str(item.amount)) for item in items)
+            order.total_amount = float(subtotal * Decimal(str(order.discount)))
+
         await self.db.commit()
         await self.db.refresh(order)
         return order
