@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import random
 from datetime import datetime, date
 from decimal import Decimal
 from io import BytesIO
@@ -329,17 +330,27 @@ class OrderService:
             order.paid_amount = 0
         return order
 
-    async def _generate_order_no(self) -> str:
+    async def _generate_order_no(self, max_retries: int = 3) -> str:
         today_str = datetime.utcnow().strftime("%Y%m%d")
         prefix = f"WD{today_str}"
 
-        result = await self.db.execute(
-            select(func.count()).select_from(Order).where(Order.order_no.like(f"{prefix}%"))
-        )
-        count = result.scalar_one()
+        for attempt in range(max_retries):
+            result = await self.db.execute(
+                select(func.count()).select_from(Order).where(
+                    Order.order_no.like(f"{prefix}%")
+                )
+            )
+            count = result.scalar_one()
+            candidate = f"{prefix}{str(count + 1 + attempt).zfill(3)}"
 
-        seq = str(count + 1).zfill(3)
-        return f"{prefix}{seq}"
+            existing = await self.db.execute(
+                select(Order).where(Order.order_no == candidate)
+            )
+            if not existing.scalar_one_or_none():
+                return candidate
+
+        # Fallback: use timestamp-based suffix to guarantee uniqueness
+        return f"{prefix}{str(int(datetime.utcnow().timestamp() * 1000) % 10000).zfill(4)}"
 
 
 # ── Serialization helpers ────────────────────────────────────────────────────
