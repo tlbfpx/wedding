@@ -1,20 +1,17 @@
 from __future__ import annotations
-from datetime import datetime, date
+from datetime import date
 from fastapi import APIRouter, Depends, Query, Request
-from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from typing import Optional
 
 from app.database import get_db
-from app.models import Customer, FollowUp, CustomerSource
-from app.models.customer import CustomerStatus, Gender, FollowUpType
+from app.models.customer import CustomerStatus
 from app.middleware.auth import get_current_user
 from app.models.user import User
-from app.utils.errors import AppException
-from app.utils.pagination import PageParams, PageResponse
+from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
 from app.schemas.customer import CustomerCreate, CustomerUpdate, FollowUpCreate, TransferRequest
+from app.services.customer_service import CustomerService
 
 router = APIRouter()
 
@@ -34,33 +31,19 @@ async def list_customers(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    query = select(Customer)
-
-    if keyword:
-        query = query.where(
-            (Customer.name.like(f"%{keyword}%")) | (Customer.phone.like(f"%{keyword}%"))
-        )
-    if status:
-        query = query.where(Customer.status == status)
-    if source_id:
-        query = query.where(Customer.source_id == source_id)
-    if assigned_sale_id:
-        query = query.where(Customer.assigned_sale_id == assigned_sale_id)
-    if date_start:
-        query = query.where(Customer.created_at >= date_start)
-    if date_end:
-        query = query.where(Customer.created_at <= date_end)
-
-    total_result = await db.execute(select(func.count()).select_from(query.subquery()))
-    total = total_result.scalar_one()
-
-    offset = (page - 1) * page_size
-    query = query.order_by(Customer.created_at.desc()).offset(offset).limit(page_size)
-    result = await db.execute(query)
-    customers = result.scalars().all()
-
+    svc = CustomerService(db)
+    items, total = await svc.list_customers(
+        keyword=keyword,
+        status=status,
+        source_id=source_id,
+        assigned_sale_id=assigned_sale_id,
+        date_start=date_start,
+        date_end=date_end,
+        page=page,
+        page_size=page_size,
+    )
     return PageResponse(
-        items=[_customer_to_dict(c) for c in customers],
+        items=items,
         total=total,
         page=page,
         page_size=page_size,
@@ -74,23 +57,8 @@ async def get_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    fu_result = await db.execute(
-        select(FollowUp)
-        .where(FollowUp.customer_id == customer_id)
-        .order_by(FollowUp.created_at.desc())
-        .limit(10)
-    )
-    follow_ups = fu_result.scalars().all()
-
-    return {
-        **_customer_to_dict(customer),
-        "follow_ups": [_followup_to_dict(fu) for fu in follow_ups],
-    }
+    svc = CustomerService(db)
+    return await svc.get_customer_detail(customer_id)
 
 
 @router.post("/customers")
@@ -100,27 +68,10 @@ async def create_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    existing = await db.execute(select(Customer).where(Customer.phone == body.phone))
-    if existing.scalar_one_or_none():
-        raise AppException(400, "DUPLICATE_PHONE", "该手机号已存在")
-
-    customer = Customer(
-        name=body.name,
-        phone=body.phone,
-        gender=body.gender,
-        source_id=body.source_id,
-        status=CustomerStatus.potential,
-        budget_range=body.budget_range,
-        wedding_date=body.wedding_date,
-        note=body.note,
-        assigned_sale_id=body.assigned_sale_id,
-    )
-    db.add(customer)
-    await db.commit()
-    await db.refresh(customer)
-
+    svc = CustomerService(db)
+    result, customer = await svc.create_customer(body)
     await log_operation(db, user.id, request, {"customer_id": customer.id, "name": customer.name})
-    return _customer_to_dict(customer)
+    return result
 
 
 @router.put("/customers/{customer_id}")
@@ -131,25 +82,10 @@ async def update_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    current_version = int(customer.updated_at.timestamp()) if customer.updated_at else int(customer.created_at.timestamp())
-    if body.version != current_version:
-        raise AppException(409, "VERSION_CONFLICT", "数据已被其他人修改，请刷新后重试")
-
-    update_data = body.model_dump(exclude_unset=True, exclude={"version"})
-    for key, value in update_data.items():
-        if value is not None:
-            setattr(customer, key, value)
-
-    await db.commit()
-    await db.refresh(customer)
-
-    await log_operation(db, user.id, request, {"customer_id": customer_id, "updated_fields": list(update_data.keys())})
-    return _customer_to_dict(customer)
+    svc = CustomerService(db)
+    result, updated_fields = await svc.update_customer(customer_id, body)
+    await log_operation(db, user.id, request, {"customer_id": customer_id, "updated_fields": updated_fields})
+    return result
 
 
 @router.post("/customers/{customer_id}/follow-ups")
@@ -160,28 +96,10 @@ async def add_follow_up(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    follow_up = FollowUp(
-        customer_id=customer_id,
-        sale_id=user.id,
-        type=body.type,
-        content=body.content,
-        next_follow_at=body.next_follow_at,
-    )
-    db.add(follow_up)
-
-    if customer.status == CustomerStatus.potential:
-        customer.status = CustomerStatus.following
-
-    await db.commit()
-    await db.refresh(follow_up)
-
+    svc = CustomerService(db)
+    result, follow_up = await svc.add_follow_up(customer_id, body, user.id)
     await log_operation(db, user.id, request, {"customer_id": customer_id, "follow_up_id": follow_up.id})
-    return _followup_to_dict(follow_up)
+    return result
 
 
 @router.post("/customers/{customer_id}/transfer")
@@ -192,24 +110,14 @@ async def transfer_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    target_result = await db.execute(select(User).where(User.id == body.target_sale_id, User.status == "active"))
-    if not target_result.scalar_one_or_none():
-        raise AppException(404, "NOT_FOUND", "目标销售不存在")
-
-    customer.assigned_sale_id = body.target_sale_id
-    await db.commit()
-
+    svc = CustomerService(db)
+    result = await svc.transfer_customer(customer_id, body.target_sale_id)
     await log_operation(db, user.id, request, {
         "customer_id": customer_id,
         "from_sale_id": user.id,
         "to_sale_id": body.target_sale_id,
     })
-    return _customer_to_dict(customer)
+    return result
 
 
 @router.post("/customers/{customer_id}/recycle")
@@ -219,17 +127,10 @@ async def recycle_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    customer.assigned_sale_id = None
-    customer.recycled_at = datetime.utcnow()
-    await db.commit()
-
+    svc = CustomerService(db)
+    result = await svc.recycle_customer(customer_id)
     await log_operation(db, user.id, request, {"customer_id": customer_id, "action": "recycle"})
-    return _customer_to_dict(customer)
+    return result
 
 
 @router.get("/customer-pool")
@@ -240,23 +141,14 @@ async def list_customer_pool(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    query = select(Customer).where(Customer.assigned_sale_id.is_(None))
-
-    if keyword:
-        query = query.where(
-            (Customer.name.like(f"%{keyword}%")) | (Customer.phone.like(f"%{keyword}%"))
-        )
-
-    total_result = await db.execute(select(func.count()).select_from(query.subquery()))
-    total = total_result.scalar_one()
-
-    offset = (page - 1) * page_size
-    query = query.order_by(Customer.recycled_at.desc()).offset(offset).limit(page_size)
-    result = await db.execute(query)
-    customers = result.scalars().all()
-
+    svc = CustomerService(db)
+    items, total = await svc.list_customer_pool(
+        keyword=keyword,
+        page=page,
+        page_size=page_size,
+    )
     return PageResponse(
-        items=[_customer_to_dict(c) for c in customers],
+        items=items,
         total=total,
         page=page,
         page_size=page_size,
@@ -271,50 +163,7 @@ async def claim_customer(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Customer).where(Customer.id == customer_id))
-    customer = result.scalar_one_or_none()
-    if not customer:
-        raise AppException(404, "NOT_FOUND", "客户不存在")
-
-    if customer.assigned_sale_id is not None:
-        raise AppException(400, "ALREADY_ASSIGNED", "该客户已被认领")
-
-    customer.assigned_sale_id = user.id
-    customer.recycled_at = None
-    customer.status = CustomerStatus.following
-    await db.commit()
-
+    svc = CustomerService(db)
+    result = await svc.claim_customer(customer_id, user.id)
     await log_operation(db, user.id, request, {"customer_id": customer_id, "action": "claim"})
-    return _customer_to_dict(customer)
-
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
-
-def _customer_to_dict(c: Customer) -> dict:
-    return {
-        "id": c.id,
-        "name": c.name,
-        "phone": c.phone,
-        "gender": c.gender.value if c.gender else None,
-        "source_id": c.source_id,
-        "status": c.status.value if c.status else None,
-        "budget_range": c.budget_range,
-        "wedding_date": str(c.wedding_date) if c.wedding_date else None,
-        "note": c.note,
-        "assigned_sale_id": c.assigned_sale_id,
-        "recycled_at": c.recycled_at.isoformat() if c.recycled_at else None,
-        "created_at": c.created_at.isoformat() if c.created_at else None,
-        "updated_at": c.updated_at.isoformat() if c.updated_at else None,
-    }
-
-
-def _followup_to_dict(fu: FollowUp) -> dict:
-    return {
-        "id": fu.id,
-        "customer_id": fu.customer_id,
-        "sale_id": fu.sale_id,
-        "type": fu.type.value,
-        "content": fu.content,
-        "next_follow_at": fu.next_follow_at.isoformat() if fu.next_follow_at else None,
-        "created_at": fu.created_at.isoformat() if fu.created_at else None,
-    }
+    return result
