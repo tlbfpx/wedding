@@ -9,7 +9,7 @@ from app.database import get_db
 from app.models.user import User, Role
 from app.utils.auth import create_access_token, create_refresh_token, decode_token
 from app.utils.cache import redis_client
-from app.middleware.auth import get_current_user, get_current_user_with_permissions
+from app.middleware.auth import get_current_user, get_permissions_ctx
 from app.config import settings
 import json
 
@@ -70,7 +70,7 @@ async def logout(user: User = Depends(get_current_user)):
 
 
 @router.get("/me")
-async def me(ctx: dict = Depends(get_current_user_with_permissions)):
+async def me(ctx: dict = Depends(get_permissions_ctx)):
     user = ctx["user"]
     return {
         "id": user.id,

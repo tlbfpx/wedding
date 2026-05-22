@@ -6,8 +6,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.models.customer import CustomerStatus
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
 from app.schemas.customer import CustomerCreate, CustomerUpdate, FollowUpCreate, TransferRequest
@@ -15,8 +14,6 @@ from app.services.customer_service import CustomerService
 
 router = APIRouter()
 
-
-# ── Routes ───────────────────────────────────────────────────────────────────
 
 @router.get("/customers")
 async def list_customers(
@@ -29,7 +26,7 @@ async def list_customers(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "read")),
 ):
     svc = CustomerService(db)
     items, total = await svc.list_customers(
@@ -41,6 +38,8 @@ async def list_customers(
         date_end=date_end,
         page=page,
         page_size=page_size,
+        scope=ctx["scope"],
+        user_id=ctx["user"].id,
     )
     return PageResponse(
         items=items,
@@ -55,7 +54,7 @@ async def list_customers(
 async def get_customer(
     customer_id: int,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "read")),
 ):
     svc = CustomerService(db)
     return await svc.get_customer_detail(customer_id)
@@ -66,11 +65,11 @@ async def create_customer(
     body: CustomerCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
     result, customer = await svc.create_customer(body)
-    await log_operation(db, user.id, request, {"customer_id": customer.id, "name": customer.name})
+    await log_operation(db, ctx["user"].id, request, {"customer_id": customer.id, "name": customer.name})
     return result
 
 
@@ -80,11 +79,11 @@ async def update_customer(
     body: CustomerUpdate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
     result, updated_fields = await svc.update_customer(customer_id, body)
-    await log_operation(db, user.id, request, {"customer_id": customer_id, "updated_fields": updated_fields})
+    await log_operation(db, ctx["user"].id, request, {"customer_id": customer_id, "updated_fields": updated_fields})
     return result
 
 
@@ -94,11 +93,11 @@ async def add_follow_up(
     body: FollowUpCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
-    result, follow_up = await svc.add_follow_up(customer_id, body, user.id)
-    await log_operation(db, user.id, request, {"customer_id": customer_id, "follow_up_id": follow_up.id})
+    result, follow_up = await svc.add_follow_up(customer_id, body, ctx["user"].id)
+    await log_operation(db, ctx["user"].id, request, {"customer_id": customer_id, "follow_up_id": follow_up.id})
     return result
 
 
@@ -108,13 +107,12 @@ async def transfer_customer(
     body: TransferRequest,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
     result = await svc.transfer_customer(customer_id, body.target_sale_id)
-    await log_operation(db, user.id, request, {
+    await log_operation(db, ctx["user"].id, request, {
         "customer_id": customer_id,
-        "from_sale_id": user.id,
         "to_sale_id": body.target_sale_id,
     })
     return result
@@ -125,11 +123,11 @@ async def recycle_customer(
     customer_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
     result = await svc.recycle_customer(customer_id)
-    await log_operation(db, user.id, request, {"customer_id": customer_id, "action": "recycle"})
+    await log_operation(db, ctx["user"].id, request, {"customer_id": customer_id, "action": "recycle"})
     return result
 
 
@@ -139,7 +137,7 @@ async def list_customer_pool(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "read")),
 ):
     svc = CustomerService(db)
     items, total = await svc.list_customer_pool(
@@ -161,9 +159,9 @@ async def claim_customer(
     customer_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("crm", "write")),
 ):
     svc = CustomerService(db)
-    result = await svc.claim_customer(customer_id, user.id)
-    await log_operation(db, user.id, request, {"customer_id": customer_id, "action": "claim"})
+    result = await svc.claim_customer(customer_id, ctx["user"].id)
+    await log_operation(db, ctx["user"].id, request, {"customer_id": customer_id, "action": "claim"})
     return result

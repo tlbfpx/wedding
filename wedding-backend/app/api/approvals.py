@@ -7,16 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.order import ApprovalType, ApprovalStatus
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.middleware.logging import log_operation
 from app.schemas.approval import ApprovalCreate, ApprovalDecision
 from app.services.approval_service import ApprovalService, approval_to_dict
 
 router = APIRouter()
 
-
-# ── Routes ───────────────────────────────────────────────────────────────────
 
 @router.get("")
 async def list_approvals(
@@ -26,7 +23,7 @@ async def list_approvals(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("order", "read")),
 ):
     service = ApprovalService(db)
     return await service.list_approvals(
@@ -43,9 +40,10 @@ async def create_approval(
     body: ApprovalCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("order", "write")),
 ):
     service = ApprovalService(db)
+    user = ctx["user"]
     approval = await service.create_approval(body, user.id)
     await log_operation(db, user.id, request, {"approval_id": approval.id, "type": body.type.value})
     return approval_to_dict(approval, {user.id: user})
@@ -57,9 +55,10 @@ async def decide_approval(
     body: ApprovalDecision,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("order", "write")),
 ):
     service = ApprovalService(db)
+    user = ctx["user"]
     approval = await service.decide_approval(approval_id, body, user.id)
     await log_operation(db, user.id, request, {
         "approval_id": approval_id,
