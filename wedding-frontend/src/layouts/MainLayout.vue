@@ -27,6 +27,7 @@ import {
   LogOutOutline,
 } from '@vicons/ionicons5'
 import { useAuthStore } from '@/stores/auth'
+import NotificationBell from '@/components/NotificationBell.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -85,6 +86,7 @@ const menuOptions: MenuOption[] = [
       { label: '角色权限', key: '/roles' },
       { label: '操作日志', key: '/operation-logs' },
       { label: '审批管理', key: '/approvals' },
+      { label: '消息通知', key: '/notifications' },
     ],
   },
 ]
@@ -159,14 +161,17 @@ const breadcrumbItems = computed(() => {
             {{ item }}
           </NBreadcrumbItem>
         </NBreadcrumb>
-        <NDropdown :options="userDropdownOptions" @select="handleUserDropdown">
-          <NSpace align="center" style="cursor: pointer">
-            <NAvatar :size="28" round style="background-color: #2080f0">
-              {{ authStore.user?.name?.charAt(0) || 'U' }}
-            </NAvatar>
-            <span style="font-size: 14px">{{ authStore.user?.name || '用户' }}</span>
-          </NSpace>
-        </NDropdown>
+        <div style="display: flex; align-items: center; gap: 16px">
+          <NotificationBell />
+          <NDropdown :options="userDropdownOptions" @select="handleUserDropdown">
+            <NSpace align="center" style="cursor: pointer">
+              <NAvatar :size="28" round style="background-color: #2080f0">
+                {{ authStore.user?.name?.charAt(0) || 'U' }}
+              </NAvatar>
+              <span style="font-size: 14px">{{ authStore.user?.name || '用户' }}</span>
+            </NSpace>
+          </NDropdown>
+        </div>
       </NLayoutHeader>
       <NLayoutContent
         content-style="padding: 24px; background: #f5f5f5; min-height: calc(100vh - 48px)"

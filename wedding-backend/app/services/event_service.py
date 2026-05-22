@@ -6,9 +6,12 @@ from typing import Optional
 from sqlalchemy import select, func, and_, extract
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Event, EventResource, StaffSchedule
+from app.models import Event, EventResource, StaffSchedule, Order
 from app.models.event import EventStatus
+from app.models.user import User
 from app.utils.errors import AppException
+from app.events import event_bus, DomainEvent
+from app.events.event_types import EVENT_CREATED, EVENT_UPDATED
 
 
 class EventService:
@@ -111,6 +114,10 @@ class EventService:
         await self.db.refresh(event)
 
         result = await _event_to_dict(event, self.db)
+
+        # Publish EVENT_CREATED notification
+        await _publish_event_notification(event, EVENT_CREATED, self.db)
+
         return result, event
 
     async def update_event(self, event_id: int, data) -> tuple[dict, list[str]]:
@@ -140,6 +147,10 @@ class EventService:
         await self.db.refresh(event)
 
         result = await _event_to_dict(event, self.db)
+
+        # Publish EVENT_UPDATED notification
+        await _publish_event_notification(event, EVENT_UPDATED, self.db)
+
         return result, list(update_data.keys())
 
     async def query_staff_schedule(
@@ -250,6 +261,40 @@ class EventService:
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
+
+async def _publish_event_notification(event: Event, event_type: str, db: AsyncSession) -> None:
+    """Publish an event notification with sale and planner info looked up from the order."""
+    planner_name = None
+    if event.planner_id:
+        presult = await db.execute(select(User).where(User.id == event.planner_id))
+        planner = presult.scalar_one_or_none()
+        if planner:
+            planner_name = planner.name
+
+    sale_id = None
+    if event.order_id:
+        oresult = await db.execute(select(Order).where(Order.id == event.order_id))
+        order = oresult.scalar_one_or_none()
+        if order:
+            sale_id = order.sale_id
+
+    await event_bus.publish(
+        DomainEvent(
+            event_type=event_type,
+            payload={
+                "event_id": event.id,
+                "event_title": event.title,
+                "order_id": event.order_id,
+                "planner_id": event.planner_id,
+                "planner_name": planner_name or "策划师",
+                "sale_id": sale_id,
+            },
+        ),
+        context={"db": db},
+    )
+
+
+
 
 async def _event_to_dict(e: Event, db: Optional[AsyncSession] = None) -> dict:
     venue_name = None

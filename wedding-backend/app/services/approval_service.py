@@ -13,7 +13,7 @@ from app.schemas.approval import ApprovalCreate, ApprovalDecision
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.events import event_bus, DomainEvent
-from app.events.event_types import APPROVAL_APPROVED
+from app.events.event_types import APPROVAL_APPROVED, APPROVAL_CREATED, APPROVAL_RESOLVED
 
 
 class ApprovalService:
@@ -84,6 +84,25 @@ class ApprovalService:
         self.db.add(approval)
         await self.db.commit()
         await self.db.refresh(approval)
+
+        # Fetch applicant name for notification
+        applicant_result = await self.db.execute(select(User).where(User.id == user_id))
+        applicant = applicant_result.scalar_one_or_none()
+        applicant_name = applicant.name if applicant else "未知用户"
+
+        await event_bus.publish(
+            DomainEvent(
+                event_type=APPROVAL_CREATED,
+                payload={
+                    "approval_id": approval.id,
+                    "approval_type": approval.type.value,
+                    "applicant_id": user_id,
+                    "applicant_name": applicant_name,
+                },
+            ),
+            context={"db": self.db},
+        )
+
         return approval
 
     async def decide_approval(
@@ -114,6 +133,26 @@ class ApprovalService:
                         "approval_type": approval.type.value,
                         "target_id": approval.target_id,
                         "approver_id": user_id,
+                    },
+                ),
+                context={"db": self.db},
+            )
+
+        # Notify applicant about resolution (both approved and rejected)
+        if decision.status in (ApprovalStatus.approved, ApprovalStatus.rejected):
+            approver_result = await self.db.execute(select(User).where(User.id == user_id))
+            approver = approver_result.scalar_one_or_none()
+            approver_name = approver.name if approver else "审批人"
+
+            await event_bus.publish(
+                DomainEvent(
+                    event_type=APPROVAL_RESOLVED,
+                    payload={
+                        "approval_id": approval.id,
+                        "approval_type": approval.type.value,
+                        "status": decision.status.value,
+                        "applicant_id": approval.applicant_id,
+                        "approver_name": approver_name,
                     },
                 ),
                 context={"db": self.db},
