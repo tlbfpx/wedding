@@ -1,6 +1,5 @@
-from __future__ import annotations
-
-from typing import Optional
+import datetime
+from typing import Optional, Union
 
 from pydantic import BaseModel
 
@@ -27,4 +26,4 @@ class UserUpdate(BaseModel):
 
 class RoleUpdate(BaseModel):
     name: Optional[str] = None
-    permissions: Optional[list[str]] = None
+    permissions: Optional[Union[dict, list, str]] = None

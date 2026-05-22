@@ -5,7 +5,8 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Supplier, SupplierService, SupplierEvaluation
+from app.models import Supplier, SupplierEvaluation
+from app.models.supplier import SupplierService as SupplierServiceModel
 from app.models.supplier import SupplierType, CooperationStatus
 from app.schemas.supplier import (
     SupplierCreate,
@@ -69,7 +70,7 @@ class SupplierService:
             raise AppException(404, "NOT_FOUND", "供应商不存在")
 
         svc_result = await self.db.execute(
-            select(SupplierService).where(SupplierService.supplier_id == supplier_id)
+            select(SupplierServiceModel).where(SupplierServiceModel.supplier_id == supplier_id)
         )
         services = svc_result.scalars().all()
 
@@ -118,7 +119,7 @@ class SupplierService:
 
     async def list_services(self, supplier_id: int) -> list[dict]:
         result = await self.db.execute(
-            select(SupplierService).where(SupplierService.supplier_id == supplier_id)
+            select(SupplierServiceModel).where(SupplierServiceModel.supplier_id == supplier_id)
         )
         services = result.scalars().all()
         return [_service_to_dict(s) for s in services]
@@ -128,7 +129,7 @@ class SupplierService:
         if not supplier_result.scalar_one_or_none():
             raise AppException(404, "NOT_FOUND", "供应商不存在")
 
-        service = SupplierService(
+        service = SupplierServiceModel(
             supplier_id=supplier_id,
             service_name=data.service_name,
             description=data.description,
@@ -145,9 +146,9 @@ class SupplierService:
         self, supplier_id: int, service_id: int, data: ServiceUpdate
     ) -> dict:
         result = await self.db.execute(
-            select(SupplierService).where(
-                SupplierService.id == service_id,
-                SupplierService.supplier_id == supplier_id,
+            select(SupplierServiceModel).where(
+                SupplierServiceModel.id == service_id,
+                SupplierServiceModel.supplier_id == supplier_id,
             )
         )
         service = result.scalar_one_or_none()
@@ -248,7 +249,7 @@ def _supplier_to_dict(s: Supplier) -> dict:
     }
 
 
-def _service_to_dict(s: SupplierService) -> dict:
+def _service_to_dict(s: SupplierServiceModel) -> dict:
     return {
         "id": s.id,
         "supplier_id": s.supplier_id,
