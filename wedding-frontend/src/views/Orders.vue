@@ -153,8 +153,8 @@ async function fetchData() {
       params.status = filters.status
     }
     if (filters.dateRange) {
-      params.start_date = new Date(filters.dateRange[0]).toISOString().slice(0, 10)
-      params.end_date = new Date(filters.dateRange[1]).toISOString().slice(0, 10)
+      params.date_start = new Date(filters.dateRange[0]).toISOString().slice(0, 10)
+      params.date_end = new Date(filters.dateRange[1]).toISOString().slice(0, 10)
     }
     const res = (await getOrders(params)) as unknown as PaginatedResult<Order>
     data.value = res.items

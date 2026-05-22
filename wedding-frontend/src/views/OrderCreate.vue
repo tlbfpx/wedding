@@ -289,7 +289,7 @@ async function handleSubmit() {
       customer_id: formData.customer_id!,
       planner_id: formData.planner_id || undefined,
       discount: formData.discount,
-      remark: formData.remark || undefined,
+      note: formData.remark || undefined,
       items: orderItems.value.map((item) => ({
         type: item.type,
         name: item.name,
@@ -297,7 +297,7 @@ async function handleSubmit() {
         unit_price: item.unit_price,
         amount: item.amount,
         supplier_id: item.supplier_id,
-        remark: item.remark,
+        note: item.remark,
       })),
     })
     message.success('订单创建成功')

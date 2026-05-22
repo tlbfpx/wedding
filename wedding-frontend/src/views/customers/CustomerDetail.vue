@@ -148,7 +148,7 @@ async function submitFollowUp() {
     const payload: Partial<FollowUp> = {
       type: followUpForm.value.type,
       content: followUpForm.value.content,
-      next_follow_up_at: followUpForm.value.next_follow_up_at
+      next_follow_at: followUpForm.value.next_follow_up_at
         ? new Date(followUpForm.value.next_follow_up_at).toISOString()
         : undefined,
     }
@@ -234,10 +234,10 @@ onMounted(() => {
           >
             <p>{{ item.content }}</p>
             <p
-              v-if="item.next_follow_up_at"
+              v-if="item.next_follow_at"
               style="color: #999; font-size: 12px; margin-top: 4px"
             >
-              下次跟进时间：{{ formatDate(item.next_follow_up_at) }}
+              下次跟进时间：{{ formatDate(item.next_follow_at) }}
             </p>
           </NTimelineItem>
         </NTimeline>

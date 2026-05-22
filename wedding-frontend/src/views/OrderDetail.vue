@@ -109,7 +109,7 @@ const itemColumns: DataTableColumns<OrderItem> = [
       return row.supplier?.name || '-'
     },
   },
-  { title: '备注', key: 'remark', width: 150 },
+  { title: '备注', key: 'note', width: 150 },
 ]
 
 const paymentColumns: DataTableColumns<Payment> = [
@@ -147,7 +147,7 @@ const paymentColumns: DataTableColumns<Payment> = [
       return new Date(row.created_at).toLocaleString('zh-CN')
     },
   },
-  { title: '备注', key: 'remark' },
+  { title: '备注', key: 'note' },
   {
     title: '记录时间',
     key: 'created_at',
@@ -199,7 +199,7 @@ async function handleAddPayment() {
     const data: any = {
       amount: paymentForm.value.amount,
       method: paymentForm.value.method,
-      remark: paymentForm.value.remark || undefined,
+      note: paymentForm.value.remark || undefined,
     }
     if (paymentForm.value.paid_at) {
       data.paid_at = new Date(paymentForm.value.paid_at).toISOString()
@@ -340,8 +340,8 @@ onMounted(() => {
             <NDescriptionsItem label="创建时间">
               {{ new Date(order.created_at).toLocaleString('zh-CN') }}
             </NDescriptionsItem>
-            <NDescriptionsItem v-if="order.remark" label="备注" :span="3">
-              {{ order.remark }}
+            <NDescriptionsItem v-if="order.note" label="备注" :span="3">
+              {{ order.note }}
             </NDescriptionsItem>
           </NDescriptions>
         </NCard>

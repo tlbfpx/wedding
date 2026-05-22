@@ -13,7 +13,7 @@ export interface Event {
   status: string
   type?: string
   guest_count?: number
-  remark?: string
+  note?: string
   resources?: EventResource[]
   created_at: string
   updated_at: string
@@ -34,8 +34,8 @@ export interface EventListParams {
   page_size?: number
   keyword?: string
   status?: string
-  start_date?: string
-  end_date?: string
+  date_start?: string
+  date_end?: string
   venue_id?: number
 }
 

@@ -139,8 +139,8 @@ async function fetchStaff() {
   staffLoading.value = true
   try {
     staffList.value = await getStaffSchedule({
-      start_date: event.value?.event_date,
-      end_date: event.value?.event_date,
+      date_start: event.value?.event_date,
+      date_end: event.value?.event_date,
     })
   } catch {
     // Silently handle
@@ -238,7 +238,7 @@ onMounted(async () => {
             {{ statusLabelMap[event.status] || event.status }}
           </NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="备注">{{ event.remark || '-' }}</NDescriptionsItem>
+        <NDescriptionsItem label="备注">{{ event.note || '-' }}</NDescriptionsItem>
       </NDescriptions>
     </NCard>
 

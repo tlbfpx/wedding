@@ -9,7 +9,7 @@ export interface OrderItem {
   amount: number
   supplier_id?: number
   supplier?: { id: number; name: string }
-  remark?: string
+  note?: string
 }
 
 export interface Order {
@@ -26,7 +26,7 @@ export interface Order {
   total_amount: number
   paid_amount: number
   discount?: number
-  remark?: string
+  note?: string
   items?: OrderItem[]
   payments?: Payment[]
   contract_url?: string
@@ -40,7 +40,7 @@ export interface Payment {
   amount: number
   method: string
   paid_at?: string
-  remark?: string
+  note?: string
   created_at: string
 }
 
@@ -50,8 +50,8 @@ export interface OrderListParams {
   keyword?: string
   status?: string
   customer_id?: number
-  start_date?: string
-  end_date?: string
+  date_start?: string
+  date_end?: string
 }
 
 export interface PaginatedResult<T> {

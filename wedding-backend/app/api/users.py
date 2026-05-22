@@ -42,7 +42,7 @@ class UserUpdate(BaseModel):
 
 class RoleUpdate(BaseModel):
     name: Optional[str] = None
-    permissions: Optional[dict] = None
+    permissions: Optional[list[str]] = None
 
 
 # ── User Routes ──────────────────────────────────────────────────────────────
@@ -226,8 +226,16 @@ async def list_operation_logs(
     result = await db.execute(query)
     logs = result.scalars().all()
 
+    # Build user name lookup
+    user_ids = list(set(l.user_id for l in logs))
+    user_map = {}
+    if user_ids:
+        uresult = await db.execute(select(User).where(User.id.in_(user_ids)))
+        for u in uresult.scalars().all():
+            user_map[u.id] = u.name
+
     return PageResponse(
-        items=[_log_to_dict(l) for l in logs],
+        items=[_log_to_dict(l, user_map) for l in logs],
         total=total,
         page=page,
         page_size=page_size,
@@ -251,24 +259,59 @@ def _user_to_dict(u: User) -> dict:
     }
 
 
+_MODULE_KEY_MAP = {
+    "crm": "customers",
+    "schedule": "events",
+    "event": "events",
+    "order": "orders",
+    "supplier": "suppliers",
+    "venue": "venues",
+    "user": "users",
+    "staff": "users",
+    "role": "roles",
+    "finance": "finance",
+    "report": "reports",
+    "system": "system",
+}
+
+
 def _role_to_dict(r: Role) -> dict:
     perms = r.permissions
     if isinstance(perms, str):
         try:
             perms = json.loads(perms)
         except (json.JSONDecodeError, TypeError):
-            perms = {}
+            perms = []
+    if isinstance(perms, dict):
+        result = []
+        for module, actions in perms.items():
+            mapped = _MODULE_KEY_MAP.get(module, module)
+            if isinstance(actions, dict):
+                for action, scope in actions.items():
+                    if scope != "none":
+                        result.append(f"{mapped}:{action}")
+            else:
+                result.append(f"{mapped}:{actions}")
+        perms = result
+    if isinstance(perms, list):
+        perms = [
+            f"{_MODULE_KEY_MAP.get(p.split(':')[0], p.split(':')[0])}:{p.split(':', 1)[1]}"
+            if ':' in p else p
+            for p in perms
+        ]
     return {
         "id": r.id,
         "name": r.name,
-        "permissions": perms,
+        "display_name": r.name,
+        "permissions": perms if isinstance(perms, list) else [],
     }
 
 
-def _log_to_dict(l: OperationLog) -> dict:
+def _log_to_dict(l: OperationLog, user_map: dict = None) -> dict:
     return {
         "id": l.id,
         "user_id": l.user_id,
+        "user_name": (user_map or {}).get(l.user_id),
         "module": l.module,
         "action": l.action,
         "target": l.target,

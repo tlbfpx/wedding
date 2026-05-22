@@ -19,7 +19,7 @@ export interface FollowUp {
   id: number
   content: string
   type: string
-  next_follow_up_at?: string
+  next_follow_at?: string
   created_at: string
 }
 

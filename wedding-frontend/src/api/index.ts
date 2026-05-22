@@ -67,11 +67,20 @@ request.interceptors.response.use(
       }
     }
 
-    const message =
-      error.response?.data?.detail ||
+    const rawDetail = error.response?.data?.detail
+    let message =
       error.response?.data?.message ||
       error.message ||
       '请求失败'
+    if (rawDetail) {
+      if (typeof rawDetail === 'string') {
+        message = rawDetail
+      } else if (Array.isArray(rawDetail)) {
+        message = rawDetail.map((e: any) => e.msg || JSON.stringify(e)).join('; ')
+      } else {
+        message = JSON.stringify(rawDetail)
+      }
+    }
 
     return Promise.reject(new Error(message))
   },

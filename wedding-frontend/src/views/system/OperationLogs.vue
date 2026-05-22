@@ -39,14 +39,13 @@ const filters = reactive({
 })
 
 const moduleOptions: SelectOption[] = [
-  { label: '客户管理', value: 'customers' },
-  { label: '排期管理', value: 'events' },
-  { label: '订单管理', value: 'orders' },
-  { label: '供应商管理', value: 'suppliers' },
-  { label: '场地管理', value: 'venues' },
-  { label: '员工管理', value: 'users' },
-  { label: '角色权限', value: 'roles' },
-  { label: '系统设置', value: 'system' },
+  { label: '客户管理', value: 'customer' },
+  { label: '排期管理', value: 'event' },
+  { label: '订单管理', value: 'order' },
+  { label: '供应商管理', value: 'supplier' },
+  { label: '场地管理', value: 'venue' },
+  { label: '审批管理', value: 'approval' },
+  { label: '系统管理', value: 'system' },
 ]
 
 const actionOptions: SelectOption[] = [
@@ -87,11 +86,11 @@ const columns: DataTableColumns<OperationLog> = [
   { title: '操作人', key: 'user_name', width: 100 },
   {
     title: '模块',
-    key: 'resource_type',
+    key: 'module',
     width: 120,
     render(row) {
-      const mod = moduleOptions.find((m) => m.value === row.resource_type)
-      return mod ? mod.label : row.resource_type
+      const mod = moduleOptions.find((m) => m.value === row.module)
+      return mod ? mod.label : row.module
     },
   },
   {
@@ -110,7 +109,7 @@ const columns: DataTableColumns<OperationLog> = [
     ellipsis: { tooltip: true },
     render(row) {
       if (row.detail) return row.detail
-      if (row.resource_id) return `ID: ${row.resource_id}`
+      if (row.target) return row.target
       return '-'
     },
   },
@@ -125,11 +124,12 @@ async function fetchLogs() {
       page_size: pagination.pageSize,
     }
     if (filters.user_id) params.user_id = filters.user_id
+    if (filters.module) params.module = filters.module
     if (filters.action) params.action = filters.action
     if (filters.dateRange) {
       const [start, end] = filters.dateRange
-      params.start_date = new Date(start).toISOString().slice(0, 10)
-      params.end_date = new Date(end).toISOString().slice(0, 10)
+      params.date_start = new Date(start).toISOString().slice(0, 10)
+      params.date_end = new Date(end).toISOString().slice(0, 10)
     }
     const res = await getOperationLogs(params)
     logs.value = res.items
@@ -143,7 +143,7 @@ async function fetchLogs() {
 
 async function fetchUserOptions() {
   try {
-    const res = await getUsers({ page_size: 200 })
+    const res = await getUsers({ page_size: 100 })
     userOptions.value = res.items.map((u: User) => ({ label: u.name, value: u.id }))
   } catch {
     // Silently handle

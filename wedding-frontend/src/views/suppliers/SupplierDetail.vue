@@ -81,7 +81,7 @@ const serviceRules: FormRules = {
 }
 
 const serviceColumns: DataTableColumns<SupplierService> = [
-  { title: '服务名称', key: 'name', width: 140 },
+  { title: '服务名称', key: 'service_name', width: 140 },
   { title: '描述', key: 'description', width: 200, ellipsis: { tooltip: true } },
   {
     title: '单价',
@@ -114,7 +114,7 @@ const showEvalModal = ref(false)
 const evalFormRef = ref<FormInst | null>(null)
 const evalForm = ref({
   rating: 5,
-  comment: '',
+  content: '',
 })
 const evalRules: FormRules = {
   rating: { required: true, type: 'number', message: '请选择评分', trigger: 'change' },
@@ -169,7 +169,7 @@ function openAddServiceModal() {
 function openEditServiceModal(service: SupplierService) {
   editingService.value = service
   serviceForm.value = {
-    name: service.name,
+    name: service.service_name,
     description: service.description || '',
     unit_price: service.unit_price ?? null,
     unit: '',
@@ -186,7 +186,7 @@ async function handleServiceSubmit() {
   }
   try {
     const data = {
-      name: serviceForm.value.name,
+      service_name: serviceForm.value.name,
       description: serviceForm.value.description || undefined,
       unit_price: serviceForm.value.unit_price ?? undefined,
       category: 'general',
@@ -207,7 +207,7 @@ async function handleServiceSubmit() {
 
 // Evaluation modal
 function openEvalModal() {
-  evalForm.value = { rating: 5, comment: '' }
+  evalForm.value = { rating: 5, content: '' }
   showEvalModal.value = true
 }
 
@@ -220,7 +220,7 @@ async function handleEvalSubmit() {
   try {
     await addSupplierEvaluation(supplierId.value, {
       rating: evalForm.value.rating,
-      comment: evalForm.value.comment || undefined,
+      content: evalForm.value.content || undefined,
     })
     message.success('评价添加成功')
     showEvalModal.value = false
@@ -245,8 +245,8 @@ onMounted(async () => {
 
     <NPageHeader :title="supplier.name">
       <template #extra>
-        <NTag :type="statusColorMap[supplier.status] as any">
-          {{ statusLabelMap[supplier.status] || supplier.status }}
+        <NTag :type="statusColorMap[supplier.cooperation_status] as any">
+          {{ statusLabelMap[supplier.cooperation_status] || supplier.cooperation_status }}
         </NTag>
       </template>
     </NPageHeader>
@@ -257,15 +257,15 @@ onMounted(async () => {
         <NDescriptionsItem label="类型">
           <NTag size="small">{{ typeLabelMap[supplier.type] || supplier.type }}</NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="联系人">{{ supplier.contact_name }}</NDescriptionsItem>
-        <NDescriptionsItem label="电话">{{ supplier.contact_phone }}</NDescriptionsItem>
+        <NDescriptionsItem label="联系人">{{ supplier.contact }}</NDescriptionsItem>
+        <NDescriptionsItem label="电话">{{ supplier.phone }}</NDescriptionsItem>
         <NDescriptionsItem label="地址">{{ supplier.address || '-' }}</NDescriptionsItem>
         <NDescriptionsItem label="状态">
-          <NTag :type="statusColorMap[supplier.status] as any" size="small">
-            {{ statusLabelMap[supplier.status] || supplier.status }}
+          <NTag :type="statusColorMap[supplier.cooperation_status] as any" size="small">
+            {{ statusLabelMap[supplier.cooperation_status] || supplier.cooperation_status }}
           </NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="备注" :span="3">{{ supplier.remark || '-' }}</NDescriptionsItem>
+        <NDescriptionsItem label="备注" :span="3">{{ supplier.note || '-' }}</NDescriptionsItem>
       </NDescriptions>
     </NCard>
 
@@ -305,8 +305,8 @@ onMounted(async () => {
             </NSpace>
             <span style="color: #999; font-size: 12px;">{{ evaluation.created_at }}</span>
           </NSpace>
-          <div v-if="evaluation.comment" style="margin-top: 8px; color: #333; font-size: 14px;">
-            {{ evaluation.comment }}
+          <div v-if="evaluation.content" style="margin-top: 8px; color: #333; font-size: 14px;">
+            {{ evaluation.content }}
           </div>
         </div>
       </div>
@@ -371,9 +371,9 @@ onMounted(async () => {
         <NFormItem path="rating" label="评分">
           <NRate v-model:value="evalForm.rating" allow-half />
         </NFormItem>
-        <NFormItem path="comment" label="内容">
+        <NFormItem path="content" label="内容">
           <NInput
-            v-model:value="evalForm.comment"
+            v-model:value="evalForm.content"
             type="textarea"
             placeholder="请输入评价内容"
             :rows="4"

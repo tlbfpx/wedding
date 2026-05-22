@@ -24,7 +24,8 @@ router = APIRouter()
 class EventCreate(BaseModel):
     order_id: Optional[int] = None
     title: str
-    date: date
+    date: Optional[date] = None
+    event_date: Optional[str] = None  # alias from frontend
     start_time: Optional[str] = None
     end_time: Optional[str] = None
     venue_id: Optional[int] = None
@@ -68,7 +69,7 @@ async def list_events(
     planner_id: Optional[int] = Query(None),
     venue_id: Optional[int] = Query(None),
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -102,7 +103,7 @@ async def list_events(
     events = result.scalars().all()
 
     return PageResponse(
-        items=[_event_to_dict(e) for e in events],
+        items=[await _event_to_dict(e, db) for e in events],
         total=total,
         page=page,
         page_size=page_size,
@@ -181,7 +182,7 @@ async def get_event(
     staff = staff_result.scalars().all()
 
     return {
-        **_event_to_dict(event),
+        **await _event_to_dict(event, db),
         "resources": [_resource_to_dict(r) for r in resources],
         "staff": [_staff_schedule_to_dict(s) for s in staff],
     }
@@ -194,10 +195,17 @@ async def create_event(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    event_date = body.date
+    if not event_date and body.event_date:
+        event_date = date.fromisoformat(body.event_date)
+
+    if not event_date:
+        raise AppException(400, "MISSING_DATE", "活动日期不能为空")
+
     conflicts = await _detect_conflicts(
         db=db,
         venue_id=body.venue_id,
-        date=body.date,
+        date=event_date,
         staff_ids=None,
         exclude_event_id=None,
     )
@@ -207,7 +215,7 @@ async def create_event(
     event = Event(
         order_id=body.order_id,
         title=body.title,
-        date=body.date,
+        date=event_date,
         venue_id=body.venue_id,
         planner_id=body.planner_id,
         status=EventStatus.draft,
@@ -218,7 +226,7 @@ async def create_event(
     await db.refresh(event)
 
     await log_operation(db, user.id, request, {"event_id": event.id, "title": event.title})
-    return _event_to_dict(event)
+    return await _event_to_dict(event, db)
 
 
 @router.put("/{event_id}")
@@ -256,7 +264,7 @@ async def update_event(
     await db.refresh(event)
 
     await log_operation(db, user.id, request, {"event_id": event_id, "updated_fields": list(update_data.keys())})
-    return _event_to_dict(event)
+    return await _event_to_dict(event, db)
 
 
 # ── Resource Routes ──────────────────────────────────────────────────────────
@@ -369,17 +377,36 @@ async def _detect_conflicts(
     return conflicts
 
 
-def _event_to_dict(e: Event) -> dict:
+async def _event_to_dict(e: Event, db: Optional[AsyncSession] = None) -> dict:
+    venue_name = None
+    if e.venue_id and db:
+        from app.models.event import Venue
+        vresult = await db.execute(select(Venue).where(Venue.id == e.venue_id))
+        venue = vresult.scalar_one_or_none()
+        if venue:
+            venue_name = venue.name
+
+    planner_name = None
+    if e.planner_id and db:
+        from app.models.user import User
+        presult = await db.execute(select(User).where(User.id == e.planner_id))
+        planner = presult.scalar_one_or_none()
+        if planner:
+            planner_name = planner.name
+
     return {
         "id": e.id,
         "order_id": e.order_id,
         "title": e.title,
+        "event_date": str(e.date) if e.date else None,
         "date": str(e.date) if e.date else None,
         "start_time": str(e.start_time) if e.start_time else None,
         "end_time": str(e.end_time) if e.end_time else None,
         "venue_id": e.venue_id,
+        "venue": {"id": e.venue_id, "name": venue_name} if e.venue_id else None,
         "status": e.status.value,
         "planner_id": e.planner_id,
+        "planner": {"id": e.planner_id, "name": planner_name} if e.planner_id else None,
         "note": e.note,
         "created_at": e.created_at.isoformat() if e.created_at else None,
         "updated_at": e.updated_at.isoformat() if e.updated_at else None,

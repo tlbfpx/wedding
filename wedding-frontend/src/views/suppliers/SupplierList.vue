@@ -43,7 +43,7 @@ const pagination = reactive({
 // Filters
 const filters = reactive({
   type: null as string | null,
-  status: null as string | null,
+  cooperation_status: null as string | null,
   keyword: '',
   rating_min: null as number | null,
 })
@@ -104,18 +104,18 @@ const formRef = ref<FormInst | null>(null)
 const formValue = ref({
   name: '',
   type: null as string | null,
-  contact_name: '',
-  contact_phone: '',
+  contact: '',
+  phone: '',
   address: '',
-  status: 'active' as string,
-  remark: '',
+  cooperation_status: 'active' as string,
+  note: '',
 })
 
 const formRules: FormRules = {
   name: { required: true, message: '请输入供应商名称', trigger: 'blur' },
   type: { required: true, message: '请选择类型', trigger: 'change' },
-  contact_name: { required: true, message: '请输入联系人', trigger: 'blur' },
-  contact_phone: { required: true, message: '请输入联系电话', trigger: 'blur' },
+  contact: { required: true, message: '请输入联系人', trigger: 'blur' },
+  phone: { required: true, message: '请输入联系电话', trigger: 'blur' },
 }
 
 const columns: DataTableColumns<Supplier> = [
@@ -130,15 +130,15 @@ const columns: DataTableColumns<Supplier> = [
       })
     },
   },
-  { title: '联系人', key: 'contact_name', width: 100 },
-  { title: '电话', key: 'contact_phone', width: 130 },
+  { title: '联系人', key: 'contact', width: 100 },
+  { title: '电话', key: 'phone', width: 130 },
   {
     title: '状态',
-    key: 'status',
+    key: 'cooperation_status',
     width: 90,
     render(row) {
-      return h(NTag, { type: statusColorMap[row.status] as any, size: 'small' }, {
-        default: () => statusLabelMap[row.status] || row.status,
+      return h(NTag, { type: statusColorMap[row.cooperation_status] as any, size: 'small' }, {
+        default: () => statusLabelMap[row.cooperation_status] || row.cooperation_status,
       })
     },
   },
@@ -173,7 +173,7 @@ async function fetchSuppliers() {
       page_size: pagination.pageSize,
     }
     if (filters.type) params.type = filters.type
-    if (filters.status) params.status = filters.status
+    if (filters.cooperation_status) params.cooperation_status = filters.cooperation_status
     if (filters.keyword) params.keyword = filters.keyword
     const res = await getSuppliers(params)
     suppliers.value = res.items
@@ -206,11 +206,11 @@ function openCreateModal() {
   formValue.value = {
     name: '',
     type: null,
-    contact_name: '',
-    contact_phone: '',
+    contact: '',
+    phone: '',
     address: '',
-    status: 'active',
-    remark: '',
+    cooperation_status: 'active',
+    note: '',
   }
   showModal.value = true
 }
@@ -220,11 +220,11 @@ function openEditModal(supplier: Supplier) {
   formValue.value = {
     name: supplier.name,
     type: supplier.type,
-    contact_name: supplier.contact_name,
-    contact_phone: supplier.contact_phone,
+    contact: supplier.contact,
+    phone: supplier.phone,
     address: supplier.address || '',
-    status: supplier.status,
-    remark: supplier.remark || '',
+    cooperation_status: supplier.cooperation_status,
+    note: supplier.note || '',
   }
   showModal.value = true
 }
@@ -241,11 +241,11 @@ async function handleSubmit() {
     const data = {
       name: formValue.value.name,
       type: formValue.value.type!,
-      contact_name: formValue.value.contact_name,
-      contact_phone: formValue.value.contact_phone,
+      contact: formValue.value.contact,
+      phone: formValue.value.phone,
       address: formValue.value.address || undefined,
-      status: formValue.value.status,
-      remark: formValue.value.remark || undefined,
+      cooperation_status: formValue.value.cooperation_status,
+      note: formValue.value.note || undefined,
     }
     if (editingSupplier.value) {
       await updateSupplier(editingSupplier.value.id, data)
@@ -286,7 +286,7 @@ onMounted(() => {
           style="width: 140px;"
         />
         <NSelect
-          v-model:value="filters.status"
+          v-model:value="filters.cooperation_status"
           :options="statusOptions"
           placeholder="状态"
           clearable
@@ -345,24 +345,24 @@ onMounted(() => {
             placeholder="请选择类型"
           />
         </NFormItem>
-        <NFormItem path="contact_name" label="联系人">
-          <NInput v-model:value="formValue.contact_name" placeholder="请输入联系人" />
+        <NFormItem path="contact" label="联系人">
+          <NInput v-model:value="formValue.contact" placeholder="请输入联系人" />
         </NFormItem>
-        <NFormItem path="contact_phone" label="电话">
-          <NInput v-model:value="formValue.contact_phone" placeholder="请输入联系电话" />
+        <NFormItem path="phone" label="电话">
+          <NInput v-model:value="formValue.phone" placeholder="请输入联系电话" />
         </NFormItem>
         <NFormItem path="address" label="地址">
           <NInput v-model:value="formValue.address" placeholder="请输入地址" />
         </NFormItem>
-        <NFormItem path="status" label="状态">
+        <NFormItem path="cooperation_status" label="状态">
           <NSelect
-            v-model:value="formValue.status"
+            v-model:value="formValue.cooperation_status"
             :options="statusOptions"
             placeholder="请选择状态"
           />
         </NFormItem>
-        <NFormItem path="remark" label="备注">
-          <NInput v-model:value="formValue.remark" type="textarea" placeholder="请输入备注" :rows="3" />
+        <NFormItem path="note" label="备注">
+          <NInput v-model:value="formValue.note" type="textarea" placeholder="请输入备注" :rows="3" />
         </NFormItem>
       </NForm>
       <template #action>

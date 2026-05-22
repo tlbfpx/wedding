@@ -21,10 +21,10 @@ export interface Role {
 export interface OperationLog {
   id: number
   user_id: number
-  user_name: string
+  user_name?: string
   action: string
-  resource_type: string
-  resource_id?: number
+  module: string
+  target?: string
   detail?: string
   ip?: string
   created_at: string

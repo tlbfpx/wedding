@@ -3,12 +3,12 @@ import request from './index'
 export interface Supplier {
   id: number
   name: string
-  contact_name: string
-  contact_phone: string
+  contact: string
+  phone: string
   type: string
   address?: string
-  status: string
-  remark?: string
+  cooperation_status: string
+  note?: string
   services?: SupplierService[]
   created_at: string
   updated_at: string
@@ -16,7 +16,7 @@ export interface Supplier {
 
 export interface SupplierService {
   id: number
-  name: string
+  service_name: string
   category: string
   unit_price: number
   description?: string
@@ -27,7 +27,7 @@ export interface SupplierEvaluation {
   supplier_id: number
   order_id: number
   rating: number
-  comment?: string
+  content?: string
   evaluator?: { id: number; name: string }
   created_at: string
 }
@@ -37,7 +37,7 @@ export interface SupplierListParams {
   page_size?: number
   keyword?: string
   type?: string
-  status?: string
+  cooperation_status?: string
 }
 
 export interface PaginatedResult<T> {

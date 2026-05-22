@@ -116,8 +116,8 @@ async function fetchEvents() {
     const startDate = new Date(year, month - 1, 1)
     const endDate = new Date(year, month + 2, 0)
     const res = await getEvents({
-      start_date: dateToStr(startDate.getTime()),
-      end_date: dateToStr(endDate.getTime()),
+      date_start: dateToStr(startDate.getTime()),
+      date_end: dateToStr(endDate.getTime()),
       page_size: 200,
     })
     events.value = res.items
@@ -163,8 +163,8 @@ async function checkConflicts() {
     const dateStr = dateToStr(formValue.value.event_date)
     // Fetch all events on the same date to check conflicts client-side
     const res = await getEvents({
-      start_date: dateStr,
-      end_date: dateStr,
+      date_start: dateStr,
+      date_end: dateStr,
       venue_id: formValue.value.venue_id ?? undefined,
       page_size: 100,
     })
@@ -206,7 +206,7 @@ async function handleSubmit() {
       start_time: startStr,
       end_time: endStr,
       venue_id: formValue.value.venue_id ?? undefined,
-      remark: formValue.value.remark || undefined,
+      note: formValue.value.remark || undefined,
     })
     message.success('活动创建成功')
     showModal.value = false

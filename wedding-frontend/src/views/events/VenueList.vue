@@ -223,8 +223,8 @@ async function fetchSchedule() {
     const startStr = new Date(start).toISOString().slice(0, 10)
     const endStr = new Date(end).toISOString().slice(0, 10)
     const res = await getEvents({
-      start_date: startStr,
-      end_date: endStr,
+      date_start: startStr,
+      date_end: endStr,
       venue_id: scheduleVenue.value.id,
       page_size: 100,
     })
