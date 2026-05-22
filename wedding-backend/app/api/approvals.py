@@ -6,7 +6,6 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 
 from app.database import get_db
 from app.models import Approval, Order
@@ -16,21 +15,9 @@ from app.models.user import User
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
+from app.schemas.approval import ApprovalCreate, ApprovalDecision
 
 router = APIRouter()
-
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
-class ApprovalCreate(BaseModel):
-    type: ApprovalType
-    target_id: int
-    reason: str
-
-
-class ApprovalDecision(BaseModel):
-    status: ApprovalStatus
-    note: Optional[str] = None
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────

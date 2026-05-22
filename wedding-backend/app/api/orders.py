@@ -8,7 +8,6 @@ from io import BytesIO
 from fastapi import APIRouter, Depends, Query, Request, UploadFile, File
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 
 from app.database import get_db
 from app.models import Order, OrderItem, Payment, Contract
@@ -19,6 +18,7 @@ from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
 from app.config import settings
+from app.schemas.order import OrderItemInput, OrderCreate, OrderUpdate, StatusTransition, PaymentCreate
 
 router = APIRouter()
 
@@ -29,42 +29,6 @@ VALID_TRANSITIONS = {
     OrderStatus.completed: [],
     OrderStatus.cancelled: [],
 }
-
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
-class OrderItemInput(BaseModel):
-    type: ItemType
-    name: str
-    quantity: int = 1
-    unit_price: float
-    supplier_id: Optional[int] = None
-    note: Optional[str] = None
-
-
-class OrderCreate(BaseModel):
-    customer_id: int
-    planner_id: Optional[int] = None
-    sale_id: int
-    discount: Optional[float] = 1.00
-    note: Optional[str] = None
-    items: list[OrderItemInput]
-
-
-class OrderUpdate(BaseModel):
-    note: Optional[str] = None
-    discount: Optional[float] = None
-    planner_id: Optional[int] = None
-
-
-class StatusTransition(BaseModel):
-    status: OrderStatus
-
-
-class PaymentCreate(BaseModel):
-    amount: float
-    method: PaymentMethod
-    note: Optional[str] = None
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────
