@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 from enum import Enum as PyEnum
 from typing import Optional
+
 from sqlalchemy import String, Text, ForeignKey, Boolean, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.base import Base, TimestampMixin
 
 
