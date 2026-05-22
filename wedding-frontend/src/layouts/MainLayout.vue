@@ -39,57 +39,81 @@ function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
-const menuOptions: MenuOption[] = [
-  {
-    label: '工作台',
-    key: '/dashboard',
-    icon: renderIcon(HomeOutline),
-  },
-  {
-    label: '客户管理',
-    key: 'customer-group',
-    icon: renderIcon(PeopleOutline),
-    children: [
-      { label: '客户列表', key: '/customers' },
-      { label: '公海池', key: '/customer-pool' },
-    ],
-  },
-  {
-    label: '排期管理',
-    key: '/events',
-    icon: renderIcon(CalendarOutline),
-  },
-  {
-    label: '订单管理',
-    key: 'order-group',
-    icon: renderIcon(DocumentTextOutline),
-    children: [
-      { label: '订单列表', key: '/orders' },
-      { label: '新建订单', key: '/orders/create' },
-    ],
-  },
-  {
-    label: '供应商管理',
-    key: '/suppliers',
-    icon: renderIcon(BusinessOutline),
-  },
-  {
-    label: '员工管理',
-    key: '/users',
-    icon: renderIcon(PersonOutline),
-  },
-  {
+const menuOptions = computed<MenuOption[]>(() => {
+  const has = (module: string, action: string = 'read') => authStore.hasPermission(`${module}:${action}`)
+
+  const items: MenuOption[] = []
+
+  if (has('dashboard')) {
+    items.push({
+      label: '工作台',
+      key: '/dashboard',
+      icon: renderIcon(HomeOutline),
+    })
+  }
+
+  if (has('customers')) {
+    items.push({
+      label: '客户管理',
+      key: 'customer-group',
+      icon: renderIcon(PeopleOutline),
+      children: [
+        { label: '客户列表', key: '/customers' },
+        { label: '公海池', key: '/customer-pool' },
+      ],
+    })
+  }
+
+  if (has('events')) {
+    items.push({
+      label: '排期管理',
+      key: '/events',
+      icon: renderIcon(CalendarOutline),
+    })
+  }
+
+  if (has('orders')) {
+    items.push({
+      label: '订单管理',
+      key: 'order-group',
+      icon: renderIcon(DocumentTextOutline),
+      children: [
+        { label: '订单列表', key: '/orders' },
+        ...(has('orders', 'write') ? [{ label: '新建订单', key: '/orders/create' }] : []),
+      ],
+    })
+  }
+
+  if (has('suppliers')) {
+    items.push({
+      label: '供应商管理',
+      key: '/suppliers',
+      icon: renderIcon(BusinessOutline),
+    })
+  }
+
+  if (has('users') || has('roles')) {
+    items.push({
+      label: '员工管理',
+      key: '/users',
+      icon: renderIcon(PersonOutline),
+    })
+  }
+
+  items.push({
     label: '系统设置',
     key: 'system-group',
     icon: renderIcon(SettingsOutline),
     children: [
-      { label: '角色权限', key: '/roles' },
-      { label: '操作日志', key: '/operation-logs' },
+      ...(has('roles') ? [{ label: '角色权限', key: '/roles' }] : []),
+      ...(has('users') ? [{ label: '操作日志', key: '/operation-logs' }] : []),
       { label: '审批管理', key: '/approvals' },
       { label: '消息通知', key: '/notifications' },
     ],
-  },
-]
+  })
+
+  return items
+})
 
 const activeKey = computed(() => route.path)
 
