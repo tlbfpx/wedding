@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from pydantic import BaseModel
 from typing import Optional
 
 from app.database import get_db
@@ -15,44 +14,9 @@ from app.models.user import User
 from app.utils.errors import AppException
 from app.utils.pagination import PageParams, PageResponse
 from app.middleware.logging import log_operation
+from app.schemas.customer import CustomerCreate, CustomerUpdate, FollowUpCreate, TransferRequest
 
 router = APIRouter()
-
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
-class CustomerCreate(BaseModel):
-    name: str
-    phone: str
-    gender: Optional[Gender] = Gender.unknown
-    source_id: Optional[int] = None
-    budget_range: Optional[str] = None
-    wedding_date: Optional[date] = None
-    note: Optional[str] = None
-    assigned_sale_id: Optional[int] = None
-
-
-class CustomerUpdate(BaseModel):
-    name: Optional[str] = None
-    phone: Optional[str] = None
-    gender: Optional[Gender] = None
-    source_id: Optional[int] = None
-    status: Optional[CustomerStatus] = None
-    budget_range: Optional[str] = None
-    wedding_date: Optional[date] = None
-    note: Optional[str] = None
-    assigned_sale_id: Optional[int] = None
-    version: int
-
-
-class FollowUpCreate(BaseModel):
-    type: FollowUpType
-    content: str
-    next_follow_at: Optional[datetime] = None
-
-
-class TransferRequest(BaseModel):
-    target_sale_id: int
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────

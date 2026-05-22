@@ -5,7 +5,6 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select, func, and_, delete, extract
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 
 from app.database import get_db
 from app.models import Event, EventResource, StaffSchedule
@@ -15,47 +14,9 @@ from app.models.user import User
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
+from app.schemas.event import EventCreate, EventUpdate, ResourceInput, ConflictCheck
 
 router = APIRouter()
-
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
-class EventCreate(BaseModel):
-    order_id: Optional[int] = None
-    title: str
-    date: Optional[date] = None
-    event_date: Optional[str] = None  # alias from frontend
-    start_time: Optional[str] = None
-    end_time: Optional[str] = None
-    venue_id: Optional[int] = None
-    planner_id: Optional[int] = None
-    note: Optional[str] = None
-
-
-class EventUpdate(BaseModel):
-    title: Optional[str] = None
-    date: Optional[date] = None
-    start_time: Optional[str] = None
-    end_time: Optional[str] = None
-    venue_id: Optional[int] = None
-    planner_id: Optional[int] = None
-    status: Optional[EventStatus] = None
-    note: Optional[str] = None
-
-
-class ResourceInput(BaseModel):
-    resource_type: ResourceType
-    resource_id: int
-    quantity: int = 1
-    note: Optional[str] = None
-
-
-class ConflictCheck(BaseModel):
-    venue_id: Optional[int] = None
-    date: date
-    staff_ids: Optional[list[int]] = None
-    exclude_event_id: Optional[int] = None
 
 
 # ── Event Routes ─────────────────────────────────────────────────────────────
