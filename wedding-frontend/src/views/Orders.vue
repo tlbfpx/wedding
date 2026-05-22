@@ -17,6 +17,7 @@ import {
 import type { DataTableColumns } from 'naive-ui'
 import { getOrders } from '@/api/orders'
 import type { Order, PaginatedResult } from '@/api/orders'
+import { exportReport } from '@/api/reports'
 
 const router = useRouter()
 const message = useMessage()
@@ -194,6 +195,27 @@ function handleCreate() {
   router.push('/orders/create')
 }
 
+async function handleExport() {
+  try {
+    const params: any = { report_type: 'order' }
+    if (filters.status) params.status = filters.status
+    if (filters.dateRange) {
+      params.date_start = new Date(filters.dateRange[0]).toISOString().slice(0, 10)
+      params.date_end = new Date(filters.dateRange[1]).toISOString().slice(0, 10)
+    }
+    const blob = await exportReport(params)
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `订单报表_${new Date().toISOString().slice(0, 10)}.xlsx`
+    link.click()
+    window.URL.revokeObjectURL(url)
+    message.success('导出成功')
+  } catch (e: any) {
+    message.error(e.message || '导出失败')
+  }
+}
+
 onMounted(() => {
   fetchData()
 })
@@ -203,7 +225,10 @@ onMounted(() => {
   <div>
     <NPageHeader title="订单管理" subtitle="管理所有订单信息">
       <template #extra>
-        <NButton type="primary" @click="handleCreate">新建订单</NButton>
+        <NSpace>
+          <NButton @click="handleExport">导出</NButton>
+          <NButton type="primary" @click="handleCreate">新建订单</NButton>
+        </NSpace>
       </template>
     </NPageHeader>
 

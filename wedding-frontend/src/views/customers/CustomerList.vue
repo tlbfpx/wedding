@@ -13,6 +13,7 @@ import {
   NModal,
   NTag,
   NPopconfirm,
+  NUpload,
   useMessage,
   type DataTableColumns,
 } from 'naive-ui'
@@ -24,6 +25,8 @@ import {
 import type { Customer, CustomerListParams } from '@/api/customers'
 import { getUsers } from '@/api/users'
 import type { User } from '@/api/users'
+import { exportReport } from '@/api/reports'
+import { downloadTemplate, uploadImport } from '@/api/imports'
 import CustomerForm from './CustomerForm.vue'
 
 const router = useRouter()
@@ -303,6 +306,54 @@ function handleFormSuccess() {
   fetchCustomers()
 }
 
+// --- Export & Import ---
+const showImportModal = ref(false)
+const importResult = ref<any>(null)
+
+async function handleExport() {
+  try {
+    const blob = await exportReport({ report_type: 'customer' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `客户报表_${new Date().toISOString().slice(0, 10)}.xlsx`
+    link.click()
+    window.URL.revokeObjectURL(url)
+    message.success('导出成功')
+  } catch (e: any) {
+    message.error(e.message || '导出失败')
+  }
+}
+
+async function handleDownloadTemplate() {
+  try {
+    const blob = await downloadTemplate('customer')
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '客户导入模板.xlsx'
+    link.click()
+    window.URL.revokeObjectURL(url)
+  } catch (e: any) {
+    message.error(e.message || '下载失败')
+  }
+}
+
+async function handleImport({ file }: { file: { file: File } }) {
+  try {
+    const res = await uploadImport('customer', file.file)
+    importResult.value = res
+    if (res.failed === 0) {
+      message.success(`导入成功，共 ${res.success} 条`)
+    } else {
+      message.warning(`导入完成：成功 ${res.success} 条，失败 ${res.failed} 条`)
+    }
+    await fetchCustomers()
+  } catch (e: any) {
+    message.error(e.message || '导入失败')
+  }
+}
+
 // --- Lifecycle ---
 onMounted(() => {
   fetchCustomers()
@@ -313,7 +364,11 @@ onMounted(() => {
   <div>
     <NPageHeader title="客户管理">
       <template #extra>
-        <NButton type="primary" @click="handleCreate">新增客户</NButton>
+        <NSpace>
+          <NButton @click="handleExport">导出</NButton>
+          <NButton @click="showImportModal = true; importResult = null">导入</NButton>
+          <NButton type="primary" @click="handleCreate">新增客户</NButton>
+        </NSpace>
       </template>
     </NPageHeader>
 
@@ -407,6 +462,32 @@ onMounted(() => {
           </NButton>
         </NSpace>
       </template>
+    </NModal>
+
+    <!-- Import modal -->
+    <NModal v-model:show="showImportModal" preset="card" title="数据导入" style="width: 500px">
+      <NSpace vertical>
+        <NButton @click="handleDownloadTemplate" type="primary" text>下载导入模板</NButton>
+        <NUpload
+          :max="1"
+          accept=".xlsx,.csv"
+          :custom-request="handleImport"
+          :show-file-list="false"
+        >
+          <NButton type="primary">选择文件上传</NButton>
+        </NUpload>
+        <div v-if="importResult" style="margin-top: 12px">
+          <p>总行数: {{ importResult.total }}</p>
+          <p style="color: #18a058">成功: {{ importResult.success }}</p>
+          <p style="color: #d03050">失败: {{ importResult.failed }}</p>
+          <div v-if="importResult.errors && importResult.errors.length > 0" style="margin-top: 8px">
+            <p style="font-weight: 600">错误详情:</p>
+            <div v-for="(err, i) in importResult.errors" :key="i" style="color: #d03050; font-size: 13px">
+              第 {{ err.row }} 行 [{{ err.field }}]: {{ err.message }}
+            </div>
+          </div>
+        </div>
+      </NSpace>
     </NModal>
   </div>
 </template>
