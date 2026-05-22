@@ -41,6 +41,9 @@ class OrderService:
         date_end: Optional[date] = None,
         page: int = 1,
         page_size: int = 20,
+        scope: str = "all",
+        user_id: Optional[int] = None,
+        user_team: Optional[str] = None,
     ) -> PageResponse:
         query = select(Order)
 
@@ -58,6 +61,13 @@ class OrderService:
             query = query.where(Order.created_at >= datetime.combine(date_start, datetime.min.time()))
         if date_end:
             query = query.where(Order.created_at <= datetime.combine(date_end, datetime.max.time()))
+
+        # Scope-based filtering
+        if scope == "own" and user_id:
+            query = query.where((Order.sale_id == user_id) | (Order.planner_id == user_id))
+        elif scope == "team" and user_team:
+            team_users = select(User.id).where(User.team == user_team)
+            query = query.where((Order.sale_id.in_(team_users)) | (Order.planner_id.in_(team_users)))
 
         total_result = await self.db.execute(select(func.count()).select_from(query.subquery()))
         total = total_result.scalar_one()

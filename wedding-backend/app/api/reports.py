@@ -6,8 +6,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.services.report_service import ReportService
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.utils.errors import AppException
 
 router = APIRouter()
@@ -21,7 +20,7 @@ async def export_report(
     status: Optional[str] = Query(None),
     sale_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("report", "read")),
 ):
     service = ReportService(db)
     if report_type == "order":

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional
-from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date
+from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin
 from datetime import datetime
@@ -35,6 +35,12 @@ class Customer(Base, TimestampMixin):
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     assigned_sale_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
     recycled_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
+
+    __table_args__ = (
+        Index("ix_customers_status", "status"),
+        Index("ix_customers_assigned_sale", "assigned_sale_id"),
+        Index("ix_customers_source", "source_id"),
+    )
 
 
 class FollowUpType(str, enum.Enum):

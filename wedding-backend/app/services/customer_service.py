@@ -26,6 +26,8 @@ class CustomerService:
         date_end: Optional[datetime],
         page: int,
         page_size: int,
+        scope: str = "all",
+        user_id: Optional[int] = None,
     ) -> tuple[list[dict], int]:
         query = select(Customer)
 
@@ -43,6 +45,8 @@ class CustomerService:
             query = query.where(Customer.created_at >= date_start)
         if date_end:
             query = query.where(Customer.created_at <= date_end)
+        if scope == "own" and user_id:
+            query = query.where(Customer.assigned_sale_id == user_id)
 
         total_result = await self.db.execute(select(func.count()).select_from(query.subquery()))
         total = total_result.scalar_one()

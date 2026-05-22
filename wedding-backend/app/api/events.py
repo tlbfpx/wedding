@@ -10,8 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models import EventResource
 from app.models.event import EventStatus
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
 from app.schemas.event import EventCreate, EventUpdate, ResourceInput, ConflictCheck
@@ -19,8 +18,6 @@ from app.services.event_service import EventService
 
 router = APIRouter()
 
-
-# ── Event Routes ─────────────────────────────────────────────────────────────
 
 @router.get("")
 async def list_events(
@@ -33,7 +30,7 @@ async def list_events(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     svc = EventService(db)
     items, total = await svc.list_events(
@@ -55,15 +52,13 @@ async def list_events(
     )
 
 
-# ── Static routes BEFORE parameterized /{event_id} ──────────────────────────
-
 @router.get("/staff-schedule")
 async def query_staff_schedule(
     date_param: Optional[date] = Query(None, alias="date"),
     staff_id: Optional[int] = Query(None),
     event_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     svc = EventService(db)
     return await svc.query_staff_schedule(
@@ -80,7 +75,7 @@ async def check_conflicts(
     staff_ids: Optional[str] = Query(None, description="Comma-separated staff IDs"),
     exclude_event_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     parsed_staff_ids = None
     if staff_ids:
@@ -95,13 +90,11 @@ async def check_conflicts(
     )
 
 
-# ── Parameterized routes ────────────────────────────────────────────────────
-
 @router.get("/{event_id}")
 async def get_event(
     event_id: int,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     svc = EventService(db)
     return await svc.get_event_detail(event_id)
@@ -112,11 +105,11 @@ async def create_event(
     body: EventCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     svc = EventService(db)
     result, event = await svc.create_event(body)
-    await log_operation(db, user.id, request, {"event_id": event.id, "title": event.title})
+    await log_operation(db, ctx["user"].id, request, {"event_id": event.id, "title": event.title})
     return result
 
 
@@ -126,21 +119,19 @@ async def update_event(
     body: EventUpdate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     svc = EventService(db)
     result, updated_fields = await svc.update_event(event_id, body)
-    await log_operation(db, user.id, request, {"event_id": event_id, "updated_fields": updated_fields})
+    await log_operation(db, ctx["user"].id, request, {"event_id": event_id, "updated_fields": updated_fields})
     return result
 
-
-# ── Resource Routes ──────────────────────────────────────────────────────────
 
 @router.get("/{event_id}/resources")
 async def list_resources(
     event_id: int,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     result = await db.execute(
         select(EventResource).where(EventResource.event_id == event_id)
@@ -155,11 +146,11 @@ async def add_resource(
     body: ResourceInput,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     svc = EventService(db)
     result, resource_id = await svc.add_resource(event_id, body)
-    await log_operation(db, user.id, request, {"event_id": event_id, "resource_id": resource_id})
+    await log_operation(db, ctx["user"].id, request, {"event_id": event_id, "resource_id": resource_id})
     return result
 
 
@@ -169,15 +160,13 @@ async def remove_resource(
     resource_id: int,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     svc = EventService(db)
     await svc.remove_resource(event_id, resource_id)
-    await log_operation(db, user.id, request, {"event_id": event_id, "removed_resource_id": resource_id})
+    await log_operation(db, ctx["user"].id, request, {"event_id": event_id, "removed_resource_id": resource_id})
     return {"message": "资源已移除"}
 
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
 
 def _resource_to_dict(r: EventResource) -> dict:
     return {

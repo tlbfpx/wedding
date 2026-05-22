@@ -238,10 +238,12 @@ async def test_role(db_session: AsyncSession) -> Role:
     """Create a default admin role with full permissions."""
     role = Role(
         name="管理员",
-        permissions='{"customer": {"read": "all", "write": "all"}, '
+        permissions='{"crm": {"read": "all", "write": "all"}, '
                     '"order": {"read": "all", "write": "all"}, '
                     '"supplier": {"read": "all", "write": "all"}, '
-                    '"event": {"read": "all", "write": "all"}, '
+                    '"schedule": {"read": "all", "write": "all"}, '
+                    '"dashboard": {"read": "all"}, '
+                    '"report": {"read": "all"}, '
                     '"system": {"read": "all", "write": "all"}}',
     )
     db_session.add(role)
@@ -252,7 +254,7 @@ async def test_role(db_session: AsyncSession) -> Role:
 
 @pytest_asyncio.fixture
 async def test_user(db_session: AsyncSession, test_role: Role) -> User:
-    """Create a test admin user and return the User object."""
+    """Create a test admin user."""
     import bcrypt
     password_hash = bcrypt.hashpw("testpass123".encode(), bcrypt.gensalt()).decode()
     user = User(
@@ -272,13 +274,18 @@ async def test_user(db_session: AsyncSession, test_role: Role) -> User:
 
 @pytest_asyncio.fixture
 async def test_sale_user(db_session: AsyncSession, test_role: Role) -> User:
-    """Create a test sales user."""
+    """Create a test sales user with limited permissions."""
     import bcrypt
     password_hash = bcrypt.hashpw("salepass123".encode(), bcrypt.gensalt()).decode()
     role = Role(
         name="销售",
-        permissions='{"customer": {"read": "own", "write": "own"}, '
-                    '"order": {"read": "own", "write": "own"}}',
+        permissions='{"crm": {"read": "own", "write": "own"}, '
+                    '"order": {"read": "own", "write": "own"}, '
+                    '"schedule": {"read": "all", "write": "none"}, '
+                    '"supplier": {"read": "none", "write": "none"}, '
+                    '"dashboard": {"read": "none"}, '
+                    '"report": {"read": "none"}, '
+                    '"system": {"read": "none", "write": "none"}}',
     )
     db_session.add(role)
     await db_session.commit()

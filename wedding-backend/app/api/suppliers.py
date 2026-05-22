@@ -1,12 +1,13 @@
 from __future__ import annotations
+
 from typing import Optional
+
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.supplier import SupplierType, CooperationStatus
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.middleware.logging import log_operation
 from app.schemas.supplier import (
     SupplierCreate,
@@ -20,8 +21,6 @@ from app.services.supplier_service import SupplierService
 router = APIRouter()
 
 
-# ── Supplier Routes ──────────────────────────────────────────────────────────
-
 @router.get("")
 async def list_suppliers(
     type: Optional[SupplierType] = Query(None),
@@ -31,7 +30,7 @@ async def list_suppliers(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "read")),
 ):
     svc = SupplierService(db)
     return await svc.list_suppliers(
@@ -48,7 +47,7 @@ async def list_suppliers(
 async def get_supplier(
     supplier_id: int,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "read")),
 ):
     svc = SupplierService(db)
     return await svc.get_supplier_detail(supplier_id)
@@ -59,11 +58,11 @@ async def create_supplier(
     body: SupplierCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "write")),
 ):
     svc = SupplierService(db)
     result = await svc.create_supplier(body)
-    await log_operation(db, user.id, request, {"supplier_id": result["id"], "name": result["name"]})
+    await log_operation(db, ctx["user"].id, request, {"supplier_id": result["id"], "name": result["name"]})
     return result
 
 
@@ -73,22 +72,20 @@ async def update_supplier(
     body: SupplierUpdate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "write")),
 ):
     svc = SupplierService(db)
     update_data = body.model_dump(exclude_unset=True)
     result = await svc.update_supplier(supplier_id, body)
-    await log_operation(db, user.id, request, {"supplier_id": supplier_id, "updated_fields": list(update_data.keys())})
+    await log_operation(db, ctx["user"].id, request, {"supplier_id": supplier_id, "updated_fields": list(update_data.keys())})
     return result
 
-
-# ── Service Routes ───────────────────────────────────────────────────────────
 
 @router.get("/{supplier_id}/services")
 async def list_services(
     supplier_id: int,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "read")),
 ):
     svc = SupplierService(db)
     return await svc.list_services(supplier_id)
@@ -100,11 +97,11 @@ async def add_service(
     body: ServiceCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "write")),
 ):
     svc = SupplierService(db)
     result = await svc.add_service(supplier_id, body)
-    await log_operation(db, user.id, request, {"supplier_id": supplier_id, "service_id": result["id"]})
+    await log_operation(db, ctx["user"].id, request, {"supplier_id": supplier_id, "service_id": result["id"]})
     return result
 
 
@@ -115,15 +112,13 @@ async def update_service(
     body: ServiceUpdate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "write")),
 ):
     svc = SupplierService(db)
     result = await svc.update_service(supplier_id, service_id, body)
-    await log_operation(db, user.id, request, {"supplier_id": supplier_id, "service_id": service_id})
+    await log_operation(db, ctx["user"].id, request, {"supplier_id": supplier_id, "service_id": service_id})
     return result
 
-
-# ── Evaluation Routes ────────────────────────────────────────────────────────
 
 @router.post("/{supplier_id}/evaluations")
 async def add_evaluation(
@@ -131,11 +126,11 @@ async def add_evaluation(
     body: EvaluationCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "write")),
 ):
     svc = SupplierService(db)
-    result = await svc.add_evaluation(supplier_id, body, user.id)
-    await log_operation(db, user.id, request, {"supplier_id": supplier_id, "evaluation_id": result["id"], "rating": body.rating})
+    result = await svc.add_evaluation(supplier_id, body, ctx["user"].id)
+    await log_operation(db, ctx["user"].id, request, {"supplier_id": supplier_id, "evaluation_id": result["id"], "rating": body.rating})
     return result
 
 
@@ -145,7 +140,7 @@ async def list_evaluations(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("supplier", "read")),
 ):
     svc = SupplierService(db)
     return await svc.list_evaluations(supplier_id, page, page_size)

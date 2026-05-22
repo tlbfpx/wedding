@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional
-from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Time, DECIMAL
+from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Time, DECIMAL, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin
 from datetime import datetime, date
@@ -42,6 +42,12 @@ class Event(Base, TimestampMixin):
     status: Mapped[EventStatus] = mapped_column(SAEnum(EventStatus), default=EventStatus.draft)
     planner_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        Index("ix_events_date", "date"),
+        Index("ix_events_status", "status"),
+        Index("ix_events_planner_id", "planner_id"),
+    )
 
 
 class EventResource(Base):

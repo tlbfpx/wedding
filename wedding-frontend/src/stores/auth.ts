@@ -57,6 +57,14 @@ export const useAuthStore = defineStore('auth', () => {
     return permissions.value.includes(permission)
   }
 
+  function hasAnyPermission(perms: string[]): boolean {
+    return perms.some(p => permissions.value.includes(p))
+  }
+
+  function hasModuleAccess(module: string): boolean {
+    return permissions.value.some(p => p.startsWith(`${module}:`))
+  }
+
   return {
     token,
     refreshTokenValue,
@@ -68,6 +76,8 @@ export const useAuthStore = defineStore('auth', () => {
     fetchUser,
     refreshToken,
     hasPermission,
+    hasAnyPermission,
+    hasModuleAccess,
     clearAuth,
   }
 })

@@ -5,8 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.services.import_service import ImportService
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.utils.errors import AppException
 
 router = APIRouter()
@@ -16,7 +15,7 @@ router = APIRouter()
 async def download_template(
     import_type: str = Query(..., description="customer/supplier"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("system", "write")),
 ):
     service = ImportService(db)
     return await service.get_template(import_type)
@@ -27,7 +26,7 @@ async def upload_import(
     import_type: str = Query(..., description="customer/supplier"),
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("system", "write")),
 ):
     service = ImportService(db)
     if import_type == "customer":

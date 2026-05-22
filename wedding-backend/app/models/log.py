@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base
 from datetime import datetime
@@ -17,3 +17,8 @@ class OperationLog(Base):
     detail: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    __table_args__ = (
+        Index("ix_operation_logs_user_id", "user_id"),
+        Index("ix_operation_logs_module", "module"),
+    )

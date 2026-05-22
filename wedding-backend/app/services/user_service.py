@@ -138,6 +138,11 @@ class UserService:
 
         await self.db.commit()
         await self.db.refresh(role)
+
+        # Invalidate permission cache
+        from app.utils.cache import redis_client
+        await redis_client.delete(f"role:perms:{role_id}")
+
         return _role_to_dict(role)
 
     async def list_operation_logs(

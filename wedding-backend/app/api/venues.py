@@ -3,23 +3,20 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 from app.database import get_db
 from app.models import Venue, Event
 from app.models.event import EventStatus
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from app.middleware.auth import require_permission
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.middleware.logging import log_operation
 
 router = APIRouter()
 
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
 
 class VenueCreate(BaseModel):
     name: str
@@ -41,8 +38,6 @@ class VenueUpdate(BaseModel):
     note: Optional[str] = None
 
 
-# ── Routes ───────────────────────────────────────────────────────────────────
-
 @router.get("")
 async def list_venues(
     keyword: Optional[str] = Query(None),
@@ -50,15 +45,12 @@ async def list_venues(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     query = select(Venue)
 
     if keyword:
-        query = query.where(
-            (Venue.name.like(f"%{keyword}%"))
-            | (Venue.address.like(f"%{keyword}%"))
-        )
+        query = query.where((Venue.name.like(f"%{keyword}%")) | (Venue.address.like(f"%{keyword}%")))
     if capacity_min is not None:
         query = query.where(Venue.capacity >= capacity_min)
 
@@ -84,7 +76,7 @@ async def create_venue(
     body: VenueCreate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     existing = await db.execute(select(Venue).where(Venue.name == body.name))
     if existing.scalar_one_or_none():
@@ -103,7 +95,7 @@ async def create_venue(
     await db.commit()
     await db.refresh(venue)
 
-    await log_operation(db, user.id, request, {"venue_id": venue.id, "name": venue.name})
+    await log_operation(db, ctx["user"].id, request, {"venue_id": venue.id, "name": venue.name})
     return _venue_to_dict(venue)
 
 
@@ -113,7 +105,7 @@ async def update_venue(
     body: VenueUpdate,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "write")),
 ):
     result = await db.execute(select(Venue).where(Venue.id == venue_id))
     venue = result.scalar_one_or_none()
@@ -132,7 +124,7 @@ async def update_venue(
     await db.commit()
     await db.refresh(venue)
 
-    await log_operation(db, user.id, request, {"venue_id": venue_id, "updated_fields": list(update_data.keys())})
+    await log_operation(db, ctx["user"].id, request, {"venue_id": venue_id, "updated_fields": list(update_data.keys())})
     return _venue_to_dict(venue)
 
 
@@ -142,7 +134,7 @@ async def check_availability(
     date_start: date = Query(...),
     date_end: date = Query(...),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
+    ctx: dict = Depends(require_permission("schedule", "read")),
 ):
     result = await db.execute(select(Venue).where(Venue.id == venue_id))
     if not result.scalar_one_or_none():
@@ -168,8 +160,6 @@ async def check_availability(
         "available": len(booked_dates) == 0,
     }
 
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
 
 def _venue_to_dict(v: Venue) -> dict:
     return {

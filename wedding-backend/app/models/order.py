@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional
-from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, DECIMAL, DateTime
+from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, DECIMAL, DateTime, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin
 from datetime import datetime
@@ -51,6 +51,12 @@ class Order(Base, TimestampMixin):
     paid_amount: Mapped[float] = mapped_column(DECIMAL(12, 2), default=0)
     discount: Mapped[float] = mapped_column(DECIMAL(3, 2), default=1.00)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        Index("ix_orders_status", "status"),
+        Index("ix_orders_sale_id", "sale_id"),
+        Index("ix_orders_planner_id", "planner_id"),
+    )
 
 
 class OrderItem(Base):
@@ -120,3 +126,7 @@ class Approval(Base):
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    __table_args__ = (
+        Index("ix_approvals_status", "status"),
+    )
