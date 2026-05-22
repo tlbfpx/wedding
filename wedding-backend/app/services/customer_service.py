@@ -107,6 +107,18 @@ class CustomerService:
             raise AppException(409, "VERSION_CONFLICT", "数据已被其他人修改，请刷新后重试")
 
         update_data = data.model_dump(exclude_unset=True, exclude={"version"})
+
+        # Validate phone uniqueness when phone is being changed
+        if update_data.get("phone") is not None and update_data["phone"] != customer.phone:
+            existing = await self.db.execute(
+                select(Customer).where(
+                    Customer.phone == update_data["phone"],
+                    Customer.id != customer_id,
+                )
+            )
+            if existing.scalar_one_or_none():
+                raise AppException(400, "DUPLICATE_PHONE", "手机号已被使用")
+
         for key, value in update_data.items():
             if value is not None:
                 setattr(customer, key, value)
