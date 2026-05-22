@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 from datetime import datetime
 import enum
 
@@ -23,7 +23,7 @@ class CooperationStatus(str, enum.Enum):
     blacklist = "blacklist"
 
 
-class Supplier(Base):
+class Supplier(Base, TimestampMixin):
     __tablename__ = "suppliers"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

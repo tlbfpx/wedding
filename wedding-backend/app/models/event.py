@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Time, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 from datetime import datetime, date
 import enum
 
@@ -29,7 +29,7 @@ class ScheduleStatus(str, enum.Enum):
     completed = "completed"
 
 
-class Event(Base):
+class Event(Base, TimestampMixin):
     __tablename__ = "events"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
