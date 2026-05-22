@@ -183,30 +183,29 @@ class SupplierService:
             evaluator_id=user_id,
         )
         self.db.add(evaluation)
+        await self.db.flush()
 
-        await self._recalculate_rating(supplier_id, data.rating)
+        await self._recalculate_rating(supplier_id)
 
         await self.db.commit()
         await self.db.refresh(evaluation)
         return _evaluation_to_dict(evaluation)
 
     async def _recalculate_rating(
-        self, supplier_id: int, new_rating: int
+        self, supplier_id: int
     ) -> None:
-        """Recalculate average rating including the newly added evaluation."""
+        """Recalculate average rating from all persisted evaluations."""
         avg_result = await self.db.execute(
-            select(func.avg(SupplierEvaluation.rating), func.count(SupplierEvaluation.id))
+            select(func.avg(SupplierEvaluation.rating))
             .where(SupplierEvaluation.supplier_id == supplier_id)
         )
-        avg_rating, count = avg_result.one()
-        # Include the new evaluation in the average
-        new_avg = ((avg_rating or 0) * count + new_rating) / (count + 1)
+        avg_rating = avg_result.scalar_one()
 
         supplier_result = await self.db.execute(
             select(Supplier).where(Supplier.id == supplier_id)
         )
         supplier = supplier_result.scalar_one()
-        supplier.rating = round(new_avg, 1)
+        supplier.rating = round(float(avg_rating or 0), 1)
 
     async def list_evaluations(
         self, supplier_id: int, page: int = 1, page_size: int = 20

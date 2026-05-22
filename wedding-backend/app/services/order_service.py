@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import random
 from datetime import datetime, date
 from decimal import Decimal
 from io import BytesIO
@@ -9,7 +10,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Order, OrderItem, Payment, Contract
+from app.models import Order, OrderItem, Payment, Contract, Customer, User
 from app.models.order import OrderStatus, ItemType, PaymentMethod, PaymentStatus, ContractStatus
 from app.schemas.order import OrderCreate, OrderUpdate, StatusTransition, PaymentCreate
 from app.utils.errors import AppException
@@ -103,6 +104,20 @@ class OrderService:
         }
 
     async def create_order(self, data: OrderCreate, user_id: int) -> Order:
+        # Validate customer exists
+        customer_result = await self.db.execute(
+            select(Customer).where(Customer.id == data.customer_id)
+        )
+        if not customer_result.scalar_one_or_none():
+            raise AppException(400, "INVALID_CUSTOMER", "客户不存在")
+
+        # Validate sale exists
+        sale_result = await self.db.execute(
+            select(User).where(User.id == data.sale_id)
+        )
+        if not sale_result.scalar_one_or_none():
+            raise AppException(400, "INVALID_SALE", "销售人员不存在")
+
         order_no = await self._generate_order_no()
 
         total_amount = Decimal("0")
@@ -158,6 +173,15 @@ class OrderService:
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(order, key, value)
+
+        # Recalculate total_amount when discount changes
+        if update_data.get("discount") is not None:
+            items_result = await self.db.execute(
+                select(OrderItem).where(OrderItem.order_id == order_id)
+            )
+            items = items_result.scalars().all()
+            subtotal = sum(Decimal(str(item.amount)) for item in items)
+            order.total_amount = float(subtotal * Decimal(str(order.discount)))
 
         await self.db.commit()
         await self.db.refresh(order)
@@ -329,17 +353,27 @@ class OrderService:
             order.paid_amount = 0
         return order
 
-    async def _generate_order_no(self) -> str:
+    async def _generate_order_no(self, max_retries: int = 3) -> str:
         today_str = datetime.utcnow().strftime("%Y%m%d")
         prefix = f"WD{today_str}"
 
-        result = await self.db.execute(
-            select(func.count()).select_from(Order).where(Order.order_no.like(f"{prefix}%"))
-        )
-        count = result.scalar_one()
+        for attempt in range(max_retries):
+            result = await self.db.execute(
+                select(func.count()).select_from(Order).where(
+                    Order.order_no.like(f"{prefix}%")
+                )
+            )
+            count = result.scalar_one()
+            candidate = f"{prefix}{str(count + 1 + attempt).zfill(3)}"
 
-        seq = str(count + 1).zfill(3)
-        return f"{prefix}{seq}"
+            existing = await self.db.execute(
+                select(Order).where(Order.order_no == candidate)
+            )
+            if not existing.scalar_one_or_none():
+                return candidate
+
+        # Fallback: use timestamp-based suffix to guarantee uniqueness
+        return f"{prefix}{str(int(datetime.utcnow().timestamp() * 1000) % 10000).zfill(4)}"
 
 
 # ── Serialization helpers ────────────────────────────────────────────────────
