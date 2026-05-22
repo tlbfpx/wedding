@@ -168,8 +168,23 @@ router.beforeEach(async (to, _from, next) => {
   // Check route-level permission if route has module meta
   const routeModule = to.meta.module as string | undefined
   if (routeModule) {
+    // Module name mapping: frontend names to backend keys
+    const moduleMap: Record<string, string> = {
+      'customers': 'crm',
+      'events': 'schedule',
+      'orders': 'order',
+      'suppliers': 'supplier',
+      'users': 'system',
+      'roles': 'system',
+    }
+
+    // Try both frontend module name and backend key
     const requiredPermission = `${routeModule}:read`
-    if (!authStore.hasPermission(requiredPermission)) {
+    const backendKey = moduleMap[routeModule]
+    const backendPermission = backendKey ? `${backendKey}:read` : ''
+
+    if (!authStore.hasPermission(requiredPermission) &&
+        (!backendPermission || !authStore.hasPermission(backendPermission))) {
       // Redirect to permission denied page
       next({ path: '/permission-denied' })
       return

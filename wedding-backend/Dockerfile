@@ -2,9 +2,10 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install system dependencies for MySQL client
+# Install system dependencies for MySQL client and curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
