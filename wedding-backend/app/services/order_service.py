@@ -10,7 +10,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Order, OrderItem, Payment, Contract
+from app.models import Order, OrderItem, Payment, Contract, Customer, User
 from app.models.order import OrderStatus, ItemType, PaymentMethod, PaymentStatus, ContractStatus
 from app.schemas.order import OrderCreate, OrderUpdate, StatusTransition, PaymentCreate
 from app.utils.errors import AppException
@@ -104,6 +104,20 @@ class OrderService:
         }
 
     async def create_order(self, data: OrderCreate, user_id: int) -> Order:
+        # Validate customer exists
+        customer_result = await self.db.execute(
+            select(Customer).where(Customer.id == data.customer_id)
+        )
+        if not customer_result.scalar_one_or_none():
+            raise AppException(400, "INVALID_CUSTOMER", "客户不存在")
+
+        # Validate sale exists
+        sale_result = await self.db.execute(
+            select(User).where(User.id == data.sale_id)
+        )
+        if not sale_result.scalar_one_or_none():
+            raise AppException(400, "INVALID_SALE", "销售人员不存在")
+
         order_no = await self._generate_order_no()
 
         total_amount = Decimal("0")
