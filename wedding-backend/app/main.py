@@ -9,6 +9,7 @@ from app.config import settings
 from app.database import get_db
 from app.utils.errors import AppException, ErrorDetail
 from app.api import auth, customers, suppliers, orders, approvals, events, venues, dashboard, users
+from app.events.handlers import register_event_handlers
 
 app = FastAPI(title=settings.APP_NAME, docs_url="/api/docs", redoc_url="/api/redoc")
 
@@ -35,6 +36,11 @@ app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
 app.include_router(venues.router, prefix="/api/v1/venues", tags=["venues"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboard"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+
+
+@app.on_event("startup")
+async def startup():
+    register_event_handlers()
 
 
 @app.get("/api/v1/health")
