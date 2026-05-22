@@ -95,7 +95,7 @@ class UserService:
         self.db.add(new_user)
         await self.db.commit()
         await self.db.refresh(new_user)
-        return {"user": _user_to_dict(new_user), "id": new_user.id, "username": data.username}
+        return _user_to_dict(new_user)
 
     async def update_user(self, user_id: int, data: UserUpdate) -> dict:
         result = await self.db.execute(select(User).where(User.id == user_id))
