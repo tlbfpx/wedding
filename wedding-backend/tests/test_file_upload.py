@@ -65,27 +65,46 @@ async def test_upload_contract_pdf(async_client: AsyncClient, auth_headers, test
 
 async def test_upload_invalid_type(async_client: AsyncClient, auth_headers, test_user):
     """
-    Uploading a non-PDF file to the contract endpoint.
-    The API currently does not validate file MIME type explicitly,
-    so any file is accepted. This test documents the current behavior.
+    Uploading a non-PDF file to the contract endpoint should be rejected.
     """
     customer = await _create_customer(async_client, auth_headers)
     order = await _create_order(
         async_client, auth_headers, customer["id"], test_user.id
     )
 
-    # Upload an executable file -- currently accepted because no type check
-    fake_content = b"not a valid file"
-    files = {"file": ("malware.exe", BytesIO(fake_content), "application/octet-stream")}
+    # Upload a text file with wrong extension - should be rejected due to magic bytes mismatch
+    fake_content = b"not a valid file content"
+    files = {"file": ("contract.txt", BytesIO(fake_content), "text/plain")}
 
     resp = await async_client.post(
         f"/api/v1/orders/{order['id']}/contract",
         headers=auth_headers,
         files=files,
     )
-    # The API does not filter by MIME type, so it accepts the upload.
-    # If file-type validation is added, change assertion to assert status == 400.
-    assert resp.status_code in (200, 400)
+    assert resp.status_code == 400
+    assert resp.json()["error"]["code"] == "INVALID_FILE_TYPE"
+
+
+async def test_upload_mismatched_mime_type(async_client: AsyncClient, auth_headers, test_user):
+    """
+    Uploading a file that claims to be PDF but has wrong magic bytes should be rejected.
+    """
+    customer = await _create_customer(async_client, auth_headers)
+    order = await _create_order(
+        async_client, auth_headers, customer["id"], test_user.id
+    )
+
+    # Content is not a PDF but claims to be in content_type
+    fake_pdf_content = b"This is not a real PDF file"
+    files = {"file": ("fake.pdf", BytesIO(fake_pdf_content), "application/pdf")}
+
+    resp = await async_client.post(
+        f"/api/v1/orders/{order['id']}/contract",
+        headers=auth_headers,
+        files=files,
+    )
+    assert resp.status_code == 400
+    assert resp.json()["error"]["code"] == "INVALID_FILE_TYPE"
 
 
 async def test_upload_too_large(async_client: AsyncClient, auth_headers, test_user):

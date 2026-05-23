@@ -79,8 +79,8 @@ class SupplierService:
 
         return {
             **_supplier_to_dict(supplier),
-            "services": [_service_to_dict(s) for s in services],
-            "evaluations": [_evaluation_to_dict(e) for e in evaluations],
+            "services": [_service_to_dict(s) for s in supplier.services],
+            "evaluations": [_evaluation_to_dict(e) for e in supplier.evaluations],
         }
 
     async def create_supplier(self, data: SupplierCreate) -> dict:

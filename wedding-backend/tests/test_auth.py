@@ -35,8 +35,8 @@ async def test_login_invalid_password(async_client: AsyncClient, test_user):
 
 async def test_login_account_locked(async_client: AsyncClient, test_user):
     """POST /api/v1/auth/login returns 403 after 5 failed attempts."""
-    # Simulate 5 failed login attempts
-    for _ in range(5):
+    # Simulate 5 failed login attempts with same username
+    for i in range(5):
         await async_client.post("/api/v1/auth/login", json={
             "username": "admin",
             "password": "wrong",

@@ -12,12 +12,17 @@ from app.api import auth, customers, suppliers, orders, approvals, events, venue
 from app.events.handlers import register_event_handlers
 from app.middleware.logging import setup_structured_logging, StructuredLoggingMiddleware
 from app.middleware.request_id import RequestIDMiddleware
+from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 # Setup structured logging first
 setup_structured_logging()
 logger = logging.getLogger("app")
 
 app = FastAPI(title=settings.APP_NAME, docs_url="/api/docs", redoc_url="/api/redoc")
+
+# Add rate limiter
+app.state.limiter = limiter
 
 # Add request ID middleware first
 app.add_middleware(RequestIDMiddleware)
@@ -43,6 +48,11 @@ async def app_exception_handler(request: Request, exc: AppException):
         extra={"request_id": request_id, "extra_data": {"status_code": exc.status_code, "error_code": exc.error.code}}
     )
     return JSONResponse(status_code=exc.status_code, content={"error": exc.error.model_dump()})
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return await rate_limit_exceeded_handler(request, exc)
 
 
 @app.exception_handler(Exception)

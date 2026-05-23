@@ -124,7 +124,7 @@ async def upload_contract(
 ):
     service = OrderService(db)
     content = await file.read()
-    contract = await service.upload_contract(order_id, content, file.filename)
+    contract = await service.upload_contract(order_id, content, file.filename, file.content_type)
     await log_operation(db, ctx["user"].id, request, {"order_id": order_id, "contract_id": contract.id})
     return contract_to_dict(contract)
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -11,6 +11,7 @@ from app.utils.auth import create_access_token, create_refresh_token, decode_tok
 from app.utils.cache import redis_client
 from app.middleware.auth import get_current_user, get_permissions_ctx
 from app.config import settings
+from app.middleware.rate_limit import limiter
 import json
 
 router = APIRouter()
@@ -32,15 +33,16 @@ class RefreshRequest(BaseModel):
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
-    lock_key = f"login:fail:{req.username}"
+@limiter.limit("20/minute")
+async def login(request: Request, req_body: LoginRequest, db: AsyncSession = Depends(get_db)):
+    lock_key = f"login:fail:{req_body.username}"
     fail_count = await redis_client.get(lock_key)
     if fail_count and int(fail_count) >= 5:
         raise HTTPException(status_code=403, detail={"code": "ACCOUNT_LOCKED", "message": "账户已锁定，请30分钟后重试"})
 
-    result = await db.execute(select(User).where(User.username == req.username, User.status == "active"))
+    result = await db.execute(select(User).where(User.username == req_body.username, User.status == "active"))
     user = result.scalar_one_or_none()
-    if not user or not bcrypt.checkpw(req.password.encode(), user.password_hash.encode()):
+    if not user or not bcrypt.checkpw(req_body.password.encode(), user.password_hash.encode()):
         await redis_client.incr(lock_key)
         await redis_client.expire(lock_key, 1800)
         raise HTTPException(status_code=401, detail={"code": "INVALID_CREDENTIALS", "message": "用户名或密码错误"})
