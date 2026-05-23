@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE_MB: int = 10
     APP_NAME: str = "婚庆管理系统"
     DEBUG: bool = True
+    SENTRY_DSN: str | None = None
 
     model_config = {"env_file": ".env"}
 

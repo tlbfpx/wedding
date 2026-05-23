@@ -1,55 +1,149 @@
 from __future__ import annotations
-from typing import Optional
-from fastapi import Request
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.log import OperationLog
+import logging
+import time
 import json
+from typing import Callable
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 
-WRITE_METHODS = {"POST", "PUT", "DELETE"}
-MODULE_MAP = {
-    "customers": "customer",
-    "customer-pool": "customer",
-    "events": "event",
-    "venues": "venue",
-    "staff-schedule": "event",
-    "orders": "order",
-    "approvals": "approval",
-    "suppliers": "supplier",
-    "users": "system",
-    "roles": "system",
-    "operation-logs": "system",
-}
+class StructuredLoggingMiddleware(BaseHTTPMiddleware):
+    """Middleware that logs requests in structured JSON format."""
+
+    def __init__(self, app, logger_name: str = "app.access"):
+        super().__init__(app)
+        self.logger = logging.getLogger(logger_name)
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        start_time = time.perf_counter()
+
+        # Extract user_id if available from request state
+        user_id = getattr(request.state, "user_id", None)
+
+        response = await call_next(request)
+
+        duration_ms = (time.perf_counter() - start_time) * 1000
+
+        log_data = {
+            "event": "http_request",
+            "method": request.method,
+            "path": str(request.url.path),
+            "status_code": response.status_code,
+            "duration_ms": round(duration_ms, 2),
+            "client_ip": request.client.host if request.client else None,
+        }
+
+        # Add request_id if available
+        request_id = getattr(request.state, "request_id", None)
+        if request_id:
+            log_data["request_id"] = request_id
+
+        # Add user_id if available
+        if user_id:
+            log_data["user_id"] = user_id
+
+        # Add query params if present (sanitized)
+        if request.query_params:
+            log_data["query_params"] = dict(request.query_params)
+
+        # Log based on status code
+        if response.status_code >= 500:
+            self.logger.error(json.dumps(log_data))
+        elif response.status_code >= 400:
+            self.logger.warning(json.dumps(log_data))
+        else:
+            self.logger.info(json.dumps(log_data))
+
+        return response
 
 
-def get_module_from_path(path: str) -> str:
+def setup_structured_logging():
+    """Configure structured JSON logging for the application."""
+    # Create formatters
+    class StructuredFormatter(logging.Formatter):
+        def format(self, record):
+            log_data = {
+                "time": self.formatTime(record, self.datefmt),
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+            }
+
+            # Add request_id if available in record
+            if hasattr(record, "request_id"):
+                log_data["request_id"] = record.request_id
+
+            # Add extra fields
+            if hasattr(record, "extra_data"):
+                log_data.update(record.extra_data)
+
+            return json.dumps(log_data)
+
+    # Configure root logger
+    root_logger = logging.getLogger("app")
+    root_logger.setLevel(logging.INFO)
+
+    # Remove existing handlers
+    root_logger.handlers.clear()
+
+    # Add structured handler
+    handler = logging.StreamHandler()
+    handler.setFormatter(StructuredFormatter())
+    root_logger.addHandler(handler)
+
+    # Configure access logger
+    access_logger = logging.getLogger("app.access")
+    access_logger.setLevel(logging.INFO)
+    access_logger.handlers.clear()
+
+    access_handler = logging.StreamHandler()
+    access_handler.setFormatter(StructuredFormatter())
+    access_logger.addHandler(access_handler)
+
+
+def get_request_logger(name: str = "app") -> logging.Logger:
+    """Get a logger that includes request context."""
+    return logging.getLogger(name)
+
+
+# ── log_operation helper ──────────────────────────────────────────────────────
+
+async def log_operation(db, user_id: int, request, detail: dict):
+    """Log a user operation to the database operation_logs table."""
+    from app.models.log import OperationLog
+    from starlette.requests import Request as StarletteRequest
+
+    # Extract operation info
+    module = _extract_module(request.url.path if hasattr(request, "url") else str(request))
+    action = _extract_action(request.method if hasattr(request, "method") else "unknown")
+    target = str(detail)[:100]
+    ip = request.client.host if hasattr(request, "client") and request.client else None
+
+    op_log = OperationLog(
+        user_id=user_id,
+        module=module,
+        action=action,
+        target=target,
+        detail=str(detail),
+        ip=ip,
+    )
+    db.add(op_log)
+    await db.commit()
+
+
+def _extract_module(path: str) -> str:
+    """Extract module name from API path."""
     parts = path.strip("/").split("/")
-    if len(parts) >= 2 and parts[0] == "api" and parts[1] == "v1":
-        resource = parts[2] if len(parts) > 2 else ""
-        return MODULE_MAP.get(resource, resource)
+    # /api/v1/customers -> customers, /api/v1/suppliers -> suppliers, etc.
+    if len(parts) >= 3:
+        return parts[2]  # customers, suppliers, orders, etc.
+    if len(parts) >= 2:
+        return parts[1]
     return "unknown"
 
 
-def get_action_from_method(method: str) -> str:
-    return {"POST": "create", "PUT": "update", "DELETE": "delete"}.get(method, "unknown")
-
-
-async def log_operation(
-    db: AsyncSession,
-    user_id: int,
-    request: Request,
-    detail: Optional[dict] = None,
-):
-    if request.method not in WRITE_METHODS:
-        return
-    log = OperationLog(
-        user_id=user_id,
-        module=get_module_from_path(request.url.path),
-        action=get_action_from_method(request.method),
-        target=request.url.path,
-        detail=json.dumps(detail, ensure_ascii=False) if detail else None,
-        ip=request.client.host if request.client else None,
-    )
-    db.add(log)
-    await db.commit()
+def _extract_action(method: str) -> str:
+    """Map HTTP method to action name."""
+    mapping = {"GET": "read", "POST": "create", "PUT": "update", "PATCH": "update", "DELETE": "delete"}
+    return mapping.get(method.upper(), method.lower())

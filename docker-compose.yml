@@ -5,8 +5,14 @@ services:
       - "80:80"
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   backend:
     build: ./wedding-backend
@@ -19,6 +25,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - JWT_SECRET=${JWT_SECRET:-production-secret-change-me}
       - DEBUG=${DEBUG:-false}
+      - SENTRY_DSN=${SENTRY_DSN:-}
     depends_on:
       mysql:
         condition: service_healthy
