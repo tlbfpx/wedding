@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 from datetime import datetime
 import enum
@@ -36,6 +36,9 @@ class Customer(Base, TimestampMixin):
     assigned_sale_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
     recycled_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
 
+    # Relationships for eager loading
+    follow_ups: Mapped[List["FollowUp"]] = relationship("FollowUp", back_populates="customer", lazy="selectin", order_by="desc(FollowUp.created_at)")
+
     __table_args__ = (
         Index("ix_customers_status", "status"),
         Index("ix_customers_assigned_sale", "assigned_sale_id"),
@@ -60,6 +63,9 @@ class FollowUp(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     next_follow_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    # Relationships
+    customer: Mapped["Customer"] = relationship("Customer", back_populates="follow_ups")
 
 
 class CustomerSource(Base):

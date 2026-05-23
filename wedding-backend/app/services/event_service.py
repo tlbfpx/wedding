@@ -5,6 +5,7 @@ from typing import Optional
 
 from sqlalchemy import select, func, and_, extract
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, joinedload
 
 from app.models import Event, EventResource, StaffSchedule, Order
 from app.models.event import EventStatus
@@ -62,25 +63,24 @@ class EventService:
         return items, total
 
     async def get_event_detail(self, event_id: int) -> dict:
-        result = await self.db.execute(select(Event).where(Event.id == event_id))
-        event = result.scalar_one_or_none()
+        result = await self.db.execute(
+            select(Event)
+            .options(
+                joinedload(Event.venue),
+                joinedload(Event.planner),
+                selectinload(Event.resources),
+                selectinload(Event.staff_schedules),
+            )
+            .where(Event.id == event_id)
+        )
+        event = result.unique().scalar_one_or_none()
         if not event:
             raise AppException(404, "NOT_FOUND", "活动不存在")
 
-        resources_result = await self.db.execute(
-            select(EventResource).where(EventResource.event_id == event_id)
-        )
-        resources = resources_result.scalars().all()
-
-        staff_result = await self.db.execute(
-            select(StaffSchedule).where(StaffSchedule.event_id == event_id)
-        )
-        staff = staff_result.scalars().all()
-
         return {
             **await _event_to_dict(event, self.db),
-            "resources": [_resource_to_dict(r) for r in resources],
-            "staff": [_staff_schedule_to_dict(s) for s in staff],
+            "resources": [_resource_to_dict(r) for r in event.resources],
+            "staff": [_staff_schedule_to_dict(s) for s in event.staff_schedules],
         }
 
     async def create_event(self, data) -> tuple[dict, object]:

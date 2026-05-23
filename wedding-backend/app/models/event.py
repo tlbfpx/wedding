@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, Date, Time, DECIMAL, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 from datetime import datetime, date
 import enum
@@ -43,6 +43,12 @@ class Event(Base, TimestampMixin):
     planner_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Relationships for eager loading
+    venue: Mapped[Optional["Venue"]] = relationship("Venue", lazy="joined")
+    planner: Mapped[Optional["User"]] = relationship("User", foreign_keys=[planner_id], lazy="joined")
+    resources: Mapped[List["EventResource"]] = relationship("EventResource", back_populates="event", lazy="selectin")
+    staff_schedules: Mapped[List["StaffSchedule"]] = relationship("StaffSchedule", back_populates="event", lazy="selectin")
+
     __table_args__ = (
         Index("ix_events_date", "date"),
         Index("ix_events_status", "status"),
@@ -60,6 +66,9 @@ class EventResource(Base):
     quantity: Mapped[int] = mapped_column(default=1)
     note: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
+    # Relationships
+    event: Mapped["Event"] = relationship("Event", back_populates="resources")
+
 
 class StaffSchedule(Base):
     __tablename__ = "staff_schedules"
@@ -70,6 +79,9 @@ class StaffSchedule(Base):
     role: Mapped[str] = mapped_column(String(30), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[ScheduleStatus] = mapped_column(SAEnum(ScheduleStatus), default=ScheduleStatus.assigned)
+
+    # Relationships
+    event: Mapped["Event"] = relationship("Event", back_populates="staff_schedules")
 
 
 class Venue(Base):

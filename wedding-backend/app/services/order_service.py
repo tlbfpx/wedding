@@ -9,6 +9,7 @@ from typing import Optional
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, joinedload
 
 from app.models import Order, OrderItem, Payment, Contract, Customer, User
 from app.models.order import OrderStatus, ItemType, PaymentMethod, PaymentStatus, ContractStatus
@@ -16,6 +17,23 @@ from app.schemas.order import OrderCreate, OrderUpdate, StatusTransition, Paymen
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.config import settings
+
+# Magic bytes for allowed file types
+ALLOWED_MIME_TYPES = {
+    "application/pdf": b"%PDF",
+    "image/jpeg": b"\xff\xd8\xff",
+    "image/png": b"\x89PNG",
+    "image/gif": b"GIF87a",
+    "image/gif": b"GIF89a",
+}
+
+
+def validate_file_magic_bytes(content: bytes, declared_mime: str) -> bool:
+    """Validate file content using magic bytes. Returns True if valid, False otherwise."""
+    magic_bytes = ALLOWED_MIME_TYPES.get(declared_mime)
+    if not magic_bytes:
+        return False
+    return content[:len(magic_bytes)] == magic_bytes
 
 
 VALID_TRANSITIONS = {
@@ -86,31 +104,24 @@ class OrderService:
         )
 
     async def get_order_detail(self, order_id: int) -> dict:
-        result = await self.db.execute(select(Order).where(Order.id == order_id))
-        order = result.scalar_one_or_none()
+        result = await self.db.execute(
+            select(Order)
+            .options(
+                selectinload(Order.items),
+                selectinload(Order.payments),
+                joinedload(Order.contract),
+            )
+            .where(Order.id == order_id)
+        )
+        order = result.unique().scalar_one_or_none()
         if not order:
             raise AppException(404, "NOT_FOUND", "订单不存在")
 
-        items_result = await self.db.execute(
-            select(OrderItem).where(OrderItem.order_id == order_id)
-        )
-        items = items_result.scalars().all()
-
-        payments_result = await self.db.execute(
-            select(Payment).where(Payment.order_id == order_id).order_by(Payment.created_at.desc())
-        )
-        payments = payments_result.scalars().all()
-
-        contract_result = await self.db.execute(
-            select(Contract).where(Contract.order_id == order_id)
-        )
-        contract = contract_result.scalar_one_or_none()
-
         return {
             **order_to_dict(order),
-            "items": [item_to_dict(i) for i in items],
-            "payments": [payment_to_dict(p) for p in payments],
-            "contract": contract_to_dict(contract) if contract else None,
+            "items": [item_to_dict(i) for i in order.items],
+            "payments": [payment_to_dict(p) for p in order.payments],
+            "contract": contract_to_dict(order.contract) if order.contract else None,
         }
 
     async def create_order(self, data: OrderCreate, user_id: int) -> Order:
@@ -243,7 +254,7 @@ class OrderService:
         return payment
 
     async def upload_contract(
-        self, order_id: int, content: bytes, filename: str
+        self, order_id: int, content: bytes, filename: str, declared_mime: str = "application/pdf"
     ) -> Contract:
         result = await self.db.execute(select(Order).where(Order.id == order_id))
         order = result.scalar_one_or_none()
@@ -254,6 +265,10 @@ class OrderService:
         max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
         if file_size > max_bytes:
             raise AppException(400, "FILE_TOO_LARGE", f"文件大小不能超过{settings.MAX_FILE_SIZE_MB}MB")
+
+        # Validate magic bytes to ensure file content matches declared MIME type
+        if not validate_file_magic_bytes(content, declared_mime):
+            raise AppException(400, "INVALID_FILE_TYPE", "文件类型与内容不匹配，仅支持 PDF 文件")
 
         upload_dir = os.path.join(settings.UPLOAD_DIR, "contracts")
         os.makedirs(upload_dir, exist_ok=True)

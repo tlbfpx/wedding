@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, DECIMAL
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 from datetime import datetime
 import enum
@@ -38,6 +38,10 @@ class Supplier(Base, TimestampMixin):
     rating: Mapped[float] = mapped_column(DECIMAL(2, 1), default=0.0)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Relationships for eager loading
+    services: Mapped[List["SupplierService"]] = relationship("SupplierService", back_populates="supplier", lazy="selectin")
+    evaluations: Mapped[List["SupplierEvaluation"]] = relationship("SupplierEvaluation", back_populates="supplier", lazy="selectin", order_by="desc(SupplierEvaluation.created_at)")
+
 
 class SupplierService(Base):
     __tablename__ = "supplier_services"
@@ -50,6 +54,9 @@ class SupplierService(Base):
     unit: Mapped[str] = mapped_column(String(20), default="次")
     note: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
+    # Relationships
+    supplier: Mapped["Supplier"] = relationship("Supplier", back_populates="services")
+
 
 class SupplierEvaluation(Base):
     __tablename__ = "supplier_evaluations"
@@ -61,3 +68,6 @@ class SupplierEvaluation(Base):
     content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     evaluator_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    # Relationships
+    supplier: Mapped["Supplier"] = relationship("Supplier", back_populates="evaluations")

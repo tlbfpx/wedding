@@ -5,6 +5,7 @@ from typing import Optional
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models import Customer, FollowUp
 from app.models.customer import CustomerStatus
@@ -60,18 +61,16 @@ class CustomerService:
         return items, total
 
     async def get_customer_detail(self, customer_id: int) -> dict:
-        result = await self.db.execute(select(Customer).where(Customer.id == customer_id))
-        customer = result.scalar_one_or_none()
+        result = await self.db.execute(
+            select(Customer)
+            .options(selectinload(Customer.follow_ups))
+            .where(Customer.id == customer_id)
+        )
+        customer = result.unique().scalar_one_or_none()
         if not customer:
             raise AppException(404, "NOT_FOUND", "客户不存在")
 
-        fu_result = await self.db.execute(
-            select(FollowUp)
-            .where(FollowUp.customer_id == customer_id)
-            .order_by(FollowUp.created_at.desc())
-            .limit(10)
-        )
-        follow_ups = fu_result.scalars().all()
+        follow_ups = sorted(customer.follow_ups, key=lambda x: x.created_at, reverse=True)[:10]
 
         return {
             **_customer_to_dict(customer),

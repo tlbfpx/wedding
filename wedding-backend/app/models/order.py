@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import String, Text, Enum as SAEnum, ForeignKey, DECIMAL, DateTime, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 from datetime import datetime
 import enum
@@ -52,6 +52,11 @@ class Order(Base, TimestampMixin):
     discount: Mapped[float] = mapped_column(DECIMAL(3, 2), default=1.00)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Relationships for eager loading
+    items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order", lazy="selectin")
+    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="order", lazy="selectin")
+    contract: Mapped[Optional["Contract"]] = relationship("Contract", back_populates="order", uselist=False, lazy="joined")
+
     __table_args__ = (
         Index("ix_orders_status", "status"),
         Index("ix_orders_sale_id", "sale_id"),
@@ -72,6 +77,9 @@ class OrderItem(Base):
     supplier_id: Mapped[Optional[int]] = mapped_column(ForeignKey("suppliers.id"), nullable=True)
     note: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
+    # Relationships
+    order: Mapped["Order"] = relationship("Order", back_populates="items")
+
 
 class Payment(Base):
     __tablename__ = "payments"
@@ -84,6 +92,9 @@ class Payment(Base):
     paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     note: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    # Relationships
+    order: Mapped["Order"] = relationship("Order", back_populates="payments")
 
 
 class ContractStatus(str, enum.Enum):
@@ -99,6 +110,9 @@ class Contract(Base):
     file_url: Mapped[str] = mapped_column(String(500), nullable=False)
     status: Mapped[ContractStatus] = mapped_column(SAEnum(ContractStatus), default=ContractStatus.pending)
     signed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Relationships
+    order: Mapped["Order"] = relationship("Order", back_populates="contract")
 
 
 class ApprovalType(str, enum.Enum):

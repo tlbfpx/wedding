@@ -4,6 +4,7 @@ from typing import Optional
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models import Supplier, SupplierEvaluation
 from app.models.supplier import SupplierService as SupplierServiceModel
@@ -64,23 +65,17 @@ class SupplierService:
         )
 
     async def get_supplier_detail(self, supplier_id: int) -> dict:
-        result = await self.db.execute(select(Supplier).where(Supplier.id == supplier_id))
-        supplier = result.scalar_one_or_none()
+        result = await self.db.execute(
+            select(Supplier)
+            .options(
+                selectinload(Supplier.services),
+                selectinload(Supplier.evaluations),
+            )
+            .where(Supplier.id == supplier_id)
+        )
+        supplier = result.unique().scalar_one_or_none()
         if not supplier:
             raise AppException(404, "NOT_FOUND", "供应商不存在")
-
-        svc_result = await self.db.execute(
-            select(SupplierServiceModel).where(SupplierServiceModel.supplier_id == supplier_id)
-        )
-        services = svc_result.scalars().all()
-
-        eval_result = await self.db.execute(
-            select(SupplierEvaluation)
-            .where(SupplierEvaluation.supplier_id == supplier_id)
-            .order_by(SupplierEvaluation.created_at.desc())
-            .limit(5)
-        )
-        evaluations = eval_result.scalars().all()
 
         return {
             **_supplier_to_dict(supplier),
