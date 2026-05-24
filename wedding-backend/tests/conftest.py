@@ -184,6 +184,9 @@ async def clean_tables(setup_database):
             await conn.execute(table.delete())
     # Also clear mock redis between tests
     await mock_redis.flushdb()
+    # Reset rate limiter to avoid test interference
+    from app.middleware.global_rate_limit import _global_limiter
+    _global_limiter.reset()
 
 
 @pytest_asyncio.fixture

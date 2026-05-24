@@ -10,11 +10,11 @@ from starlette.responses import JSONResponse
 class InMemoryRateLimiter:
     """Simple in-memory rate limiter for global protection."""
 
-    def __init__(self):
+    def __init__(self, max_requests: int = 10000, window: int = 60):
         self._requests: dict[str, list[float]] = defaultdict(list)
         self._lock = Lock()
-        self._window = 60  # 1 minute window
-        self._max_requests = 120  # 120 requests per minute per IP
+        self._window = window  # 1 minute window
+        self._max_requests = max_requests
 
     def is_allowed(self, key: str) -> bool:
         now = time.time()
@@ -27,6 +27,11 @@ class InMemoryRateLimiter:
                 return False
             self._requests[key].append(now)
             return True
+
+    def reset(self):
+        """Reset all rate limit data. Used for testing."""
+        with self._lock:
+            self._requests.clear()
 
 
 _global_limiter = InMemoryRateLimiter()
