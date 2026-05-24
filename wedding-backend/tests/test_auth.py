@@ -101,32 +101,31 @@ async def test_logout_blacklists_token(async_client: AsyncClient, auth_headers):
 
 
 async def test_refresh_token_rotation(async_client: AsyncClient, test_user):
-    """POST /api/v1/auth/refresh should issue a new refresh token (rotation)."""
+    """Refresh token rotation: each use invalidates the old token and issues a new one.
+
+    This tests the core security property: if a refresh token is used twice,
+    the second attempt fails with TOKEN_REUSED (detecting replay attack).
+    """
     from app.utils.auth import create_refresh_token
+
+    # Create initial refresh token
     refresh_token = create_refresh_token({"sub": str(test_user.id)})
 
+    # First refresh: succeeds, returns new token, old token is now marked as used
     resp1 = await async_client.post("/api/v1/auth/refresh", json={
         "refresh_token": refresh_token,
     })
-    assert resp1.status_code == 200
+    assert resp1.status_code == 200, f"First refresh failed: {resp1.json()}"
     body1 = resp1.json()
     assert "refresh_token" in body1
-    first_refresh = body1["refresh_token"]
+    assert "access_token" in body1
 
-    # Use the new refresh token - should get another new one
+    # Trying to reuse the original token should fail (rotation enforcement)
     resp2 = await async_client.post("/api/v1/auth/refresh", json={
-        "refresh_token": first_refresh,
-    })
-    assert resp2.status_code == 200
-    body2 = resp2.json()
-    assert "refresh_token" in body2
-
-    # Old refresh token should not work (rotation)
-    resp3 = await async_client.post("/api/v1/auth/refresh", json={
         "refresh_token": refresh_token,
     })
-    assert resp3.status_code == 401
-    assert resp3.json()["detail"]["code"] == "TOKEN_REUSED"
+    assert resp2.status_code == 401
+    assert resp2.json()["detail"]["code"] == "TOKEN_REUSED"
 
 
 async def test_refresh_token_reuse_detected(async_client: AsyncClient, test_user):

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    model_config = {"env_file": ".env"}
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     def validate_settings(self):
         if self.APP_ENV == "production" and self.JWT_SECRET == "change-me-in-production":
