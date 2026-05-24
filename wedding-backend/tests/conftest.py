@@ -121,6 +121,14 @@ class MockRedis:
     async def expire(self, key: str, ttl: int) -> None:
         self._expiry[key] = ttl
 
+    async def exists(self, key: str) -> int:
+        """Check if key exists (1=yes, 0=no)."""
+        return 1 if key in self._store else 0
+
+    async def ping(self) -> bool:
+        """Redis ping (for health checks)."""
+        return True
+
     async def keys(self, pattern: str = "*") -> list[str]:
         return list(self._store.keys())
 

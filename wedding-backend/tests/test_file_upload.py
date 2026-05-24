@@ -127,3 +127,66 @@ async def test_upload_too_large(async_client: AsyncClient, auth_headers, test_us
     )
     assert resp.status_code == 400
     assert resp.json()["error"]["code"] == "FILE_TOO_LARGE"
+
+
+async def test_upload_filename_path_traversal(async_client: AsyncClient, auth_headers, test_user):
+    """
+    Filenames with path traversal characters should be sanitized.
+    """
+    customer = await _create_customer(async_client, auth_headers)
+    order = await _create_order(
+        async_client, auth_headers, customer["id"], test_user.id
+    )
+
+    pdf_content = b"%PDF-1.4 fake pdf content for testing"
+    files = {
+        "file": (
+            "../../../etc/passwd",
+            BytesIO(pdf_content),
+            "application/pdf"
+        )
+    }
+
+    resp = await async_client.post(
+        f"/api/v1/orders/{order['id']}/contract",
+        headers=auth_headers,
+        files=files,
+    )
+    # Should succeed but filename should be sanitized (no path traversal)
+    assert resp.status_code == 200
+    file_url = resp.json()["file_url"]
+    # The file_url should not contain ".." segments
+    assert ".." not in file_url
+
+
+async def test_upload_filename_special_chars(async_client: AsyncClient, auth_headers, test_user):
+    """
+    Filenames with special characters should be sanitized.
+    """
+    customer = await _create_customer(async_client, auth_headers)
+    order = await _create_order(
+        async_client, auth_headers, customer["id"], test_user.id
+    )
+
+    pdf_content = b"%PDF-1.4 fake pdf content for testing"
+    files = {
+        "file": (
+            "合同<special>:chars|.pdf",
+            BytesIO(pdf_content),
+            "application/pdf"
+        )
+    }
+
+    resp = await async_client.post(
+        f"/api/v1/orders/{order['id']}/contract",
+        headers=auth_headers,
+        files=files,
+    )
+    # Should succeed with sanitized filename
+    assert resp.status_code == 200
+    file_url = resp.json()["file_url"]
+    # Should not contain special path characters
+    assert "<" not in file_url
+    assert ">" not in file_url
+    assert ":" not in file_url
+    assert "|" not in file_url
