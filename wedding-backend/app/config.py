@@ -15,9 +15,22 @@ class Settings(BaseSettings):
     APP_NAME: str = "婚庆管理系统"
     DEBUG: bool = True
     SENTRY_DSN: str | None = None
+    APP_ENV: str = "development"
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     model_config = {"env_file": ".env"}
 
+    def validate_settings(self):
+        if self.APP_ENV == "production" and self.JWT_SECRET == "change-me-in-production":
+            raise ValueError("JWT_SECRET must be set to a secure value in production")
+
 
 settings = Settings()
+try:
+    settings.validate_settings()
+except ValueError as e:
+    import logging
+    logging.basicConfig(level=logging.CRITICAL)
+    logging.critical(f"CONFIGURATION ERROR: {e}")
+    raise
 Path(settings.UPLOAD_DIR).mkdir(exist_ok=True)

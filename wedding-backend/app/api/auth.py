@@ -1,5 +1,6 @@
 from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -15,6 +16,7 @@ from app.middleware.rate_limit import limiter
 import json
 
 router = APIRouter()
+security = HTTPBearer()
 
 
 class LoginRequest(BaseModel):
@@ -30,6 +32,12 @@ class LoginResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
+
+
+class RefreshResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -55,19 +63,38 @@ async def login(request: Request, req_body: LoginRequest, db: AsyncSession = Dep
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=RefreshResponse)
 async def refresh(req: RefreshRequest):
     payload = decode_token(req.refresh_token)
     if not payload or payload.get("type") != "refresh":
         raise HTTPException(status_code=401, detail={"code": "TOKEN_EXPIRED", "message": "刷新令牌无效或已过期"})
 
-    access_token = create_access_token({"sub": payload["sub"]})
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Check for token reuse (rotation)
+    used_key = f"refresh:used:{req.refresh_token}"
+    if await redis_client.exists(used_key):
+        # Token reuse detected - potential theft, revoke all user tokens
+        user_id = payload.get("sub")
+        await redis_client.delete(f"user:tokens:{user_id}")
+        raise HTTPException(status_code=401, detail={"code": "TOKEN_REUSED", "message": "刷新令牌已被使用，请重新登录"})
+
+    # Mark old token as used (rotation)
+    await redis_client.setex(used_key, 604800, "1")
+
+    user_id = payload["sub"]
+    access_token = create_access_token({"sub": user_id})
+    new_refresh_token = create_refresh_token({"sub": user_id})
+    return RefreshResponse(access_token=access_token, refresh_token=new_refresh_token)
 
 
 @router.post("/logout")
-async def logout(user: User = Depends(get_current_user)):
-    # Note: in production the token from the request would be passed here
+async def logout(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: User = Depends(get_current_user),
+):
+    token = credentials.credentials
+    # Blacklist the access token
+    await redis_client.setex(f"jwt:blacklist:{token}", 7200, "1")
     return {"message": "已登出"}
 
 

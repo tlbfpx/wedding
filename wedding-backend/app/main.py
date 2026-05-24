@@ -8,11 +8,13 @@ import traceback
 from app.config import settings
 from app.database import get_db
 from app.utils.errors import AppException, ErrorDetail
-from app.api import auth, customers, suppliers, orders, approvals, events, venues, dashboard, users, notifications, reports, imports
+from app.api import auth, customers, suppliers, orders, approvals, events, venues, dashboard, users, notifications, reports, imports, health
 from app.events.handlers import register_event_handlers
 from app.middleware.logging import setup_structured_logging, StructuredLoggingMiddleware
 from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
+from app.middleware.global_rate_limit import GlobalRateLimitMiddleware
+from app.middleware.metrics import MetricsMiddleware, get_metrics
 from slowapi.errors import RateLimitExceeded
 
 # Setup structured logging first
@@ -31,13 +33,20 @@ app.add_middleware(RequestIDMiddleware)
 app.add_middleware(StructuredLoggingMiddleware)
 
 # CORS middleware
+cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global rate limiting middleware
+app.add_middleware(GlobalRateLimitMiddleware)
+
+# Metrics middleware
+app.add_middleware(MetricsMiddleware)
 
 
 @app.exception_handler(AppException)
@@ -80,6 +89,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(customers.router, prefix="/api/v1", tags=["customers"])
 app.include_router(suppliers.router, prefix="/api/v1/suppliers", tags=["suppliers"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["orders"])
@@ -93,6 +103,12 @@ app.include_router(reports.router, prefix="/api/v1/reports", tags=["reports"])
 app.include_router(imports.router, prefix="/api/v1/imports", tags=["imports"])
 
 
+# Metrics endpoint for Prometheus
+@app.get("/metrics", tags=["metrics"])
+async def metrics():
+    return get_metrics()
+
+
 @app.on_event("startup")
 async def startup():
     register_event_handlers()
@@ -103,3 +119,12 @@ async def startup():
     if sentry_dsn:
         from app.sentry import init_sentry
         init_sentry(sentry_dsn)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    logger.info("Application shutdown initiated", extra={"event": "shutdown"})
+    # Close database connections
+    from app.database import engine
+    await engine.dispose()
+    logger.info("Application shutdown complete", extra={"event": "shutdown"})

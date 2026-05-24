@@ -36,6 +36,21 @@ def validate_file_magic_bytes(content: bytes, declared_mime: str) -> bool:
     return content[:len(magic_bytes)] == magic_bytes
 
 
+def sanitize_filename(filename: str) -> str:
+    """Remove path traversal and dangerous characters from filename."""
+    # Remove any path components
+    filename = filename.replace("..", "").replace("/", "").replace("\\", "")
+    # Remove other dangerous chars
+    filename = filename.replace("\x00", "").replace("\n", "").replace("\r", "")
+    # Keep only safe characters (alphanumeric, dots, dashes, underscores)
+    import re
+    filename = re.sub(r"[^\w.\-]", "_", filename)
+    # Ensure not empty
+    if not filename or filename.startswith("."):
+        filename = "file_" + filename.lstrip(".")
+    return filename or "unnamed"
+
+
 VALID_TRANSITIONS = {
     OrderStatus.intention: [OrderStatus.signed, OrderStatus.cancelled],
     OrderStatus.signed: [OrderStatus.executing, OrderStatus.cancelled],
@@ -272,7 +287,8 @@ class OrderService:
 
         upload_dir = os.path.join(settings.UPLOAD_DIR, "contracts")
         os.makedirs(upload_dir, exist_ok=True)
-        file_name = f"{order_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{filename}"
+        safe_filename = sanitize_filename(filename)
+        file_name = f"{order_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{safe_filename}"
         file_path = os.path.join(upload_dir, file_name)
 
         with open(file_path, "wb") as f:
