@@ -76,3 +76,7 @@ volumes:
   mysql_data:
   redis_data:
   uploads:
+
+networks:
+  default:
+    name: wedding-network
