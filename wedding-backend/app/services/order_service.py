@@ -291,8 +291,10 @@ class OrderService:
         file_name = f"{order_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{safe_filename}"
         file_path = os.path.join(upload_dir, file_name)
 
+        # Stream file to disk to avoid memory issues with large files
         with open(file_path, "wb") as f:
-            f.write(content)
+            for chunk in iter(lambda: content.read(65536), b""):
+                f.write(chunk)
 
         file_url = f"/uploads/contracts/{file_name}"
 
