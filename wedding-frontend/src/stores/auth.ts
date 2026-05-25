@@ -3,9 +3,14 @@ import { ref, computed } from 'vue'
 import { loginApi, refreshTokenApi, logoutApi, getMeApi } from '@/api/auth'
 import type { UserInfo } from '@/api/auth'
 
+const TOKEN_KEY = 'wedding_token'
+const REFRESH_TOKEN_KEY = 'wedding_refresh_token'
+
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string>(localStorage.getItem('token') || '')
-  const refreshTokenValue = ref<string>(localStorage.getItem('refreshToken') || '')
+  // Use sessionStorage instead of localStorage for better security
+  // Data lives only for the browser tab session, not persisted across browser restarts
+  const token = ref<string>(sessionStorage.getItem(TOKEN_KEY) || '')
+  const refreshTokenValue = ref<string>(sessionStorage.getItem(REFRESH_TOKEN_KEY) || '')
   const user = ref<UserInfo | null>(null)
 
   const isLoggedIn = computed(() => !!token.value)
@@ -15,16 +20,16 @@ export const useAuthStore = defineStore('auth', () => {
   function setTokens(access: string, refresh: string) {
     token.value = access
     refreshTokenValue.value = refresh
-    localStorage.setItem('token', access)
-    localStorage.setItem('refreshToken', refresh)
+    sessionStorage.setItem(TOKEN_KEY, access)
+    sessionStorage.setItem(REFRESH_TOKEN_KEY, refresh)
   }
 
   function clearAuth() {
     token.value = ''
     refreshTokenValue.value = ''
     user.value = null
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
+    sessionStorage.removeItem(TOKEN_KEY)
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY)
   }
 
   async function login(username: string, password: string) {

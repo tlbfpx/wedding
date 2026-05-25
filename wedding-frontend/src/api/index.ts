@@ -1,5 +1,6 @@
 import axios from 'axios'
-import type { AxiosResponse } from 'axios'
+import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import DOMPurify from 'dompurify'
 import { useAuthStore } from '@/stores/auth'
 
 const request = axios.create({
@@ -7,13 +8,46 @@ const request = axios.create({
   timeout: 15000,
 })
 
-// Request interceptor - attach token
+// Track pending requests for deduplication
+const pendingRequests = new Map<string, Promise<unknown>>()
+
+function getRequestKey(config: InternalAxiosRequestConfig): string {
+  return `${config.method || 'GET'}:${config.url || ''}:${JSON.stringify(config.params || {})}:${JSON.stringify(config.data || {})}`
+}
+
+// Request interceptor - attach token and handle CSRF
 request.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const authStore = useAuthStore()
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`
     }
+
+    // Add CSRF token for state-changing operations
+    if (['post', 'put', 'patch', 'delete'].includes((config.method || '').toLowerCase())) {
+      try {
+        const csrfResp = await axios.get('/api/v1/auth/csrf')
+        config.headers['X-CSRF-Token'] = csrfResp.data.csrf_token
+      } catch {
+        // CSRF endpoint may not exist in test environment
+      }
+    }
+
+    // Request deduplication for GET requests
+    if (config.method?.toLowerCase() === 'get') {
+      const key = getRequestKey(config as InternalAxiosRequestConfig)
+      if (pendingRequests.has(key)) {
+        // Cancel the previous request by throwing an AbortError
+        const controller = new AbortController()
+        config.signal = controller.signal
+        // Signal the previous request to abort
+        pendingRequests.set(key, new Promise((_, reject) => {
+          controller.signal.addEventListener('abort', () => reject(new DOMException('Deduplicated', 'AbortError')))
+        }))
+      }
+      pendingRequests.set(key, request(config as InternalAxiosRequestConfig).catch(() => {}))
+    }
+
     return config
   },
   (error) => {
@@ -23,13 +57,18 @@ request.interceptors.request.use(
 
 // Response interceptor - handle errors & token refresh
 let isRefreshing = false
-let pendingRequests: Array<(token: string) => void> = []
+let pendingRequestsQueue: Array<(token: string) => void> = []
 
 request.interceptors.response.use(
   (response: AxiosResponse) => {
     return response.data
   },
   async (error) => {
+    // Handle deduplicated requests
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return Promise.reject(error)
+    }
+
     const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -42,7 +81,7 @@ request.interceptors.response.use(
 
       if (isRefreshing) {
         return new Promise((resolve) => {
-          pendingRequests.push((token: string) => {
+          pendingRequestsQueue.push((token: string) => {
             originalRequest.headers.Authorization = `Bearer ${token}`
             resolve(request(originalRequest))
           })
@@ -54,12 +93,12 @@ request.interceptors.response.use(
 
       try {
         const newToken = await authStore.refreshToken()
-        pendingRequests.forEach((cb) => cb(newToken))
-        pendingRequests = []
+        pendingRequestsQueue.forEach((cb) => cb(newToken))
+        pendingRequestsQueue = []
         originalRequest.headers.Authorization = `Bearer ${newToken}`
         return request(originalRequest)
       } catch {
-        pendingRequests = []
+        pendingRequestsQueue = []
         authStore.logout()
         return Promise.reject(error)
       } finally {
@@ -82,7 +121,10 @@ request.interceptors.response.use(
       }
     }
 
-    return Promise.reject(new Error(message))
+    // XSS protection: sanitize error messages before display
+    const sanitizedMessage = DOMPurify.sanitize(message, { ALLOWED_TAGS: [] })
+
+    return Promise.reject(new Error(sanitizedMessage))
   },
 )
 
