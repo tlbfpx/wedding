@@ -61,6 +61,7 @@ class Order(Base, TimestampMixin):
         Index("ix_orders_status", "status"),
         Index("ix_orders_sale_id", "sale_id"),
         Index("ix_orders_planner_id", "planner_id"),
+        Index("ix_orders_customer_id", "customer_id"),
     )
 
 

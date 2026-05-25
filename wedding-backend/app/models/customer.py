@@ -43,6 +43,7 @@ class Customer(Base, TimestampMixin):
         Index("ix_customers_status", "status"),
         Index("ix_customers_assigned_sale", "assigned_sale_id"),
         Index("ix_customers_source", "source_id"),
+        Index("ix_follow_ups_customer_id", "customer_id"),
     )
 
 

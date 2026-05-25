@@ -83,6 +83,11 @@ class StaffSchedule(Base):
     # Relationships
     event: Mapped["Event"] = relationship("Event", back_populates="staff_schedules")
 
+    __table_args__ = (
+        Index("ix_staff_schedules_staff_id", "staff_id"),
+        Index("ix_staff_schedules_date", "date"),
+    )
+
 
 class Venue(Base):
     __tablename__ = "venues"

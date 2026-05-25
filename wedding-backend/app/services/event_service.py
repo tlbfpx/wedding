@@ -52,14 +52,19 @@ class EventService:
             query = query.where(Event.venue_id == venue_id)
 
         total_result = await self.db.execute(select(func.count()).select_from(query.subquery()))
-        total = total_result.scalar_one()
+        total = total_result.scalar()
 
         offset = (page - 1) * page_size
-        query = query.order_by(Event.date.desc()).offset(offset).limit(page_size)
+        query = (
+            query.options(joinedload(Event.venue), joinedload(Event.planner))
+            .order_by(Event.date.desc())
+            .offset(offset)
+            .limit(page_size)
+        )
         result = await self.db.execute(query)
-        events = result.scalars().all()
+        events = result.scalars().unique().all()
 
-        items = [await _event_to_dict(e, self.db) for e in events]
+        items = [_event_to_dict(e) for e in events]
         return items, total
 
     async def get_event_detail(self, event_id: int) -> dict:
@@ -297,21 +302,9 @@ async def _publish_event_notification(event: Event, event_type: str, db: AsyncSe
 
 
 async def _event_to_dict(e: Event, db: Optional[AsyncSession] = None) -> dict:
-    venue_name = None
-    if e.venue_id and db:
-        from app.models.event import Venue
-        vresult = await db.execute(select(Venue).where(Venue.id == e.venue_id))
-        venue = vresult.scalar_one_or_none()
-        if venue:
-            venue_name = venue.name
-
-    planner_name = None
-    if e.planner_id and db:
-        from app.models.user import User
-        presult = await db.execute(select(User).where(User.id == e.planner_id))
-        planner = presult.scalar_one_or_none()
-        if planner:
-            planner_name = planner.name
+    # Use pre-loaded relationships when available (via joinedload in list_events)
+    venue_name = e.venue.name if e.venue else None
+    planner_name = e.planner.name if e.planner else None
 
     return {
         "id": e.id,
