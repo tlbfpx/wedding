@@ -15,6 +15,7 @@ from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 from app.middleware.global_rate_limit import GlobalRateLimitMiddleware
 from app.middleware.metrics import MetricsMiddleware, get_metrics
+from app.middleware.csrf import CSRFMiddleware
 from slowapi.errors import RateLimitExceeded
 
 # Setup structured logging first
@@ -47,6 +48,9 @@ app.add_middleware(GlobalRateLimitMiddleware)
 
 # Metrics middleware
 app.add_middleware(MetricsMiddleware)
+
+# CSRF protection middleware
+app.add_middleware(CSRFMiddleware)
 
 
 @app.exception_handler(AppException)

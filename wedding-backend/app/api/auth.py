@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 import bcrypt
+import secrets
 
 from app.database import get_db
 from app.models.user import User, Role
@@ -16,6 +17,8 @@ import json
 
 router = APIRouter()
 security = HTTPBearer()
+
+CSRF_SECRET = secrets.token_hex(32)
 
 
 class LoginRequest(BaseModel):
@@ -37,6 +40,16 @@ class RefreshResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class CsrfTokenResponse(BaseModel):
+    csrf_token: str
+
+
+@router.get("/csrf", response_model=CsrfTokenResponse)
+async def get_csrf_token():
+    """Get a CSRF token for state-changing operations."""
+    return CsrfTokenResponse(csrf_token=CSRF_SECRET)
 
 
 @router.post("/login", response_model=LoginResponse)

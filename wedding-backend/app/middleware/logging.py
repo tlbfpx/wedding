@@ -43,9 +43,13 @@ class StructuredLoggingMiddleware(BaseHTTPMiddleware):
         if user_id:
             log_data["user_id"] = user_id
 
-        # Add query params if present (sanitized)
+        # Add query params if present (sanitized for sensitive fields)
         if request.query_params:
-            log_data["query_params"] = dict(request.query_params)
+            params = dict(request.query_params)
+            # Filter out sensitive fields
+            sensitive_fields = {"password", "token", "secret", "access_token", "refresh_token", "api_key", "key", "authorization"}
+            sanitized = {k: "***REDACTED***" if k.lower() in sensitive_fields else v for k, v in params.items()}
+            log_data["query_params"] = sanitized
 
         # Log based on status code
         if response.status_code >= 500:
