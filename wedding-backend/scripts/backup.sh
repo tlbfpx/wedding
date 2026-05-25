@@ -22,9 +22,10 @@ echo "[backup] Starting MySQL backup at $(date)"
 # Ensure backup directory exists
 mkdir -p "${BACKUP_DIR}"
 
-# Run mysqldump
+# Run mysqldump with password via environment variable (avoids command-line exposure)
 echo "[backup] Dumping database ${DB_NAME}..."
-mysqldump -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" \
+export MYSQL_PWD="${DB_PASS}"
+mysqldump -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" \
     --single-transaction --quick --lock-tables=false \
     --routines --triggers --events \
     "${DB_NAME}" | gzip > "${BACKUP_FILE}"
@@ -43,6 +44,16 @@ if [ -n "${S3_BUCKET}" ]; then
     echo "[backup] Uploading to S3: s3://${S3_BUCKET}/${S3_PREFIX}/${DB_NAME}_${TIMESTAMP}.sql.gz"
     aws s3 cp "${BACKUP_FILE}" "s3://${S3_BUCKET}/${S3_PREFIX}/${DB_NAME}_${TIMESTAMP}.sql.gz"
     echo "[backup] S3 upload complete"
+
+    # Encrypt backup with gpg if GPG_RECIPIENT is set
+    if [ -n "${GPG_RECIPIENT}" ]; then
+        echo "[backup] Encrypting backup with GPG..."
+        GPG_OUTPUT="${BACKUP_FILE}.gpg"
+        gpg --export -a "${GPG_RECIPIENT}" 2>/dev/null || gpg --batch --yes --recipient "${GPG_RECIPIENT}" --encrypt -o "${GPG_OUTPUT}" "${BACKUP_FILE}"
+        aws s3 cp "${GPG_OUTPUT}" "s3://${S3_BUCKET}/${S3_PREFIX}/${DB_NAME}_${TIMESTAMP}.sql.gz.gpg"
+        rm -f "${GPG_OUTPUT}"
+        echo "[backup] Encrypted backup uploaded to S3"
+    fi
 fi
 
 # Cleanup old backups (local)

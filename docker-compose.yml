@@ -13,6 +13,16 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - wedding-network
 
   backend:
     build: ./wedding-backend
@@ -42,6 +52,16 @@ services:
     volumes:
       - uploads:/app/uploads
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    networks:
+      - wedding-network
 
   mysql:
     image: mysql:8.0
@@ -60,6 +80,16 @@ services:
       timeout: 3s
       retries: 10
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - wedding-network
 
   redis:
     image: redis:7-alpine
@@ -73,6 +103,16 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - wedding-network
 
   # Automated MySQL backup (runs daily at 3 AM)
   backup:
