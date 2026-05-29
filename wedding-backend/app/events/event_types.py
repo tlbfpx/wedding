@@ -14,3 +14,6 @@ SUPPLIER_EVALUATED = "supplier.evaluated"
 
 EVENT_CREATED = "event.created"
 EVENT_UPDATED = "event.updated"
+
+# Finance module events
+PAYMENT_RECORDED = "finance.payment_recorded"

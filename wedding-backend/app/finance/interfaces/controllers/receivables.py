@@ -2,7 +2,7 @@
 应收账款 API
 """
 from __future__ import annotations
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
@@ -36,10 +36,8 @@ async def list_receivables(
     start_datetime = None
     end_datetime = None
     if date_start:
-        from datetime import datetime
         start_datetime = datetime.combine(date_start, datetime.min.time())
     if date_end:
-        from datetime import datetime
         end_datetime = datetime.combine(date_end, datetime.max.time())
 
     items, total = await service.repo.list(
@@ -58,15 +56,13 @@ async def list_receivables(
         result_items.append({
             "id": item.id,
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order else None,
-            "customer_name": item.order.customer.name if hasattr(item, 'order') and item.order and hasattr(item.order, 'customer') else None,
-            "sale_name": item.order.sale.name if hasattr(item, 'order') and item.order and hasattr(item.order, 'sale') else None,
             "total_amount": str(item.total_amount),
             "received_amount": str(item.received_amount),
             "remaining_amount": str(item.remaining_amount),
             "status": item.status.value if isinstance(item.status, ReceivableStatus) else item.status,
             "due_date": item.due_date.isoformat() if item.due_date else None,
             "is_overdue": item.is_overdue,
+            "overdue_days": item.overdue_days,
             "created_at": item.created_at.isoformat() if item.created_at else None,
         })
 
@@ -100,8 +96,6 @@ async def list_overdue_receivables(
         result_items.append({
             "id": item.id,
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order else None,
-            "customer_name": item.order.customer.name if hasattr(item, 'order') and item.order and hasattr(item.order, 'customer') else None,
             "total_amount": str(item.total_amount),
             "received_amount": str(item.received_amount),
             "remaining_amount": str(item.remaining_amount),
@@ -133,13 +127,27 @@ async def get_receivable(
         from app.utils.errors import AppException
         raise AppException(404, "RECEIVABLE_NOT_FOUND", "应收记录不存在")
 
+    # 获取关联订单信息
+    order_no = None
+    customer_name = None
+    customer_phone = None
+    sale_name = None
+
+    if receivable.order:
+        order_no = receivable.order.order_no
+        if hasattr(receivable.order, 'customer') and receivable.order.customer:
+            customer_name = receivable.order.customer.name
+            customer_phone = receivable.order.customer.phone
+        if hasattr(receivable.order, 'sale') and receivable.order.sale:
+            sale_name = receivable.order.sale.name
+
     return {
         "id": receivable.id,
         "order_id": receivable.order_id,
-        "order_no": receivable.order.order_no if hasattr(receivable, 'order') and receivable.order else None,
-        "customer_name": receivable.order.customer.name if hasattr(receivable, 'order') and receivable.order and hasattr(receivable.order, 'customer') else None,
-        "customer_phone": receivable.order.customer.phone if hasattr(receivable, 'order') and receivable.order and hasattr(receivable.order, 'customer') else None,
-        "sale_name": receivable.order.sale.name if hasattr(receivable, 'order') and receivable.order and hasattr(receivable.order, 'sale') else None,
+        "order_no": order_no,
+        "customer_name": customer_name,
+        "customer_phone": customer_phone,
+        "sale_name": sale_name,
         "total_amount": str(receivable.total_amount),
         "received_amount": str(receivable.received_amount),
         "remaining_amount": str(receivable.remaining_amount),
@@ -149,4 +157,6 @@ async def get_receivable(
         "overdue_days": receivable.overdue_days,
         "created_at": receivable.created_at.isoformat() if receivable.created_at else None,
         "updated_at": receivable.updated_at.isoformat() if receivable.updated_at else None,
+        # 获取收款记录
+        "payments": [],  # TODO: 实现收款记录查询
     }

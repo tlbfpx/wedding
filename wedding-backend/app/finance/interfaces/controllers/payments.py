@@ -55,7 +55,6 @@ async def create_payment(
     return {
         "id": payment.id,
         "order_id": payment.order_id,
-        "order_no": payment.order.order_no if hasattr(payment, 'order') and payment.order else None,
         "amount": str(payment.amount),
         "method": payment.method.value if isinstance(payment.method, PaymentMethod) else payment.method,
         "paid_at": payment.paid_at.isoformat() if payment.paid_at else None,
@@ -92,7 +91,6 @@ async def list_payments(
         result_items.append({
             "id": item.id,
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order else None,
             "amount": str(item.amount),
             "method": item.method.value if isinstance(item.method, PaymentMethod) else item.method,
             "paid_at": item.paid_at.isoformat() if item.paid_at else None,

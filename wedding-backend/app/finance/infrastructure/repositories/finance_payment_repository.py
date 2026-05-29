@@ -39,7 +39,7 @@ class FinancePaymentRepository:
         payment = FinancePayment(
             order_id=order_id,
             amount=amount,
-            method=method,
+            method=method.value if isinstance(method, PaymentMethod) else method,
             paid_at=paid_at,
             note=note,
             created_by=created_by,

@@ -57,7 +57,6 @@ async def create_invoice(
     return {
         "id": invoice.id,
         "order_id": invoice.order_id,
-        "order_no": invoice.order.order_no if hasattr(invoice, 'order') and invoice.order else None,
         "invoice_type": invoice.invoice_type.value if isinstance(invoice.invoice_type, InvoiceType) else invoice.invoice_type,
         "amount": str(invoice.amount),
         "title": invoice.title,
@@ -92,7 +91,6 @@ async def list_invoices(
         result_items.append({
             "id": item.id,
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order else None,
             "invoice_type": item.invoice_type.value if isinstance(item.invoice_type, InvoiceType) else item.invoice_type,
             "amount": str(item.amount),
             "title": item.title,
@@ -126,7 +124,6 @@ async def get_invoice(
     return {
         "id": invoice.id,
         "order_id": invoice.order_id,
-        "order_no": invoice.order.order_no if hasattr(invoice, 'order') and invoice.order else None,
         "invoice_type": invoice.invoice_type.value if isinstance(invoice.invoice_type, InvoiceType) else invoice.invoice_type,
         "amount": str(invoice.amount),
         "title": invoice.title,
@@ -194,7 +191,6 @@ async def upload_invoice_pdf(
 ):
     """上传发票 PDF"""
     from app.config import settings
-    from app.utils.files import sanitize_filename
 
     # 验证文件类型
     if file.content_type != "application/pdf":
@@ -214,7 +210,8 @@ async def upload_invoice_pdf(
     upload_dir = os.path.join(settings.UPLOAD_DIR, "invoices")
     os.makedirs(upload_dir, exist_ok=True)
 
-    safe_filename = sanitize_filename(file.filename)
+    import re
+    safe_filename = re.sub(r"[^\w.\-]", "_", file.filename)
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
     file_name = f"{invoice_id}_{timestamp}_{safe_filename}"
     file_path = os.path.join(upload_dir, file_name)

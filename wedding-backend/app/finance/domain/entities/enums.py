@@ -3,7 +3,6 @@
 """
 
 import enum
-from typing import Literal
 
 
 class ReceivableStatus(str, enum.Enum):
@@ -53,4 +52,10 @@ class InvoiceStatus(str, enum.Enum):
 
 
 # 付款方式复用订单模块定义
-PaymentMethod = Literal["cash", "transfer", "wechat", "alipay", "card"]
+class PaymentMethod(str, enum.Enum):
+    cash = "cash"
+    transfer = "transfer"
+    wechat = "wechat"
+    alipay = "alipay"
+    card = "card"
+

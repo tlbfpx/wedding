@@ -69,7 +69,7 @@ class PaymentService:
         payment = await self.payment_repo.create(
             order_id=order_id,
             amount=amount,
-            method=method,
+            method=method.value if isinstance(method, PaymentMethod) else method,
             paid_at=paid_at or datetime.utcnow(),
             note=note,
             created_by=created_by,
@@ -128,7 +128,7 @@ class PaymentService:
         legacy_payment = Payment(
             order_id=order_id,
             amount=amount,
-            method=method,
+            method=method.value if isinstance(method, PaymentMethod) else method,
             status=PaymentStatus.confirmed,
             paid_at=paid_at or datetime.utcnow(),
             note=note,

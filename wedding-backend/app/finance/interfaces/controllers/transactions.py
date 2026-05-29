@@ -3,7 +3,6 @@
 """
 from __future__ import annotations
 from datetime import date
-from decimal import Decimal
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
@@ -70,9 +69,7 @@ async def list_transactions(
             "category": item.category.value if item.category and isinstance(item.category, ExpenseCategory) else item.category,
             "amount": str(item.amount),
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order and hasattr(item.order, 'order_no') else None,
             "supplier_id": item.supplier_id,
-            "supplier_name": item.supplier.name if hasattr(item, 'supplier') and item.supplier else None,
             "date": item.date.isoformat() if item.date else None,
             "method": item.method,
             "note": item.note,

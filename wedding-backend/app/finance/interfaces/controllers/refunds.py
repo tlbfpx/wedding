@@ -49,7 +49,6 @@ async def create_refund(
     return {
         "id": refund.id,
         "order_id": refund.order_id,
-        "order_no": refund.order.order_no if hasattr(refund, 'order') and refund.order else None,
         "amount": str(refund.amount),
         "reason": refund.reason,
         "status": refund.status.value if isinstance(refund.status, RefundStatus) else refund.status,
@@ -81,7 +80,6 @@ async def list_refunds(
         result_items.append({
             "id": item.id,
             "order_id": item.order_id,
-            "order_no": item.order.order_no if hasattr(item, 'order') and item.order else None,
             "amount": str(item.amount),
             "reason": item.reason,
             "status": item.status.value if isinstance(item.status, RefundStatus) else item.status,
@@ -114,7 +112,6 @@ async def get_refund(
     return {
         "id": refund.id,
         "order_id": refund.order_id,
-        "order_no": refund.order.order_no if hasattr(refund, 'order') and refund.order else None,
         "amount": str(refund.amount),
         "reason": refund.reason,
         "status": refund.status.value if isinstance(refund.status, RefundStatus) else refund.status,

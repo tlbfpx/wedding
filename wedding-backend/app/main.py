@@ -10,6 +10,8 @@ from app.database import get_db
 from app.utils.errors import AppException, ErrorDetail
 from app.api import auth, customers, suppliers, orders, approvals, events, venues, dashboard, users, notifications, reports, imports, health
 from app.events.handlers import register_event_handlers
+from app.finance.interfaces.controllers import receivables, payments, refunds, transactions, invoices, reconciliations
+from app.finance.interfaces.subscribers.event_handlers import register_finance_event_handlers
 from app.middleware.logging import setup_structured_logging, StructuredLoggingMiddleware
 from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
@@ -106,6 +108,14 @@ app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["reports"])
 app.include_router(imports.router, prefix="/api/v1/imports", tags=["imports"])
 
+# Finance module routes
+app.include_router(receivables.router, prefix="/api/v1/finance/receivables", tags=["finance-receivables"])
+app.include_router(payments.router, prefix="/api/v1/finance/payments", tags=["finance-payments"])
+app.include_router(refunds.router, prefix="/api/v1/finance/refunds", tags=["finance-refunds"])
+app.include_router(transactions.router, prefix="/api/v1/finance/transactions", tags=["finance-transactions"])
+app.include_router(invoices.router, prefix="/api/v1/finance/invoices", tags=["finance-invoices"])
+app.include_router(reconciliations.router, prefix="/api/v1/finance/reconciliations", tags=["finance-reconciliations"])
+
 
 # Metrics endpoint for Prometheus
 @app.get("/metrics", tags=["metrics"])
@@ -116,6 +126,7 @@ async def metrics():
 @app.on_event("startup")
 async def startup():
     register_event_handlers()
+    register_finance_event_handlers()
     logger.info("Application startup complete", extra={"event": "startup"})
 
     # Initialize Sentry if DSN is provided
