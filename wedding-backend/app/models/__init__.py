@@ -6,6 +6,7 @@ from app.models.supplier import Supplier, SupplierService, SupplierEvaluation
 from app.models.order import Order, OrderItem, Payment, Contract, Approval
 from app.models.event import Event, EventResource, StaffSchedule, Venue
 from app.models.notification import Notification, NotificationType
+from app.finance.domain.entities import Receivable, FinancePayment, Refund, Transaction, Invoice, Reconciliation
 
 __all__ = [
     "Base", "User", "Role", "OperationLog",
@@ -14,4 +15,5 @@ __all__ = [
     "Order", "OrderItem", "Payment", "Contract", "Approval",
     "Event", "EventResource", "StaffSchedule", "Venue",
     "Notification", "NotificationType",
+    "Receivable", "FinancePayment", "Refund", "Transaction", "Invoice", "Reconciliation",
 ]
