@@ -21,6 +21,7 @@ ROLES = [
             "dashboard": {"read": "all"},
             "report": {"read": "all"},
             "system": {"read": "all", "write": "all"},
+            "finance": {"read": "all", "write": "all", "approve": "all", "export": "all"},
         },
     },
     {
@@ -33,6 +34,7 @@ ROLES = [
             "dashboard": {"read": "team"},
             "report": {"read": "all"},
             "system": {"read": "none", "write": "none"},
+            "finance": {"read": "all", "write": "all"},
         },
     },
     {
