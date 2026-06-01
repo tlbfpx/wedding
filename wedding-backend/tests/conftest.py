@@ -206,6 +206,9 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     # startup events, so we must do this explicitly).
     register_event_handlers()
 
+    from app.finance.interfaces.subscribers.event_handlers import register_finance_event_handlers
+    register_finance_event_handlers()
+
     # Override database dependency
     app.dependency_overrides[get_db] = override_get_db
 

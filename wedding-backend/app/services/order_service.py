@@ -17,6 +17,8 @@ from app.schemas.order import OrderCreate, OrderUpdate, StatusTransition, Paymen
 from app.utils.errors import AppException
 from app.utils.pagination import PageResponse
 from app.config import settings
+from app.events import DomainEvent, event_bus
+from app.events.event_types import ORDER_CREATED, ORDER_STATUS_CHANGED, ORDER_CANCELLED
 
 # Magic bytes for allowed file types
 ALLOWED_MIME_TYPES = {
@@ -193,8 +195,23 @@ class OrderService:
             item.order_id = order.id
             self.db.add(item)
 
+        await event_bus.publish(
+            DomainEvent(
+                event_type=ORDER_CREATED,
+                payload={
+                    "order_id": order.id,
+                    "order_no": order.order_no,
+                    "total_amount": float(order.total_amount),
+                    "customer_id": order.customer_id,
+                    "sale_id": order.sale_id,
+                },
+            ),
+            context={"db": self.db},
+        )
+
         await self.db.commit()
         await self.db.refresh(order)
+
         return order
 
     async def update_order(self, order_id: int, data: OrderUpdate) -> Order:
@@ -238,8 +255,23 @@ class OrderService:
             )
 
         order.status = new_status
+
+        event_type = ORDER_CANCELLED if new_status == OrderStatus.cancelled else ORDER_STATUS_CHANGED
+        await event_bus.publish(
+            DomainEvent(
+                event_type=event_type,
+                payload={
+                    "order_id": order.id,
+                    "order_no": order.order_no,
+                    "new_status": new_status.value,
+                },
+            ),
+            context={"db": self.db},
+        )
+
         await self.db.commit()
         await self.db.refresh(order)
+
         return order
 
     async def record_payment(self, order_id: int, data: PaymentCreate) -> Payment:

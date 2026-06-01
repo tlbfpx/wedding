@@ -99,6 +99,9 @@ class TransactionService:
             }
         ))
 
+        await self.db.commit()
+        await self.db.refresh(transaction)
+
         return transaction
 
     async def create_refund_transaction(

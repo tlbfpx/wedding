@@ -93,6 +93,16 @@ class PaymentService:
         # 同时写入 Payment 表（兼容期）
         await self._create_legacy_payment(order_id, amount, method, paid_at, note)
 
+        # 更新 Order.paid_amount
+        from app.models.order import Order
+        order_result = await self.db.execute(select(Order).where(Order.id == order_id))
+        order = order_result.scalar_one_or_none()
+        if order:
+            order.paid_amount = float(Decimal(str(order.paid_amount)) + Decimal(str(amount)))
+
+        await self.db.commit()
+        await self.db.refresh(payment)
+
         # 发布事件
         await event_bus.publish(DomainEvent(
             event_type=PAYMENT_RECORDED,
@@ -174,7 +184,9 @@ class PaymentService:
         if note is not None:
             payment.note = note
 
-        return await self.payment_repo.update(payment)
+        result = await self.payment_repo.update(payment)
+        await self.db.commit()
+        return result
 
     async def delete_payment(self, payment_id: int) -> None:
         """删除收款记录"""
@@ -199,6 +211,15 @@ class PaymentService:
         transactions = result.scalars().all()
         for tx in transactions:
             await self.db.delete(tx)
+
+        # 更新 Order.paid_amount
+        from app.models.order import Order
+        order_result = await self.db.execute(select(Order).where(Order.id == payment.order_id))
+        order = order_result.scalar_one_or_none()
+        if order:
+            order.paid_amount = float(max(0, Decimal(str(order.paid_amount)) - Decimal(str(payment.amount))))
+
+        await self.db.commit()
 
     async def list_payments(
         self,

@@ -106,6 +106,9 @@ class InvoiceService:
                 approval.target_id = invoice.id
             await self.invoice_repo.update(invoice)
 
+        await self.db.commit()
+        await self.db.refresh(invoice)
+
         # 发布事件
         from app.finance.domain.events.event_types import INVOICE_REQUESTED
         await event_bus.publish(DomainEvent(
@@ -146,6 +149,9 @@ class InvoiceService:
             invoice.issued_at = issued_at
 
         invoice = await self.invoice_repo.update(invoice)
+
+        await self.db.commit()
+        await self.db.refresh(invoice)
 
         # 如果状态变更为已开票，发布事件
         if status == InvoiceStatus.issued:

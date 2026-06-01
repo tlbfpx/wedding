@@ -72,7 +72,7 @@ class RefundService:
         )
 
         # 创建审批记录
-        from app.models.order import Approval, ApprovalStatus
+        from app.models.order import Approval, ApprovalStatus, ApprovalType
 
         approval = Approval(
             type=ApprovalType.refund,
@@ -86,6 +86,9 @@ class RefundService:
 
         refund.approval_id = approval.id
         await self.refund_repo.update(refund)
+
+        await self.db.commit()
+        await self.db.refresh(refund)
 
         # 发布审批创建事件
         await event_bus.publish(DomainEvent(
