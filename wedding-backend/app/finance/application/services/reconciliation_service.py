@@ -11,7 +11,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.finance.infrastructure.repositories import ReconciliationRepository, ReceivableRepository, TransactionRepository
-from app.finance.domain.entities import Reconciliation, Receivable
+from app.finance.domain.entities import Reconciliation, Receivable, Transaction
 from app.finance.domain.entities.enums import ReceivableStatus, TransactionType, ExpenseCategory
 from app.events import DomainEvent, event_bus
 from app.utils.errors import AppException

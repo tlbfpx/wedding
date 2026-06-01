@@ -255,7 +255,8 @@ async def test_role(db_session: AsyncSession) -> Role:
                     '"schedule": {"read": "all", "write": "all"}, '
                     '"dashboard": {"read": "all"}, '
                     '"report": {"read": "all"}, '
-                    '"system": {"read": "all", "write": "all"}}',
+                    '"system": {"read": "all", "write": "all"}, '
+                    '"finance": {"read": "all", "write": "all", "approve": "all", "export": "all"}}',
     )
     db_session.add(role)
     await db_session.commit()
@@ -321,11 +322,11 @@ async def test_sale_user(db_session: AsyncSession, test_role: Role) -> User:
 async def auth_headers(test_user: User) -> dict[str, str]:
     """Return authorization headers with a valid JWT for the test admin user."""
     token = create_access_token({"sub": str(test_user.id)})
-    return {"Authorization": f"Bearer {token}"}
+    return {"Authorization": f"Bearer {token}", "X-CSRF-Token": "test-csrf-token-for-integration-tests"}
 
 
 @pytest_asyncio.fixture
 async def sale_auth_headers(test_sale_user: User) -> dict[str, str]:
     """Return authorization headers with a valid JWT for the test sale user."""
     token = create_access_token({"sub": str(test_sale_user.id)})
-    return {"Authorization": f"Bearer {token}"}
+    return {"Authorization": f"Bearer {token}", "X-CSRF-Token": "test-csrf-token-for-integration-tests"}

@@ -2,7 +2,7 @@
 收支明细服务
 """
 from __future__ import annotations
-from datetime import date, datetime
+from datetime import date as date_type, datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -71,7 +71,7 @@ class TransactionService:
         amount: float,
         order_id: Optional[int] = None,
         supplier_id: Optional[int] = None,
-        date: Optional[date] = None,
+        date: Optional[date_type] = None,
         note: Optional[str] = None,
         created_by: Optional[int] = None,
     ) -> Transaction:
@@ -82,7 +82,7 @@ class TransactionService:
             amount=Decimal(str(amount)),
             order_id=order_id,
             supplier_id=supplier_id,
-            date=date or date.today(),
+            date=date or date_type.today(),
             note=note,
         )
 
@@ -170,8 +170,8 @@ class TransactionService:
         category: Optional[ExpenseCategory] = None,
         order_id: Optional[int] = None,
         supplier_id: Optional[int] = None,
-        date_start: Optional[date] = None,
-        date_end: Optional[date] = None,
+        date_start: Optional[date_type] = None,
+        date_end: Optional[date_type] = None,
         page: int = 1,
         page_size: int = 20,
     ) -> tuple[list[Transaction], int]:
@@ -189,7 +189,7 @@ class TransactionService:
         )
 
     async def get_summary(
-        self, start_date: date, end_date: date
+        self, start_date: date_type, end_date: date_type
     ) -> dict:
         """获取收支汇总统计"""
         return await self.transaction_repo.get_summary(start_date, end_date)
