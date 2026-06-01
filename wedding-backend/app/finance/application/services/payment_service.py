@@ -201,9 +201,7 @@ class PaymentService:
             await self._update_receivable_status(receivable)
             await self.receivable_repo.update(receivable)
 
-        await self.payment_repo.delete(payment_id)
-
-        # 删除关联的交易记录
+        # 先删除关联的交易记录（FK 约束）
         from app.finance.domain.entities import Transaction
         result = await self.db.execute(
             select(Transaction).where(Transaction.payment_id == payment_id)
@@ -211,6 +209,8 @@ class PaymentService:
         transactions = result.scalars().all()
         for tx in transactions:
             await self.db.delete(tx)
+
+        await self.payment_repo.delete(payment_id)
 
         # 更新 Order.paid_amount
         from app.models.order import Order
