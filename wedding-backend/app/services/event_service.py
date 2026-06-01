@@ -64,7 +64,7 @@ class EventService:
         result = await self.db.execute(query)
         events = result.scalars().unique().all()
 
-        items = [_event_to_dict(e) for e in events]
+        items = [await _event_to_dict(e, self.db) for e in events]
         return items, total
 
     async def get_event_detail(self, event_id: int) -> dict:
