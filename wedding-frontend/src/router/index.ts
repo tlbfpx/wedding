@@ -128,6 +128,42 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/Notifications.vue'),
         meta: { title: '消息通知' },
       },
+      {
+        path: 'finance/receivables',
+        name: 'FinanceReceivables',
+        component: () => import('@/views/finance/ReceivableList.vue'),
+        meta: { title: '应收账款', module: 'finance' },
+      },
+      {
+        path: 'finance/payments',
+        name: 'FinancePayments',
+        component: () => import('@/views/finance/PaymentList.vue'),
+        meta: { title: '收款管理', module: 'finance' },
+      },
+      {
+        path: 'finance/refunds',
+        name: 'FinanceRefunds',
+        component: () => import('@/views/finance/RefundList.vue'),
+        meta: { title: '退款管理', module: 'finance' },
+      },
+      {
+        path: 'finance/transactions',
+        name: 'FinanceTransactions',
+        component: () => import('@/views/finance/TransactionList.vue'),
+        meta: { title: '收支明细', module: 'finance' },
+      },
+      {
+        path: 'finance/invoices',
+        name: 'FinanceInvoices',
+        component: () => import('@/views/finance/InvoiceList.vue'),
+        meta: { title: '开票管理', module: 'finance' },
+      },
+      {
+        path: 'finance/reconciliation',
+        name: 'FinanceReconciliation',
+        component: () => import('@/views/finance/ReconciliationPage.vue'),
+        meta: { title: '财务对账', module: 'finance' },
+      },
     ],
   },
 ]
@@ -138,23 +174,22 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from, next) => {
-  const token = localStorage.getItem('token')
   const authStore = useAuthStore()
 
   // Redirect to login if not authenticated
-  if (to.meta.requiresAuth !== false && !token) {
+  if (to.meta.requiresAuth !== false && !authStore.isLoggedIn) {
     next({ path: '/login', query: { redirect: to.fullPath } })
     return
   }
 
   // Redirect to home if already logged in and trying to access login
-  if (to.path === '/login' && token) {
+  if (to.path === '/login' && authStore.isLoggedIn) {
     next({ path: '/' })
     return
   }
 
   // If authenticated, ensure user data is loaded before permission check
-  if (token && !authStore.user) {
+  if (authStore.isLoggedIn && !authStore.user) {
     try {
       await authStore.fetchUser()
     } catch {
@@ -176,6 +211,7 @@ router.beforeEach(async (to, _from, next) => {
       'suppliers': 'supplier',
       'users': 'system',
       'roles': 'system',
+      'finance': 'finance',
     }
 
     // Try both frontend module name and backend key

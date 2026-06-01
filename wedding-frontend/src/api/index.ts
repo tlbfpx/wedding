@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosResponse } from 'axios'
 import DOMPurify from 'dompurify'
 import { useAuthStore } from '@/stores/auth'
 
@@ -7,13 +7,6 @@ const request = axios.create({
   baseURL: '/api/v1',
   timeout: 15000,
 })
-
-// Track pending requests for deduplication
-const pendingRequests = new Map<string, Promise<unknown>>()
-
-function getRequestKey(config: InternalAxiosRequestConfig): string {
-  return `${config.method || 'GET'}:${config.url || ''}:${JSON.stringify(config.params || {})}:${JSON.stringify(config.data || {})}`
-}
 
 // Request interceptor - attach token and handle CSRF
 request.interceptors.request.use(
@@ -33,21 +26,6 @@ request.interceptors.request.use(
       }
     }
 
-    // Request deduplication for GET requests
-    if (config.method?.toLowerCase() === 'get') {
-      const key = getRequestKey(config as InternalAxiosRequestConfig)
-      if (pendingRequests.has(key)) {
-        // Cancel the previous request by throwing an AbortError
-        const controller = new AbortController()
-        config.signal = controller.signal
-        // Signal the previous request to abort
-        pendingRequests.set(key, new Promise((_, reject) => {
-          controller.signal.addEventListener('abort', () => reject(new DOMException('Deduplicated', 'AbortError')))
-        }))
-      }
-      pendingRequests.set(key, request(config as InternalAxiosRequestConfig).catch(() => {}))
-    }
-
     return config
   },
   (error) => {
@@ -64,11 +42,6 @@ request.interceptors.response.use(
     return response.data
   },
   async (error) => {
-    // Handle deduplicated requests
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return Promise.reject(error)
-    }
-
     const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {

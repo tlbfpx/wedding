@@ -24,6 +24,7 @@ import {
   BusinessOutline,
   PersonOutline,
   SettingsOutline,
+  WalletOutline,
   LogOutOutline,
 } from '@vicons/ionicons5'
 import { useAuthStore } from '@/stores/auth'
@@ -89,6 +90,22 @@ const menuOptions = computed<MenuOption[]>(() => {
       label: '供应商管理',
       key: '/suppliers',
       icon: renderIcon(BusinessOutline),
+    })
+  }
+
+  if (has('finance')) {
+    items.push({
+      label: '财务管理',
+      key: 'finance-group',
+      icon: renderIcon(WalletOutline),
+      children: [
+        { label: '应收账款', key: '/finance/receivables' },
+        { label: '收款管理', key: '/finance/payments' },
+        { label: '退款管理', key: '/finance/refunds' },
+        { label: '收支明细', key: '/finance/transactions' },
+        { label: '开票管理', key: '/finance/invoices' },
+        { label: '财务对账', key: '/finance/reconciliation' },
+      ],
     })
   }
 

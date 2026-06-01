@@ -148,5 +148,6 @@ volumes:
   backup_data:
 
 networks:
-  default:
+  wedding-network:
     name: wedding-network
+    driver: bridge
