@@ -103,7 +103,7 @@ class ContractStatus(str, enum.Enum):
     signed = "signed"
 
 
-class Contract(Base):
+class Contract(Base, TimestampMixin):
     __tablename__ = "contracts"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

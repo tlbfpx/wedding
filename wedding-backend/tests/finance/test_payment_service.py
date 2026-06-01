@@ -4,6 +4,7 @@
 import pytest
 from datetime import datetime
 from decimal import Decimal
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.finance.application.services import PaymentService
@@ -11,23 +12,31 @@ from app.finance.domain.entities.enums import PaymentMethod
 from app.utils.errors import AppException
 
 
+@pytest.fixture(autouse=True)
+async def _clean_finance_tables(db_session: AsyncSession):
+    """Clean finance-related tables before each test."""
+    for tbl in [
+        "transactions", "finance_payments", "refunds",
+        "invoices", "reconciliations", "receivables",
+    ]:
+        await db_session.execute(text(f"DELETE FROM {tbl}"))
+    # Also clean legacy payments created by the service
+    await db_session.execute(text("DELETE FROM payments"))
+    await db_session.commit()
+
+
 @pytest.mark.asyncio
 async def test_record_payment(db_session: AsyncSession):
     """测试登记收款"""
-    # 先创建应收记录
     from app.finance.application.services import ReceivableService
-    from app.finance.infrastructure.repositories import ReceivableRepository
 
     receivable_service = ReceivableService(db_session)
-    receivable_repo = ReceivableRepository(db_session)
 
-    # 创建应收
     receivable = await receivable_service.create_receivable(
         order_id=10,
         total_amount=Decimal("10000.00"),
     )
 
-    # 登记收款
     payment_service = PaymentService(db_session)
     payment = await payment_service.record_payment(
         order_id=10,
@@ -42,7 +51,6 @@ async def test_record_payment(db_session: AsyncSession):
     assert payment.amount == 5000.00
     assert payment.method == PaymentMethod.transfer
 
-    # 验证应收已更新
     await db_session.refresh(receivable)
     assert receivable.received_amount == Decimal("5000.00")
 
@@ -52,14 +60,12 @@ async def test_record_payment_exceeds_total(db_session: AsyncSession):
     """测试收款金额超过应收"""
     from app.finance.application.services import ReceivableService
 
-    # 创建应收记录
     receivable_service = ReceivableService(db_session)
     await receivable_service.create_receivable(
         order_id=11,
         total_amount=Decimal("10000.00"),
     )
 
-    # 尝试收款超过应收
     payment_service = PaymentService(db_session)
 
     with pytest.raises(AppException) as exc_info:
@@ -78,7 +84,6 @@ async def test_update_payment(db_session: AsyncSession):
     """测试修改收款记录"""
     from app.finance.application.services import ReceivableService
 
-    # 创建应收并收款
     receivable_service = ReceivableService(db_session)
     await receivable_service.create_receivable(
         order_id=12,
@@ -94,7 +99,6 @@ async def test_update_payment(db_session: AsyncSession):
         created_by=1,
     )
 
-    # 修改收款金额
     updated_payment = await payment_service.update_payment(
         payment_id=payment.id,
         amount=6000.00,
@@ -108,7 +112,6 @@ async def test_delete_payment(db_session: AsyncSession):
     """测试删除收款记录"""
     from app.finance.application.services import ReceivableService
 
-    # 创建应收并收款
     receivable_service = ReceivableService(db_session)
     receivable = await receivable_service.create_receivable(
         order_id=13,
@@ -124,10 +127,8 @@ async def test_delete_payment(db_session: AsyncSession):
         created_by=1,
     )
 
-    # 删除收款
     await payment_service.delete_payment(payment.id)
 
-    # 验证应收已扣减
     await db_session.refresh(receivable)
     assert receivable.received_amount == Decimal("0")
 
