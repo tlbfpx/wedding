@@ -8,3 +8,4 @@ class DecisionDimension(str, Enum):
     SOURCE = "source"
     SERVICE = "service"
     SUPPLIER = "supplier"
+    ALL = "all"

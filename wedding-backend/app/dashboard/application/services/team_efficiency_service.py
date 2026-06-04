@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.order import Order, OrderStatus
 from app.models.customer import Customer, CustomerStatus
-from app.models.follow_up import FollowUp
+from app.models.customer import FollowUp
 from app.models.user import User
 from app.dashboard.domain.value_objects import PeriodType, PeriodRange
 from app.dashboard.infrastructure.cache import RedisCacheService

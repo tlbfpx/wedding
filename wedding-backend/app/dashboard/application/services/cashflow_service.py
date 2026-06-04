@@ -156,7 +156,9 @@ class CashflowService:
 
         query = CashflowService._apply_scope_filter(query, Order.sale_id, scope, user_id)
 
-        total, paid = await db.execute(query).one() or (0, 0)
+        result = await db.execute(query)
+        row = result.one_or_none()
+        total, paid = (row[0], row[1]) if row else (0, 0)
 
         total_val = Decimal(str(total)) if total else Decimal("0")
         paid_val = Decimal(str(paid)) if paid else Decimal("0")
