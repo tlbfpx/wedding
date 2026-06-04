@@ -16,7 +16,6 @@ import {
   getCashflowData,
   getTeamEfficiency,
   getAlerts,
-  resolveAlert,
   getDecisionSupport,
   type PeriodType,
   type CompareToType,
@@ -206,7 +205,7 @@ watch([selectedPeriod, compareTo], () => {
 })
 
 // ========== 预警处理 ==========
-async function handleAlertResolved(alertId: string) {
+async function handleAlertResolved(_alertId: string) {
   // 重新加载预警列表
   await fetchAlerts()
   message.success('预警已标记为已处理')
@@ -270,13 +269,13 @@ onUnmounted(() => {
         <NGi v-if="canViewFinance">
           <CashflowPanel
             :loading="cashflowLoading"
-            :data="cashflowData"
+            :data="cashflowData || undefined"
           />
         </NGi>
         <NGi>
           <TeamEfficiencyPanel
             :loading="teamLoading"
-            :data="teamData"
+            :data="teamData || undefined"
           />
         </NGi>
       </NGrid>
@@ -284,7 +283,7 @@ onUnmounted(() => {
       <!-- 第三行：风险预警 -->
       <AlertsPanel
         :loading="alertsLoading"
-        :data="alertsData"
+        :data="alertsData || undefined"
         @resolved="handleAlertResolved"
         style="margin-bottom: 16px"
       />
@@ -293,7 +292,7 @@ onUnmounted(() => {
       <DecisionSupportPanel
         v-if="canViewDecisionSupport"
         :loading="decisionLoading"
-        :data="decisionData"
+        :data="decisionData || undefined"
       />
     </template>
   </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { NCard, NGrid, NGi, NSkeleton, NStatistic, NProgress, NSpace, NTag } from 'naive-ui'
+import { NCard, NGrid, NGi, NSkeleton, NProgress } from 'naive-ui'
 import type { MetricValue } from '@/api/dashboard'
 
 interface Props {
@@ -24,7 +24,7 @@ interface MetricCard {
   format: 'currency' | 'number' | 'percent'
 }
 
-const metricCards = computed<MetricCard[]>((() => {
+const metricCards = computed<MetricCard[]>(() => {
   if (!props.metrics) return []
   return [
     {
@@ -53,7 +53,7 @@ const metricCards = computed<MetricCard[]>((() => {
       format: 'currency',
     },
   ]
-})())
+})
 
 function formatValue(value: number, format: string): string {
   switch (format) {
@@ -83,12 +83,6 @@ function getTrendLabel(trend?: number): string {
   return `${absTrend.toFixed(1)}%`
 }
 
-function getAchievementStatus(achievement?: number): 'success' | 'warning' | 'error' | undefined {
-  if (achievement === undefined) return undefined
-  if (achievement >= 0.8) return 'success'
-  if (achievement >= 0.6) return 'warning'
-  return 'error'
-}
 </script>
 
 <template>

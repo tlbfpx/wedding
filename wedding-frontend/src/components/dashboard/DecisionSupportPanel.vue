@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { NCard, NSkeleton, NTabs, NTabPane, NDataTable, NProgress, NSpace } from 'naive-ui'
+import { computed, h } from 'vue'
+import { NCard, NSkeleton, NTabs, NTabPane, NDataTable, NProgress } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import type { DecisionSupportResponse } from '@/api/dashboard'
 
@@ -68,20 +68,18 @@ const serviceColumns: DataTableColumns<DecisionSupportResponse['service_breakdow
     key: 'percent',
     width: 200,
     render: (row) => {
-      return (
-        <div style="display: flex; align-items: center; gap: 8px">
-          <NProgress
-            type="line"
-            percentage={row.percent * 100}
-            showIndicator={false}
-            height={16}
-            railColor="#f0f0f0"
-          />
-          <span style="width: 50px; text-align: right; font-size: 13px">
-            {(row.percent * 100).toFixed(0)}%
-          </span>
-        </div>
-      )
+      return h('div', { style: 'display: flex; align-items: center; gap: 8px' }, [
+        h(NProgress, {
+          type: 'line',
+          percentage: row.percent * 100,
+          showIndicator: false,
+          height: 16,
+          railColor: '#f0f0f0',
+        }),
+        h('span', {
+          style: 'width: 50px; text-align: right; font-size: 13px'
+        }, `${(row.percent * 100).toFixed(0)}%`),
+      ])
     },
   },
   {
@@ -185,7 +183,6 @@ const servicesWithLabels = computed(() => {
           size="small"
           :pagination="{
             pageSize: 10,
-            pageSizeOptions: [5, 10, 20],
           }"
           :scroll-x="800"
         />

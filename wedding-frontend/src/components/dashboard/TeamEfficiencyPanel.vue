@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { NCard, NSkeleton, NGrid, NGi, NStatistic, NSpace, NProgress, NDataTable, NSelect } from 'naive-ui'
+import { NCard, NSkeleton, NGrid, NGi, NSpace, NProgress, NDataTable, NSelect } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import type { TeamEfficiencyResponse } from '@/api/dashboard'
 
@@ -33,14 +33,11 @@ const funnelStages = computed(() => {
   }))
 })
 
-const maxFunnelCount = computed(() => {
-  const counts = props.data?.funnel?.map(f => f.count) || []
-  return Math.max(...counts, 1)
-})
 
 const salesRanking = computed(() => {
   if (!props.data?.ranking) return []
-  return [...props.data.ranking].sort((a, b) => {
+  const ranking = [...props.data.ranking]
+  return ranking.sort((a, b) => {
     switch (sortBy.value) {
       case 'revenue':
         return b.revenue - a.revenue
@@ -171,7 +168,6 @@ function formatAmount(amount: number): string {
           size="small"
           :pagination="{
             pageSize: 5,
-            pageSizeOptions: [5, 10, 20],
           }"
         />
       </div>

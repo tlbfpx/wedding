@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { NCard, NSkeleton, NSpace, NList, NListItem, NThing, NTag, NButton, NButtonGroup, NCollapse, NCollapseItem, NSpin } from 'naive-ui'
+import { NCard, NSkeleton, NSpace, NTag, NButton, NButtonGroup, NCollapse, NCollapseItem } from 'naive-ui'
 import type { AlertsResponse, AlertItem } from '@/api/dashboard'
 import { resolveAlert } from '@/api/dashboard'
 
@@ -20,23 +20,19 @@ const emit = defineEmits<{
 const resolving = ref<Set<string>>(new Set())
 const collapsed = ref(false)
 
-const highAlerts = computed(() => {
+const highAlerts = computed<AlertItem[]>(() => {
   return props.data?.alerts.filter(a => a.level === 'high') || []
 })
 
-const mediumAlerts = computed(() => {
+const mediumAlerts = computed<AlertItem[]>(() => {
   return props.data?.alerts.filter(a => a.level === 'medium') || []
-})
-
-const lowAlerts = computed(() => {
-  return props.data?.alerts.filter(a => a.level === 'low') || []
 })
 
 const displayAlerts = computed(() => {
   const result: AlertItem[] = []
   if (!collapsed.value) {
-    result.push(...highAlerts.slice(0, 10))
-    result.push(...mediumAlerts.slice(0, 10))
+    result.push(...highAlerts.value.slice(0, 10))
+    result.push(...mediumAlerts.value.slice(0, 10))
   }
   return result
 })
