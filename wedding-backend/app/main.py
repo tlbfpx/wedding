@@ -9,6 +9,7 @@ from app.config import settings
 from app.database import get_db
 from app.utils.errors import AppException, ErrorDetail
 from app.api import auth, customers, suppliers, orders, approvals, events, venues, dashboard, users, notifications, reports, imports, health
+from app.dashboard.interfaces.controllers import health_controller
 from app.events.handlers import register_event_handlers
 from app.finance.interfaces.controllers import receivables, payments, refunds, transactions, invoices, reconciliations
 from app.finance.interfaces.subscribers.event_handlers import register_finance_event_handlers
@@ -103,6 +104,7 @@ app.include_router(approvals.router, prefix="/api/v1/approvals", tags=["approval
 app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
 app.include_router(venues.router, prefix="/api/v1/venues", tags=["venues"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboard"])
+app.include_router(health_controller.router, prefix="/api/v1/dashboard", tags=["dashboard-v2"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["notifications"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["reports"])

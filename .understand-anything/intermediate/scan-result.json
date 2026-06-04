@@ -1,0 +1,2633 @@
+{
+  "name": "wedding",
+  "description": "Enterprise wedding industry management platform supporting CRM, order management, supplier management, event scheduling, and RBAC-based system administration. Note: this project has over 100 source files; consider scoping analysis to a subdirectory for faster results.",
+  "languages": [
+    "conf",
+    "config",
+    "css",
+    "dockerfile",
+    "html",
+    "json",
+    "mako",
+    "markdown",
+    "pid",
+    "python",
+    "shell",
+    "txt",
+    "typescript",
+    "unknown",
+    "vue",
+    "yaml"
+  ],
+  "frameworks": [
+    "Alembic",
+    "Docker",
+    "Docker Compose",
+    "FastAPI",
+    "Naive UI",
+    "Pinia",
+    "Playwright",
+    "Pydantic",
+    "Pytest",
+    "SQLAlchemy",
+    "Uvicorn",
+    "Vite",
+    "Vue"
+  ],
+  "files": [
+    {
+      "path": ".claude/commands/opsx/apply.md",
+      "language": "markdown",
+      "sizeLines": 152,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/archive.md",
+      "language": "markdown",
+      "sizeLines": 157,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/bulk-archive.md",
+      "language": "markdown",
+      "sizeLines": 242,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/continue.md",
+      "language": "markdown",
+      "sizeLines": 114,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/explore.md",
+      "language": "markdown",
+      "sizeLines": 173,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/ff.md",
+      "language": "markdown",
+      "sizeLines": 97,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/new.md",
+      "language": "markdown",
+      "sizeLines": 69,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/onboard.md",
+      "language": "markdown",
+      "sizeLines": 550,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/propose.md",
+      "language": "markdown",
+      "sizeLines": 106,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/sync.md",
+      "language": "markdown",
+      "sizeLines": 134,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/commands/opsx/verify.md",
+      "language": "markdown",
+      "sizeLines": 164,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-apply-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 156,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-archive-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 114,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-bulk-archive-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 246,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-continue-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 118,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-explore/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 288,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-ff-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 101,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-new-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 74,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-onboard/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 554,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-propose/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 110,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-sync-specs/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 138,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".claude/skills/openspec-verify-change/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 168,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".codegraph/daemon.pid",
+      "language": "pid",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".env.example",
+      "language": "config",
+      "sizeLines": 30,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".understand-anything/.understandignore",
+      "language": "unknown",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "AGENTS.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "sizeLines": 497,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docker-compose.yml",
+      "language": "yaml",
+      "sizeLines": 152,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "docs/api-versioning.md",
+      "language": "markdown",
+      "sizeLines": 113,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/architecture.md",
+      "language": "markdown",
+      "sizeLines": 394,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/lifecycle/docs-baseline-documentation.md",
+      "language": "markdown",
+      "sizeLines": 86,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/lifecycle/feat-iteration-2-report-notification-import.md",
+      "language": "markdown",
+      "sizeLines": 99,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/lifecycle/refactor-extract-service-layer-decouple-approval.md",
+      "language": "markdown",
+      "sizeLines": 91,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/module-dependencies.md",
+      "language": "markdown",
+      "sizeLines": 224,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/PRD.md",
+      "language": "markdown",
+      "sizeLines": 654,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-013-data-report-export.md",
+      "language": "markdown",
+      "sizeLines": 105,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-014-notification-system.md",
+      "language": "markdown",
+      "sizeLines": 95,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-015-data-import.md",
+      "language": "markdown",
+      "sizeLines": 104,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-016-iteration-2-architecture.md",
+      "language": "markdown",
+      "sizeLines": 197,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-017-finance-management.md",
+      "language": "markdown",
+      "sizeLines": 403,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/prd/FR-018-dashboard-redesign.md",
+      "language": "markdown",
+      "sizeLines": 639,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/refactoring-plan.md",
+      "language": "markdown",
+      "sizeLines": 766,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-05-21-wedding-management-system-design.md",
+      "language": "markdown",
+      "sizeLines": 643,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/topology.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/.openspec.yaml",
+      "language": "yaml",
+      "sizeLines": 2,
+      "fileCategory": "config"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/design.md",
+      "language": "markdown",
+      "sizeLines": 112,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/proposal.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/approval-workflow/spec.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/auth/spec.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/customer-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 75,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/dashboard/spec.md",
+      "language": "markdown",
+      "sizeLines": 73,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/file-upload/spec.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/order-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 82,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/schedule-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/supplier-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/specs/system-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 57,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/changes/archive/2026-05-21-wedding-management-system/tasks.md",
+      "language": "markdown",
+      "sizeLines": 186,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/config.yaml",
+      "language": "yaml",
+      "sizeLines": 20,
+      "fileCategory": "config"
+    },
+    {
+      "path": "openspec/specs/approval-workflow/spec.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/auth/spec.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/customer-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 79,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/dashboard/spec.md",
+      "language": "markdown",
+      "sizeLines": 77,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/file-upload/spec.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/order-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 86,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/schedule-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 74,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/supplier-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "openspec/specs/system-management/spec.md",
+      "language": "markdown",
+      "sizeLines": 61,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 303,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tests/e2e_functional.py",
+      "language": "python",
+      "sizeLines": 677,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/e2e_test.py",
+      "language": "python",
+      "sizeLines": 585,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/.env.example",
+      "language": "config",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-backend/.python-version",
+      "language": "unknown",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/alembic.ini",
+      "language": "config",
+      "sizeLines": 36,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-backend/app/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/approvals.py",
+      "language": "python",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/auth.py",
+      "language": "python",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/customers.py",
+      "language": "python",
+      "sizeLines": 167,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/dashboard.py",
+      "language": "python",
+      "sizeLines": 235,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/events.py",
+      "language": "python",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/health.py",
+      "language": "python",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/imports.py",
+      "language": "python",
+      "sizeLines": 37,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/notifications.py",
+      "language": "python",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/orders.py",
+      "language": "python",
+      "sizeLines": 139,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/reports.py",
+      "language": "python",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/suppliers.py",
+      "language": "python",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/users.py",
+      "language": "python",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/api/venues.py",
+      "language": "python",
+      "sizeLines": 176,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/config.py",
+      "language": "python",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/database.py",
+      "language": "python",
+      "sizeLines": 11,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/events/__init__.py",
+      "language": "python",
+      "sizeLines": 121,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/events/event_types.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/events/handlers.py",
+      "language": "python",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/__init__.py",
+      "language": "python",
+      "sizeLines": 15,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/__init__.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/invoice_service.py",
+      "language": "python",
+      "sizeLines": 231,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/payment_service.py",
+      "language": "python",
+      "sizeLines": 242,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/receivable_service.py",
+      "language": "python",
+      "sizeLines": 149,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/reconciliation_service.py",
+      "language": "python",
+      "sizeLines": 238,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/refund_service.py",
+      "language": "python",
+      "sizeLines": 236,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/application/services/transaction_service.py",
+      "language": "python",
+      "sizeLines": 198,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/docs/contracts.md",
+      "language": "markdown",
+      "sizeLines": 664,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/app/finance/docs/design-overview.md",
+      "language": "markdown",
+      "sizeLines": 952,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/__init__.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/enums.py",
+      "language": "python",
+      "sizeLines": 61,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/finance_payment.py",
+      "language": "python",
+      "sizeLines": 34,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/invoice.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/receivable.py",
+      "language": "python",
+      "sizeLines": 46,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/reconciliation.py",
+      "language": "python",
+      "sizeLines": 28,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/refund.py",
+      "language": "python",
+      "sizeLines": 38,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/entities/transaction.py",
+      "language": "python",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/events/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/events/event_types.py",
+      "language": "python",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/domain/services/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/finance_payment_repository.py",
+      "language": "python",
+      "sizeLines": 114,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/invoice_repository.py",
+      "language": "python",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/receivable_repository.py",
+      "language": "python",
+      "sizeLines": 139,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/reconciliation_repository.py",
+      "language": "python",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/refund_repository.py",
+      "language": "python",
+      "sizeLines": 94,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/infrastructure/repositories/transaction_repository.py",
+      "language": "python",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/__init__.py",
+      "language": "python",
+      "sizeLines": 14,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/invoices.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/payments.py",
+      "language": "python",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/receivables.py",
+      "language": "python",
+      "sizeLines": 162,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/reconciliations.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/refunds.py",
+      "language": "python",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/controllers/transactions.py",
+      "language": "python",
+      "sizeLines": 159,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/subscribers/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/finance/interfaces/subscribers/event_handlers.py",
+      "language": "python",
+      "sizeLines": 265,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/main.py",
+      "language": "python",
+      "sizeLines": 144,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/__init__.py",
+      "language": "python",
+      "sizeLines": 4,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/auth.py",
+      "language": "python",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/csrf.py",
+      "language": "python",
+      "sizeLines": 57,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/global_rate_limit.py",
+      "language": "python",
+      "sizeLines": 64,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/logging.py",
+      "language": "python",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/metrics.py",
+      "language": "python",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/rate_limit.py",
+      "language": "python",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/middleware/request_id.py",
+      "language": "python",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/__init__.py",
+      "language": "python",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/base.py",
+      "language": "python",
+      "sizeLines": 13,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/customer.py",
+      "language": "python",
+      "sizeLines": 79,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/event.py",
+      "language": "python",
+      "sizeLines": 102,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/log.py",
+      "language": "python",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/notification.py",
+      "language": "python",
+      "sizeLines": 34,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/order.py",
+      "language": "python",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/supplier.py",
+      "language": "python",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/models/user.py",
+      "language": "python",
+      "sizeLines": 39,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/approval.py",
+      "language": "python",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/customer.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/event.py",
+      "language": "python",
+      "sizeLines": 43,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/import_schema.py",
+      "language": "python",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/notification.py",
+      "language": "python",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/order.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/report.py",
+      "language": "python",
+      "sizeLines": 17,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/supplier.py",
+      "language": "python",
+      "sizeLines": 49,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/schemas/user.py",
+      "language": "python",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/seed.py",
+      "language": "python",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/sentry.py",
+      "language": "python",
+      "sizeLines": 53,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/approval_service.py",
+      "language": "python",
+      "sizeLines": 198,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/customer_service.py",
+      "language": "python",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/event_service.py",
+      "language": "python",
+      "sizeLines": 347,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/import_service.py",
+      "language": "python",
+      "sizeLines": 311,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/notification_service.py",
+      "language": "python",
+      "sizeLines": 125,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/order_service.py",
+      "language": "python",
+      "sizeLines": 505,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/report_service.py",
+      "language": "python",
+      "sizeLines": 269,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/supplier_service.py",
+      "language": "python",
+      "sizeLines": 268,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/services/user_service.py",
+      "language": "python",
+      "sizeLines": 256,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/utils/__init__.py",
+      "language": "python",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/utils/auth.py",
+      "language": "python",
+      "sizeLines": 26,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/utils/cache.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/utils/errors.py",
+      "language": "python",
+      "sizeLines": 20,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/app/utils/pagination.py",
+      "language": "python",
+      "sizeLines": 20,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/docker-entrypoint.sh",
+      "language": "shell",
+      "sizeLines": 8,
+      "fileCategory": "script"
+    },
+    {
+      "path": "wedding-backend/Dockerfile",
+      "language": "dockerfile",
+      "sizeLines": 30,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "wedding-backend/docs/approvals-contracts.md",
+      "language": "markdown",
+      "sizeLines": 106,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/approvals-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 105,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/auth-contracts.md",
+      "language": "markdown",
+      "sizeLines": 137,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/auth-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 110,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/customers-contracts.md",
+      "language": "markdown",
+      "sizeLines": 243,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/customers-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 157,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/events-contracts.md",
+      "language": "markdown",
+      "sizeLines": 255,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/events-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 144,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/orders-contracts.md",
+      "language": "markdown",
+      "sizeLines": 271,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/orders-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 224,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/suppliers-contracts.md",
+      "language": "markdown",
+      "sizeLines": 273,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/suppliers-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 133,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/users-contracts.md",
+      "language": "markdown",
+      "sizeLines": 176,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/users-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 120,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/venues-contracts.md",
+      "language": "markdown",
+      "sizeLines": 125,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/docs/venues-design-overview.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/migrations/env.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/script.py.mako",
+      "language": "mako",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/20d8e52af40a_merge_iteration_3_indexes.py",
+      "language": "python",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/693abebeafeb_add_timestamps_to_contracts.py",
+      "language": "python",
+      "sizeLines": 27,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/6f85506964fe_add_finance_module_models.py",
+      "language": "python",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/a1b2c3d4e5f6_add_iteration_3_indexes.py",
+      "language": "python",
+      "sizeLines": 65,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/d0437c85fcd0_initial_tables.py",
+      "language": "python",
+      "sizeLines": 268,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/ee2ac8e4af0d_add_notifications_table.py",
+      "language": "python",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/f7a8b9c0d1e2_add_fk_indexes.py",
+      "language": "python",
+      "sizeLines": 105,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/migrations/versions/fd667ac70a31_add_timestamps_to_supplier_and_event.py",
+      "language": "python",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/pytest.ini",
+      "language": "config",
+      "sizeLines": 8,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-backend/requirements.txt",
+      "language": "txt",
+      "sizeLines": 22,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-backend/scripts/backup.sh",
+      "language": "shell",
+      "sizeLines": 75,
+      "fileCategory": "script"
+    },
+    {
+      "path": "wedding-backend/tests/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/conftest.py",
+      "language": "python",
+      "sizeLines": 335,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/finance/__init__.py",
+      "language": "python",
+      "sizeLines": 3,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/finance/test_payment_service.py",
+      "language": "python",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/finance/test_receivable_service.py",
+      "language": "python",
+      "sizeLines": 176,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_approvals.py",
+      "language": "python",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_auth.py",
+      "language": "python",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_csrf.py",
+      "language": "python",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_customers.py",
+      "language": "python",
+      "sizeLines": 247,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_dashboard.py",
+      "language": "python",
+      "sizeLines": 159,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_events.py",
+      "language": "python",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_file_upload.py",
+      "language": "python",
+      "sizeLines": 192,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_finance.py",
+      "language": "python",
+      "sizeLines": 202,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_health.py",
+      "language": "python",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_imports.py",
+      "language": "python",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_metrics.py",
+      "language": "python",
+      "sizeLines": 38,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_notifications.py",
+      "language": "python",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_orders.py",
+      "language": "python",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_rate_limit.py",
+      "language": "python",
+      "sizeLines": 47,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_rbac.py",
+      "language": "python",
+      "sizeLines": 191,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_reports.py",
+      "language": "python",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_suppliers.py",
+      "language": "python",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-backend/tests/test_system.py",
+      "language": "python",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/Dockerfile",
+      "language": "dockerfile",
+      "sizeLines": 28,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "wedding-frontend/docs/frontend-architecture.md",
+      "language": "markdown",
+      "sizeLines": 342,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-frontend/e2e/smoke.spec.ts",
+      "language": "typescript",
+      "sizeLines": 80,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/index.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "wedding-frontend/nginx.conf",
+      "language": "conf",
+      "sizeLines": 50,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/package.json",
+      "language": "json",
+      "sizeLines": 30,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-frontend/playwright.config.ts",
+      "language": "typescript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/README.md",
+      "language": "markdown",
+      "sizeLines": 5,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "wedding-frontend/src/api/approvals.ts",
+      "language": "typescript",
+      "sizeLines": 47,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/auth.ts",
+      "language": "typescript",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/customers.ts",
+      "language": "typescript",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/dashboard.ts",
+      "language": "typescript",
+      "sizeLines": 81,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/events.ts",
+      "language": "typescript",
+      "sizeLines": 97,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/finance.ts",
+      "language": "typescript",
+      "sizeLines": 342,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/imports.ts",
+      "language": "typescript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/index.ts",
+      "language": "typescript",
+      "sizeLines": 103,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/notifications.ts",
+      "language": "typescript",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/orders.ts",
+      "language": "typescript",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/reports.ts",
+      "language": "typescript",
+      "sizeLines": 11,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/suppliers.ts",
+      "language": "typescript",
+      "sizeLines": 94,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/users.ts",
+      "language": "typescript",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/api/venues.ts",
+      "language": "typescript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/App.vue",
+      "language": "vue",
+      "sizeLines": 14,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/components/HelloWorld.vue",
+      "language": "vue",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/components/NotificationBell.vue",
+      "language": "vue",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/layouts/MainLayout.vue",
+      "language": "vue",
+      "sizeLines": 225,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/main.ts",
+      "language": "typescript",
+      "sizeLines": 13,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/router/index.ts",
+      "language": "typescript",
+      "sizeLines": 233,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/stores/auth.ts",
+      "language": "typescript",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/style.css",
+      "language": "css",
+      "sizeLines": 296,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "wedding-frontend/src/views/Approvals.vue",
+      "language": "vue",
+      "sizeLines": 313,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/CustomerDetail.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/CustomerPool.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Customers.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/customers/CustomerDetail.vue",
+      "language": "vue",
+      "sizeLines": 298,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/customers/CustomerForm.vue",
+      "language": "vue",
+      "sizeLines": 255,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/customers/CustomerList.vue",
+      "language": "vue",
+      "sizeLines": 493,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/customers/CustomerPool.vue",
+      "language": "vue",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Dashboard.vue",
+      "language": "vue",
+      "sizeLines": 498,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/EventDetail.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Events.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/events/EventDetail.vue",
+      "language": "vue",
+      "sizeLines": 310,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/events/EventList.vue",
+      "language": "vue",
+      "sizeLines": 380,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/events/VenueList.vue",
+      "language": "vue",
+      "sizeLines": 371,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/InvoiceList.vue",
+      "language": "vue",
+      "sizeLines": 388,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/PaymentList.vue",
+      "language": "vue",
+      "sizeLines": 317,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/ReceivableList.vue",
+      "language": "vue",
+      "sizeLines": 246,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/ReconciliationPage.vue",
+      "language": "vue",
+      "sizeLines": 240,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/RefundList.vue",
+      "language": "vue",
+      "sizeLines": 294,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/finance/TransactionList.vue",
+      "language": "vue",
+      "sizeLines": 356,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Login.vue",
+      "language": "vue",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/OperationLogs.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/OrderCreate.vue",
+      "language": "vue",
+      "sizeLines": 423,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/OrderDetail.vue",
+      "language": "vue",
+      "sizeLines": 472,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Orders.vue",
+      "language": "vue",
+      "sizeLines": 283,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Roles.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/SupplierDetail.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Suppliers.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/suppliers/SupplierDetail.vue",
+      "language": "vue",
+      "sizeLines": 391,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/suppliers/SupplierList.vue",
+      "language": "vue",
+      "sizeLines": 457,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/system/Notifications.vue",
+      "language": "vue",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/system/OperationLogs.vue",
+      "language": "vue",
+      "sizeLines": 240,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/system/PermissionDenied.vue",
+      "language": "vue",
+      "sizeLines": 81,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/system/RoleList.vue",
+      "language": "vue",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/system/UserList.vue",
+      "language": "vue",
+      "sizeLines": 392,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Users.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/src/views/Venues.vue",
+      "language": "vue",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "wedding-frontend/test-results/.last-run.json",
+      "language": "json",
+      "sizeLines": 3,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-frontend/tsconfig.app.json",
+      "language": "json",
+      "sizeLines": 19,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-frontend/tsconfig.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-frontend/tsconfig.node.json",
+      "language": "json",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "wedding-frontend/vite.config.ts",
+      "language": "typescript",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 305,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "large",
+  "importMap": {
+    ".claude/commands/opsx/apply.md": [],
+    ".claude/commands/opsx/archive.md": [],
+    ".claude/commands/opsx/bulk-archive.md": [],
+    ".claude/commands/opsx/continue.md": [],
+    ".claude/commands/opsx/explore.md": [],
+    ".claude/commands/opsx/ff.md": [],
+    ".claude/commands/opsx/new.md": [],
+    ".claude/commands/opsx/onboard.md": [],
+    ".claude/commands/opsx/propose.md": [],
+    ".claude/commands/opsx/sync.md": [],
+    ".claude/commands/opsx/verify.md": [],
+    ".claude/skills/openspec-apply-change/SKILL.md": [],
+    ".claude/skills/openspec-archive-change/SKILL.md": [],
+    ".claude/skills/openspec-bulk-archive-change/SKILL.md": [],
+    ".claude/skills/openspec-continue-change/SKILL.md": [],
+    ".claude/skills/openspec-explore/SKILL.md": [],
+    ".claude/skills/openspec-ff-change/SKILL.md": [],
+    ".claude/skills/openspec-new-change/SKILL.md": [],
+    ".claude/skills/openspec-onboard/SKILL.md": [],
+    ".claude/skills/openspec-propose/SKILL.md": [],
+    ".claude/skills/openspec-sync-specs/SKILL.md": [],
+    ".claude/skills/openspec-verify-change/SKILL.md": [],
+    ".codegraph/daemon.pid": [],
+    ".env.example": [],
+    ".understand-anything/.understandignore": [],
+    "AGENTS.md": [],
+    "CLAUDE.md": [],
+    "docker-compose.yml": [],
+    "docs/api-versioning.md": [],
+    "docs/architecture.md": [],
+    "docs/lifecycle/docs-baseline-documentation.md": [],
+    "docs/lifecycle/feat-iteration-2-report-notification-import.md": [],
+    "docs/lifecycle/refactor-extract-service-layer-decouple-approval.md": [],
+    "docs/module-dependencies.md": [],
+    "docs/PRD.md": [],
+    "docs/prd/FR-013-data-report-export.md": [],
+    "docs/prd/FR-014-notification-system.md": [],
+    "docs/prd/FR-015-data-import.md": [],
+    "docs/prd/FR-016-iteration-2-architecture.md": [],
+    "docs/prd/FR-017-finance-management.md": [],
+    "docs/prd/FR-018-dashboard-redesign.md": [],
+    "docs/refactoring-plan.md": [],
+    "docs/superpowers/specs/2026-05-21-wedding-management-system-design.md": [],
+    "docs/topology.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/.openspec.yaml": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/design.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/proposal.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/approval-workflow/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/auth/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/customer-management/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/dashboard/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/file-upload/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/order-management/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/schedule-management/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/supplier-management/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/specs/system-management/spec.md": [],
+    "openspec/changes/archive/2026-05-21-wedding-management-system/tasks.md": [],
+    "openspec/config.yaml": [],
+    "openspec/specs/approval-workflow/spec.md": [],
+    "openspec/specs/auth/spec.md": [],
+    "openspec/specs/customer-management/spec.md": [],
+    "openspec/specs/dashboard/spec.md": [],
+    "openspec/specs/file-upload/spec.md": [],
+    "openspec/specs/order-management/spec.md": [],
+    "openspec/specs/schedule-management/spec.md": [],
+    "openspec/specs/supplier-management/spec.md": [],
+    "openspec/specs/system-management/spec.md": [],
+    "README.md": [],
+    "tests/e2e_functional.py": [],
+    "tests/e2e_test.py": [],
+    "wedding-backend/.env.example": [],
+    "wedding-backend/.python-version": [],
+    "wedding-backend/alembic.ini": [],
+    "wedding-backend/app/__init__.py": [],
+    "wedding-backend/app/api/__init__.py": [],
+    "wedding-backend/app/api/approvals.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/schemas/approval.py",
+      "wedding-backend/app/services/approval_service.py"
+    ],
+    "wedding-backend/app/api/auth.py": [
+      "wedding-backend/app/config.py",
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/rate_limit.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/auth.py",
+      "wedding-backend/app/utils/cache.py"
+    ],
+    "wedding-backend/app/api/customers.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/schemas/customer.py",
+      "wedding-backend/app/services/customer_service.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/api/dashboard.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/models/event.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/models/supplier.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/cache.py"
+    ],
+    "wedding-backend/app/api/events.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/event.py",
+      "wedding-backend/app/schemas/event.py",
+      "wedding-backend/app/services/event_service.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/api/health.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/utils/cache.py"
+    ],
+    "wedding-backend/app/api/imports.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/services/import_service.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/api/notifications.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/schemas/notification.py",
+      "wedding-backend/app/services/notification_service.py"
+    ],
+    "wedding-backend/app/api/orders.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/schemas/order.py",
+      "wedding-backend/app/services/order_service.py"
+    ],
+    "wedding-backend/app/api/reports.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/services/report_service.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/api/suppliers.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/supplier.py",
+      "wedding-backend/app/schemas/supplier.py",
+      "wedding-backend/app/services/supplier_service.py"
+    ],
+    "wedding-backend/app/api/users.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/schemas/user.py",
+      "wedding-backend/app/services/user_service.py"
+    ],
+    "wedding-backend/app/api/venues.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/event.py",
+      "wedding-backend/app/utils/errors.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/config.py": [],
+    "wedding-backend/app/database.py": [
+      "wedding-backend/app/config.py"
+    ],
+    "wedding-backend/app/events/__init__.py": [],
+    "wedding-backend/app/events/event_types.py": [],
+    "wedding-backend/app/events/handlers.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py"
+    ],
+    "wedding-backend/app/finance/__init__.py": [],
+    "wedding-backend/app/finance/application/__init__.py": [],
+    "wedding-backend/app/finance/application/services/__init__.py": [
+      "wedding-backend/app/finance/application/services/invoice_service.py",
+      "wedding-backend/app/finance/application/services/payment_service.py",
+      "wedding-backend/app/finance/application/services/receivable_service.py",
+      "wedding-backend/app/finance/application/services/reconciliation_service.py",
+      "wedding-backend/app/finance/application/services/refund_service.py",
+      "wedding-backend/app/finance/application/services/transaction_service.py"
+    ],
+    "wedding-backend/app/finance/application/services/invoice_service.py": [
+      "wedding-backend/app/config.py",
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/application/services/payment_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/application/services/receivable_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/application/services/reconciliation_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/application/services/refund_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/application/services/transaction_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/finance/infrastructure/repositories/__init__.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/finance/docs/contracts.md": [],
+    "wedding-backend/app/finance/docs/design-overview.md": [],
+    "wedding-backend/app/finance/domain/__init__.py": [],
+    "wedding-backend/app/finance/domain/entities/__init__.py": [
+      "wedding-backend/app/finance/domain/entities/finance_payment.py",
+      "wedding-backend/app/finance/domain/entities/invoice.py",
+      "wedding-backend/app/finance/domain/entities/receivable.py",
+      "wedding-backend/app/finance/domain/entities/reconciliation.py",
+      "wedding-backend/app/finance/domain/entities/refund.py",
+      "wedding-backend/app/finance/domain/entities/transaction.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/enums.py": [],
+    "wedding-backend/app/finance/domain/entities/finance_payment.py": [
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/invoice.py": [
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/receivable.py": [
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/reconciliation.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/refund.py": [
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/entities/transaction.py": [
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/finance/domain/events/__init__.py": [],
+    "wedding-backend/app/finance/domain/events/event_types.py": [],
+    "wedding-backend/app/finance/domain/services/__init__.py": [],
+    "wedding-backend/app/finance/infrastructure/__init__.py": [],
+    "wedding-backend/app/finance/infrastructure/repositories/__init__.py": [
+      "wedding-backend/app/finance/infrastructure/repositories/finance_payment_repository.py",
+      "wedding-backend/app/finance/infrastructure/repositories/invoice_repository.py",
+      "wedding-backend/app/finance/infrastructure/repositories/receivable_repository.py",
+      "wedding-backend/app/finance/infrastructure/repositories/reconciliation_repository.py",
+      "wedding-backend/app/finance/infrastructure/repositories/refund_repository.py",
+      "wedding-backend/app/finance/infrastructure/repositories/transaction_repository.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/finance_payment_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/invoice_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/receivable_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/models/order.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/reconciliation_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/refund_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py"
+    ],
+    "wedding-backend/app/finance/infrastructure/repositories/transaction_repository.py": [
+      "wedding-backend/app/finance/domain/entities/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py"
+    ],
+    "wedding-backend/app/finance/interfaces/__init__.py": [],
+    "wedding-backend/app/finance/interfaces/controllers/__init__.py": [
+      "wedding-backend/app/finance/interfaces/controllers/__init__.py",
+      "wedding-backend/app/finance/interfaces/controllers/invoices.py",
+      "wedding-backend/app/finance/interfaces/controllers/payments.py",
+      "wedding-backend/app/finance/interfaces/controllers/receivables.py",
+      "wedding-backend/app/finance/interfaces/controllers/reconciliations.py",
+      "wedding-backend/app/finance/interfaces/controllers/refunds.py",
+      "wedding-backend/app/finance/interfaces/controllers/transactions.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/invoices.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/payments.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/receivables.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/reconciliations.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/refunds.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/controllers/transactions.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/middleware/auth.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/finance/interfaces/subscribers/__init__.py": [],
+    "wedding-backend/app/finance/interfaces/subscribers/event_handlers.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/main.py": [
+      "wedding-backend/app/api/__init__.py",
+      "wedding-backend/app/api/approvals.py",
+      "wedding-backend/app/api/auth.py",
+      "wedding-backend/app/api/customers.py",
+      "wedding-backend/app/api/dashboard.py",
+      "wedding-backend/app/api/events.py",
+      "wedding-backend/app/api/health.py",
+      "wedding-backend/app/api/imports.py",
+      "wedding-backend/app/api/notifications.py",
+      "wedding-backend/app/api/orders.py",
+      "wedding-backend/app/api/reports.py",
+      "wedding-backend/app/api/suppliers.py",
+      "wedding-backend/app/api/users.py",
+      "wedding-backend/app/api/venues.py",
+      "wedding-backend/app/config.py",
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/events/handlers.py",
+      "wedding-backend/app/finance/interfaces/controllers/__init__.py",
+      "wedding-backend/app/finance/interfaces/controllers/invoices.py",
+      "wedding-backend/app/finance/interfaces/controllers/payments.py",
+      "wedding-backend/app/finance/interfaces/controllers/receivables.py",
+      "wedding-backend/app/finance/interfaces/controllers/reconciliations.py",
+      "wedding-backend/app/finance/interfaces/controllers/refunds.py",
+      "wedding-backend/app/finance/interfaces/controllers/transactions.py",
+      "wedding-backend/app/finance/interfaces/subscribers/event_handlers.py",
+      "wedding-backend/app/middleware/csrf.py",
+      "wedding-backend/app/middleware/global_rate_limit.py",
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/middleware/metrics.py",
+      "wedding-backend/app/middleware/rate_limit.py",
+      "wedding-backend/app/middleware/request_id.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/middleware/__init__.py": [
+      "wedding-backend/app/middleware/logging.py",
+      "wedding-backend/app/middleware/request_id.py"
+    ],
+    "wedding-backend/app/middleware/auth.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/auth.py",
+      "wedding-backend/app/utils/cache.py"
+    ],
+    "wedding-backend/app/middleware/csrf.py": [],
+    "wedding-backend/app/middleware/global_rate_limit.py": [],
+    "wedding-backend/app/middleware/logging.py": [
+      "wedding-backend/app/middleware/logging.py"
+    ],
+    "wedding-backend/app/middleware/metrics.py": [],
+    "wedding-backend/app/middleware/rate_limit.py": [],
+    "wedding-backend/app/middleware/request_id.py": [
+      "wedding-backend/app/middleware/logging.py"
+    ],
+    "wedding-backend/app/models/__init__.py": [
+      "wedding-backend/app/finance/domain/entities/finance_payment.py",
+      "wedding-backend/app/finance/domain/entities/invoice.py",
+      "wedding-backend/app/finance/domain/entities/receivable.py",
+      "wedding-backend/app/finance/domain/entities/reconciliation.py",
+      "wedding-backend/app/finance/domain/entities/refund.py",
+      "wedding-backend/app/finance/domain/entities/transaction.py",
+      "wedding-backend/app/models/base.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/models/event.py",
+      "wedding-backend/app/models/log.py",
+      "wedding-backend/app/models/notification.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/models/supplier.py",
+      "wedding-backend/app/models/user.py"
+    ],
+    "wedding-backend/app/models/base.py": [],
+    "wedding-backend/app/models/customer.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/event.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/log.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/notification.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/order.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/supplier.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/models/user.py": [
+      "wedding-backend/app/models/base.py"
+    ],
+    "wedding-backend/app/schemas/__init__.py": [],
+    "wedding-backend/app/schemas/approval.py": [
+      "wedding-backend/app/models/order.py"
+    ],
+    "wedding-backend/app/schemas/customer.py": [
+      "wedding-backend/app/models/customer.py"
+    ],
+    "wedding-backend/app/schemas/event.py": [
+      "wedding-backend/app/models/event.py"
+    ],
+    "wedding-backend/app/schemas/import_schema.py": [],
+    "wedding-backend/app/schemas/notification.py": [],
+    "wedding-backend/app/schemas/order.py": [
+      "wedding-backend/app/models/order.py"
+    ],
+    "wedding-backend/app/schemas/report.py": [],
+    "wedding-backend/app/schemas/supplier.py": [
+      "wedding-backend/app/models/supplier.py"
+    ],
+    "wedding-backend/app/schemas/user.py": [
+      "wedding-backend/app/models/user.py"
+    ],
+    "wedding-backend/app/seed.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/user.py"
+    ],
+    "wedding-backend/app/sentry.py": [],
+    "wedding-backend/app/services/__init__.py": [],
+    "wedding-backend/app/services/approval_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/schemas/approval.py",
+      "wedding-backend/app/utils/errors.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/services/customer_service.py": [
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/services/event_service.py": [
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/event.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/services/import_service.py": [
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/models/supplier.py",
+      "wedding-backend/app/schemas/import_schema.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/services/notification_service.py": [
+      "wedding-backend/app/models/notification.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/services/order_service.py": [
+      "wedding-backend/app/config.py",
+      "wedding-backend/app/events/__init__.py",
+      "wedding-backend/app/events/event_types.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/order.py",
+      "wedding-backend/app/schemas/order.py",
+      "wedding-backend/app/utils/errors.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/services/report_service.py": [
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/customer.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/services/supplier_service.py": [
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/supplier.py",
+      "wedding-backend/app/schemas/supplier.py",
+      "wedding-backend/app/utils/errors.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/services/user_service.py": [
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/schemas/user.py",
+      "wedding-backend/app/utils/errors.py",
+      "wedding-backend/app/utils/pagination.py"
+    ],
+    "wedding-backend/app/utils/__init__.py": [
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/app/utils/auth.py": [
+      "wedding-backend/app/config.py"
+    ],
+    "wedding-backend/app/utils/cache.py": [
+      "wedding-backend/app/config.py"
+    ],
+    "wedding-backend/app/utils/errors.py": [],
+    "wedding-backend/app/utils/pagination.py": [],
+    "wedding-backend/docker-entrypoint.sh": [],
+    "wedding-backend/Dockerfile": [],
+    "wedding-backend/docs/approvals-contracts.md": [],
+    "wedding-backend/docs/approvals-design-overview.md": [],
+    "wedding-backend/docs/auth-contracts.md": [],
+    "wedding-backend/docs/auth-design-overview.md": [],
+    "wedding-backend/docs/customers-contracts.md": [],
+    "wedding-backend/docs/customers-design-overview.md": [],
+    "wedding-backend/docs/events-contracts.md": [],
+    "wedding-backend/docs/events-design-overview.md": [],
+    "wedding-backend/docs/orders-contracts.md": [],
+    "wedding-backend/docs/orders-design-overview.md": [],
+    "wedding-backend/docs/suppliers-contracts.md": [],
+    "wedding-backend/docs/suppliers-design-overview.md": [],
+    "wedding-backend/docs/users-contracts.md": [],
+    "wedding-backend/docs/users-design-overview.md": [],
+    "wedding-backend/docs/venues-contracts.md": [],
+    "wedding-backend/docs/venues-design-overview.md": [],
+    "wedding-backend/migrations/env.py": [
+      "wedding-backend/app/config.py",
+      "wedding-backend/app/models/__init__.py"
+    ],
+    "wedding-backend/migrations/script.py.mako": [],
+    "wedding-backend/migrations/versions/20d8e52af40a_merge_iteration_3_indexes.py": [],
+    "wedding-backend/migrations/versions/693abebeafeb_add_timestamps_to_contracts.py": [],
+    "wedding-backend/migrations/versions/6f85506964fe_add_finance_module_models.py": [],
+    "wedding-backend/migrations/versions/a1b2c3d4e5f6_add_iteration_3_indexes.py": [],
+    "wedding-backend/migrations/versions/d0437c85fcd0_initial_tables.py": [],
+    "wedding-backend/migrations/versions/ee2ac8e4af0d_add_notifications_table.py": [],
+    "wedding-backend/migrations/versions/f7a8b9c0d1e2_add_fk_indexes.py": [],
+    "wedding-backend/migrations/versions/fd667ac70a31_add_timestamps_to_supplier_and_event.py": [],
+    "wedding-backend/pytest.ini": [],
+    "wedding-backend/requirements.txt": [],
+    "wedding-backend/scripts/backup.sh": [],
+    "wedding-backend/tests/__init__.py": [],
+    "wedding-backend/tests/conftest.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/events/handlers.py",
+      "wedding-backend/app/main.py",
+      "wedding-backend/app/models/__init__.py",
+      "wedding-backend/app/models/base.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/__init__.py",
+      "wedding-backend/app/utils/auth.py"
+    ],
+    "wedding-backend/tests/finance/__init__.py": [],
+    "wedding-backend/tests/finance/test_payment_service.py": [
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/tests/finance/test_receivable_service.py": [
+      "wedding-backend/app/finance/application/services/__init__.py",
+      "wedding-backend/app/finance/domain/entities/enums.py",
+      "wedding-backend/app/utils/errors.py"
+    ],
+    "wedding-backend/tests/test_approvals.py": [],
+    "wedding-backend/tests/test_auth.py": [],
+    "wedding-backend/tests/test_csrf.py": [],
+    "wedding-backend/tests/test_customers.py": [
+      "wedding-backend/app/models/customer.py"
+    ],
+    "wedding-backend/tests/test_dashboard.py": [],
+    "wedding-backend/tests/test_events.py": [
+      "wedding-backend/app/models/event.py"
+    ],
+    "wedding-backend/tests/test_file_upload.py": [],
+    "wedding-backend/tests/test_finance.py": [],
+    "wedding-backend/tests/test_health.py": [],
+    "wedding-backend/tests/test_imports.py": [],
+    "wedding-backend/tests/test_metrics.py": [],
+    "wedding-backend/tests/test_notifications.py": [],
+    "wedding-backend/tests/test_orders.py": [],
+    "wedding-backend/tests/test_rate_limit.py": [],
+    "wedding-backend/tests/test_rbac.py": [
+      "wedding-backend/app/database.py",
+      "wedding-backend/app/events/handlers.py",
+      "wedding-backend/app/main.py",
+      "wedding-backend/app/models/user.py",
+      "wedding-backend/app/utils/__init__.py",
+      "wedding-backend/app/utils/auth.py",
+      "wedding-backend/tests/conftest.py"
+    ],
+    "wedding-backend/tests/test_reports.py": [],
+    "wedding-backend/tests/test_suppliers.py": [],
+    "wedding-backend/tests/test_system.py": [
+      "wedding-backend/app/models/user.py"
+    ],
+    "wedding-frontend/Dockerfile": [],
+    "wedding-frontend/docs/frontend-architecture.md": [],
+    "wedding-frontend/e2e/smoke.spec.ts": [],
+    "wedding-frontend/index.html": [],
+    "wedding-frontend/nginx.conf": [],
+    "wedding-frontend/package.json": [],
+    "wedding-frontend/playwright.config.ts": [],
+    "wedding-frontend/README.md": [],
+    "wedding-frontend/src/api/approvals.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/auth.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/customers.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/dashboard.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/events.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/finance.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/imports.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/index.ts": [],
+    "wedding-frontend/src/api/notifications.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/orders.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/reports.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/suppliers.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/users.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/api/venues.ts": [
+      "wedding-frontend/src/api/index.ts"
+    ],
+    "wedding-frontend/src/App.vue": [],
+    "wedding-frontend/src/components/HelloWorld.vue": [],
+    "wedding-frontend/src/components/NotificationBell.vue": [],
+    "wedding-frontend/src/layouts/MainLayout.vue": [],
+    "wedding-frontend/src/main.ts": [
+      "wedding-frontend/src/App.vue",
+      "wedding-frontend/src/router/index.ts"
+    ],
+    "wedding-frontend/src/router/index.ts": [],
+    "wedding-frontend/src/stores/auth.ts": [],
+    "wedding-frontend/src/style.css": [],
+    "wedding-frontend/src/views/Approvals.vue": [],
+    "wedding-frontend/src/views/CustomerDetail.vue": [],
+    "wedding-frontend/src/views/CustomerPool.vue": [],
+    "wedding-frontend/src/views/Customers.vue": [],
+    "wedding-frontend/src/views/customers/CustomerDetail.vue": [],
+    "wedding-frontend/src/views/customers/CustomerForm.vue": [],
+    "wedding-frontend/src/views/customers/CustomerList.vue": [],
+    "wedding-frontend/src/views/customers/CustomerPool.vue": [],
+    "wedding-frontend/src/views/Dashboard.vue": [],
+    "wedding-frontend/src/views/EventDetail.vue": [],
+    "wedding-frontend/src/views/Events.vue": [],
+    "wedding-frontend/src/views/events/EventDetail.vue": [],
+    "wedding-frontend/src/views/events/EventList.vue": [],
+    "wedding-frontend/src/views/events/VenueList.vue": [],
+    "wedding-frontend/src/views/finance/InvoiceList.vue": [],
+    "wedding-frontend/src/views/finance/PaymentList.vue": [],
+    "wedding-frontend/src/views/finance/ReceivableList.vue": [],
+    "wedding-frontend/src/views/finance/ReconciliationPage.vue": [],
+    "wedding-frontend/src/views/finance/RefundList.vue": [],
+    "wedding-frontend/src/views/finance/TransactionList.vue": [],
+    "wedding-frontend/src/views/Login.vue": [],
+    "wedding-frontend/src/views/OperationLogs.vue": [],
+    "wedding-frontend/src/views/OrderCreate.vue": [],
+    "wedding-frontend/src/views/OrderDetail.vue": [],
+    "wedding-frontend/src/views/Orders.vue": [],
+    "wedding-frontend/src/views/Roles.vue": [],
+    "wedding-frontend/src/views/SupplierDetail.vue": [],
+    "wedding-frontend/src/views/Suppliers.vue": [],
+    "wedding-frontend/src/views/suppliers/SupplierDetail.vue": [],
+    "wedding-frontend/src/views/suppliers/SupplierList.vue": [],
+    "wedding-frontend/src/views/system/Notifications.vue": [],
+    "wedding-frontend/src/views/system/OperationLogs.vue": [],
+    "wedding-frontend/src/views/system/PermissionDenied.vue": [],
+    "wedding-frontend/src/views/system/RoleList.vue": [],
+    "wedding-frontend/src/views/system/UserList.vue": [],
+    "wedding-frontend/src/views/Users.vue": [],
+    "wedding-frontend/src/views/Venues.vue": [],
+    "wedding-frontend/test-results/.last-run.json": [],
+    "wedding-frontend/tsconfig.app.json": [],
+    "wedding-frontend/tsconfig.json": [],
+    "wedding-frontend/tsconfig.node.json": [],
+    "wedding-frontend/vite.config.ts": []
+  }
+}
