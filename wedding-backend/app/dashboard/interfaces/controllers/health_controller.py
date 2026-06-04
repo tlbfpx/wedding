@@ -9,12 +9,12 @@ from app.database import get_db
 from app.middleware.auth import require_permission
 from app.dashboard.domain.value_objects import PeriodType, CompareToType
 from app.dashboard.application.services.health_service import HealthService
-from app.dashboard.domain.dtos import HealthMetrics
+from app.dashboard.domain.dtos.health_metrics import HealthMetrics
 
 router = APIRouter()
 
 
-@router.get("/health", response_model=HealthMetrics)
+@router.get("/health")
 async def get_health_metrics(
     period: PeriodType = Query(PeriodType.MONTH, description="Statistics period"),
     compare_to: Optional[CompareToType] = Query(None, description="Comparison period"),

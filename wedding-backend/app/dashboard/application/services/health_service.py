@@ -6,9 +6,8 @@ from typing import Optional
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.order import Order, OrderStatus
+from app.models.order import Order, OrderStatus, Payment, PaymentStatus
 from app.models.customer import Customer, CustomerStatus
-from app.models.payment import Payment, PaymentStatus
 
 from app.dashboard.domain.value_objects import PeriodType, CompareToType, PeriodRange, MetricValue
 from app.dashboard.domain.dtos import HealthMetrics, MetricValueResponse

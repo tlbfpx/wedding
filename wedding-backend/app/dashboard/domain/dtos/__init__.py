@@ -1,5 +1,5 @@
 """Dashboard DTOs."""
-from .health_metrics import HealthMetrics
+from .health_metrics import HealthMetrics, MetricValueResponse
 from .cashflow_metrics import (
     CashflowMetrics,
     CashInBreakdown,
@@ -23,6 +23,7 @@ from .decision_support_metrics import (
 
 __all__ = [
     "HealthMetrics",
+    "MetricValueResponse",
     "CashflowMetrics",
     "CashInBreakdown",
     "ReceivablesSummary",
