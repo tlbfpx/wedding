@@ -1,112 +1,142 @@
-# 2026-06-04 Dashboard 管理层驾驶舱重构
+# Dashboard 模块重构变更日志
 
-> 变更日期: 2026-06-04
-> 需求编号: FR-018
-> 变更类型: 重大重构
-
----
-
-## 1. 变更背景
-
-当前 Dashboard 模块为单文件路由实现，所有查询逻辑内联在 `app/api/dashboard.py` 中，缺乏 Service 层和领域模型。本次重构将 Dashboard 升级为独立的 DDD 模块，提供管理层驾驶舱所需的五大维度数据洞察。
+**日期**: 2026-06-04
+**功能**: FR-018 Dashboard 管理层驾驶舱重构
+**影响模块**: app/dashboard
 
 ---
 
-## 2. 变更内容
+## 变更背景
 
-### 2.1 模块结构
+原有 Dashboard 模块存在以下问题：
+1. 单文件路由 (api/dashboard.py) 包含所有查询逻辑，可维护性差
+2. 缺少领域模型，查询逻辑分散
+3. 无统一缓存策略
+4. 权限过滤简陋，依赖前端传参
+5. 缺少数据聚合层
 
-新增 `app/dashboard/` 目录，采用标准 DDD 分层：
+## 变更方案
+
+### 1. 架构重构
+
+将 Dashboard 从单文件路由重构为 DDD 分层模块：
 
 ```
 app/dashboard/
-├── docs/           # 文档
-├── domain/         # 领域层（VO、DTO）
-├── application/    # 应用层（Service）
-├── infrastructure/ # 基础设施层（缓存）
-└── interfaces/     # 接口层（Controller）
+├── domain/
+│   ├── value_objects/      # PeriodRange, MetricValue, AlertLevel, enums
+│   └── dtos/               # HealthMetrics, CashflowMetrics, etc.
+├── application/
+│   └── services/           # 5 个业务服务
+├── infrastructure/
+│   └── cache/              # RedisCacheService
+└── interfaces/
+    └── controllers/        # 6 个 Controller
 ```
 
-### 2.2 新增 API
+### 2. 新增 API
 
-| API | 方法 | 路径 | 功能 |
-|-----|------|------|------|
-| 经营健康度 | GET | `/api/v1/dashboard/health` | 营收/订单/客单价/签约率/毛利 |
-| 现金流 | GET | `/api/v1/dashboard/cashflow` | 现金流入/应收/账龄/周转 |
-| 团队效能 | GET | `/api/v1/dashboard/team-efficiency` | 团队对比/转化漏斗/销售排行 |
-| 风险预警 | GET | `/api/v1/dashboard/alerts` | 预警列表 |
-| 风险预警 | POST | `/api/v1/dashboard/alerts/:id/resolve` | 标记已处理 |
-| 决策支撑 | GET | `/api/v1/dashboard/decision-support` | ROI/服务/供应商分析 |
+| API | 功能 | 权限 | 缓存TTL |
+|-----|------|------|---------|
+| GET /api/v1/dashboard/health | 经营健康度 | dashboard:read | 300s |
+| GET /api/v1/dashboard/cashflow | 现金流与应收 | dashboard:read + finance:read | 300s |
+| GET /api/v1/dashboard/team-efficiency | 团队效能 | dashboard:read | 300s |
+| GET /api/v1/dashboard/alerts | 风险预警 | dashboard:read | 60s |
+| POST /api/v1/dashboard/alerts/{id}/resolve | 标记预警已处理 | dashboard:write | - |
+| GET /api/v1/dashboard/decision-support | 决策支撑 | dashboard:read_all | 600s |
 
-### 2.3 废弃 API
+### 3. 核心功能实现
 
-| 旧 API | 替换为 |
-|--------|--------|
-| `/api/dashboard/overview` | `/api/v1/dashboard/health` |
-| `/api/dashboard/sales-ranking` | `/api/v1/dashboard/team-efficiency` |
-| `/api/dashboard/conversion-funnel` | `/api/v1/dashboard/team-efficiency` |
-| `/api/dashboard/finance-summary` | `/api/v1/dashboard/cashflow` |
+#### 经营健康度
+- 营收、订单数、客单价、签约率、毛利
+- 支持环比/同比对比
+- 目标达成率分析
 
-废弃 API 保持可用，添加 `Deprecation: true` 响应头。
+#### 现金流与应收
+- 现金流入按付款方式分布
+- 应收余额、逾期应收、账龄分析
+- 应收周转天数
+
+#### 团队效能
+- 团队对比（营收、人数、人均产出）
+- 转化漏斗（潜在→跟进→意向→签约→流失）
+- 销售排行（支持分页）
+
+#### 风险预警
+- 逾期应收预警（>5万）
+- 即将到期活动提醒（3天内）
+- 长期未跟进客户（>7天）
+- 预警级别分级
+
+#### 决策支撑
+- 客户来源 ROI 分析
+- 服务类型收入占比
+- 供应商性价比评分
+
+### 4. 缓存策略
+
+| 数据类型 | Key 格式 | TTL | 失效策略 |
+|----------|----------|-----|----------|
+| 经营健康度 | dashboard:health:{period}:{compare}:{scope}:{user_id} | 300s | 数据更新时失效 |
+| 现金流数据 | dashboard:cashflow:{period}:{scope}:{user_id} | 300s | 数据更新时失效 |
+| 团队效能 | dashboard:team:{period}:{team}:{page}:{scope}:{user_id} | 300s | 数据更新时失效 |
+| 风险预警 | dashboard:alerts:{level}:{type}:{scope}:{user_id} | 60s | 高频刷新 |
+| 决策支撑 | dashboard:decision:{period}:{dimension}:{scope} | 600s | 低频变化 |
+
+### 5. 权限控制
+
+所有 API 通过 require_permission 中间件验证，并根据返回的 scope 过滤数据：
+- scope == "all" → 无过滤，返回全局数据
+- scope == "team" → 过滤为本团队数据
+- scope == "own" → 过滤为本人数据
+
+### 6. DTO 序列化
+
+使用 Pydantic BaseModel 替代 dataclass，确保 FastAPI 正确序列化响应：
+- HealthMetrics
+- MetricValueResponse
+- 所有其他 DTO
+
+## 向后兼容性
+
+### 保留的旧 API
+以下 API 保持可用，添加 deprecated=True 标记：
+- GET /api/v1/dashboard/overview
+- GET /api/v1/dashboard/sales-ranking
+- GET /api/v1/dashboard/conversion-funnel
+- GET /api/v1/dashboard/finance-summary
+
+### 废弃的 API
+- GET /api/v1/dashboard/schedule-heatmap → 保留
+- GET /api/v1/dashboard/supplier-ranking → 保留
+
+## 测试覆盖
+
+- 单元测试：tests/test_dashboard_health.py
+- 覆盖场景：
+  - 不同周期（月/季/年）
+  - 对比周期（环比/同比）
+  - 缓存生效
+  - 权限验证
+  - 参数校验
+
+## 性能优化
+
+1. 数据库查询优化：使用 SQLAlchemy 聚合函数
+2. 缓存策略：高频数据缓存，低频数据实时计算
+3. 分页支持：排行榜类查询支持分页
+
+## 后续改进方向
+
+1. 添加更多单元测试和集成测试
+2. 实现缓存预热机制
+3. 添加 Prometheus 指标监控
+4. 实现预警规则的数据库配置化
+5. 添加异步导出功能
 
 ---
 
-## 3. 技术实现
-
-### 3.1 缓存策略
-
-| 数据类型 | TTL | 失效策略 |
-|----------|-----|----------|
-| 经营健康度 | 300s | 数据更新时主动失效 |
-| 现金流 | 300s | 数据更新时主动失效 |
-| 团队效能 | 300s | 数据更新时主动失效 |
-| 风险预警 | 60s | 高频刷新 |
-| 决策支撑 | 600s | 低频变化 |
-
-### 3.2 权限控制
-
-复用现有 `require_permission` 中间件，根据返回的 `scope` 过滤数据：
-- `all`: 无过滤
-- `team`: 过滤为本团队
-- `own`: 过滤为本人
-
-### 3.3 数据聚合
-
-Dashboard 不引入新的仓储，直接查询 Model 或调用现有 Service：
-- Order, Customer, User, Event, Payment 等模型直接查询
-- Finance 模块数据可选调用其 Service
-
----
-
-## 4. 影响范围
-
-### 4.1 后端影响
-
-- 新增 `app/dashboard/` 模块
-- 保留 `app/api/dashboard.py`（兼容期）
-- 无数据库变更
-
-### 4.2 前端影响
-
-- 新增 `src/api/dashboard.ts` 方法
-- 重构 `src/views/Dashboard.vue` 页面
-- 旧 API 调用逐步迁移
-
----
-
-## 5. 兼容性保证
-
-- 旧 API `/api/dashboard/*` 保持可用
-- 新 API `/api/v1/dashboard/*` 并行运行
-- 建议过渡期 6 个月后移除旧 API
-
----
-
-## 6. 后续工作
-
-- [ ] 各功能详细设计文档（feature-*.md）
-- [ ] 接口契约文档（contracts.md）
-- [ ] Service 层实现
-- [ ] Controller 层实现
-- [ ] 前端页面重构
-- [ ] 集成测试
+**相关文档**:
+- 设计概览: docs/design-overview.md
+- 接口契约: docs/contracts.md
+- 功能详设: docs/feature-*.md
