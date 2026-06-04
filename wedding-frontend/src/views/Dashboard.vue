@@ -1,498 +1,300 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import {
   NCard,
   NGrid,
   NGi,
-  NStatistic,
-  NSkeleton,
   NSpace,
-  NList,
-  NListItem,
-  NThing,
-  NTag,
-  NDataTable,
-  NProgress,
   NSelect,
+  NSwitch,
+  NAlert,
+  useMessage,
 } from 'naive-ui'
-import type { DataTableColumns } from 'naive-ui'
+import { useAuthStore } from '@/stores/auth'
 import {
-  getOverview,
-  getSalesRanking,
-  getConversionFunnel,
-  getFinanceSummary,
-  getScheduleHeatmap,
-  getSupplierRanking,
+  getHealthMetrics,
+  getCashflowData,
+  getTeamEfficiency,
+  getAlerts,
+  resolveAlert,
+  getDecisionSupport,
+  type PeriodType,
+  type CompareToType,
+  type HealthMetricsResponse,
+  type CashflowResponse,
+  type TeamEfficiencyResponse,
+  type AlertsResponse,
+  type DecisionSupportResponse,
 } from '@/api/dashboard'
-import { getEvents as getEventList } from '@/api/events'
-import type {
-  OverviewData,
-  SalesRankingItem,
-  ConversionFunnel,
-  FinanceSummary,
-  ScheduleHeatmapResult,
-  SupplierRankingItem,
-} from '@/api/dashboard'
-import type { Event } from '@/api/events'
+import HealthMetrics from '@/components/dashboard/HealthMetrics.vue'
+import CashflowPanel from '@/components/dashboard/CashflowPanel.vue'
+import TeamEfficiencyPanel from '@/components/dashboard/TeamEfficiencyPanel.vue'
+import AlertsPanel from '@/components/dashboard/AlertsPanel.vue'
+import DecisionSupportPanel from '@/components/dashboard/DecisionSupportPanel.vue'
 
-function formatAmount(amount: number): string {
-  return '¥' + amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
+const message = useMessage()
+const authStore = useAuthStore()
 
-// Loading states per section
-const overviewLoading = ref(true)
-const salesLoading = ref(true)
-const funnelLoading = ref(true)
-const financeLoading = ref(true)
-const heatmapLoading = ref(true)
-const supplierLoading = ref(true)
-const eventsLoading = ref(true)
-
-// Period selector
+// ========== 全局筛选器 ==========
 const periodOptions = [
   { label: '本月', value: 'month' },
   { label: '本季度', value: 'quarter' },
   { label: '本年', value: 'year' },
 ]
-const selectedPeriod = ref<string>('month')
+const selectedPeriod = ref<PeriodType>('month')
 
-const periodLabel = computed(() => {
-  const map: Record<string, string> = { month: '本月', quarter: '本季度', year: '本年' }
-  return map[selectedPeriod.value] || '本月'
-})
-
-// Data
-const overview = ref<OverviewData | null>(null)
-const salesRanking = ref<SalesRankingItem[]>([])
-const funnelData = ref<ConversionFunnel | null>(null)
-const financeData = ref<FinanceSummary | null>(null)
-const heatmapData = ref<ScheduleHeatmapResult | null>(null)
-const supplierRanking = ref<SupplierRankingItem[]>([])
-const recentEvents = ref<Event[]>([])
-
-// Sales ranking columns
-const salesColumns: DataTableColumns<SalesRankingItem> = [
-  {
-    title: '排名',
-    key: 'rank',
-    width: 60,
-    render: (_, index) => index + 1,
-  },
-  {
-    title: '姓名',
-    key: 'sale_name',
-  },
-  {
-    title: '订单数',
-    key: 'order_count',
-    width: 80,
-  },
-  {
-    title: '金额',
-    key: 'total_amount',
-    width: 120,
-    render: (row) => formatAmount(row.total_amount),
-  },
+const compareToOptions = [
+  { label: '环比上月', value: 'prev_period' },
+  { label: '同比去年', value: 'same_period_last_year' },
 ]
+const compareTo = ref<CompareToType>('prev_period')
 
-// Funnel computed
-const funnelStages = computed(() => {
-  if (!funnelData.value) return []
-  const items = funnelData.value.funnel
-  if (items.length === 0) return []
-  const maxCount = Math.max(...items.map((s) => s.count), 1)
-  const statusLabels: Record<string, string> = {
-    potential: '潜在',
-    following: '跟进',
-    intention: '意向',
-    signed: '签约',
-    executing: '执行',
-    completed: '已完成',
+const autoRefresh = ref(true)
+const refreshInterval = 5 * 60 * 1000 // 5 minutes
+let refreshTimer: ReturnType<typeof setInterval> | null = null
+
+// ========== 权限检查 ==========
+const canViewDashboard = computed(() => authStore.hasPermission('dashboard:read') || authStore.hasPermission('dashboard:read_all'))
+const canViewFinance = computed(() => authStore.hasPermission('finance:read'))
+const canViewDecisionSupport = computed(() => authStore.hasPermission('dashboard:read_all'))
+
+// ========== 数据状态 ==========
+const healthLoading = ref(false)
+const cashflowLoading = ref(false)
+const teamLoading = ref(false)
+const alertsLoading = ref(false)
+const decisionLoading = ref(false)
+
+const healthData = ref<HealthMetricsResponse | null>(null)
+const cashflowData = ref<CashflowResponse | null>(null)
+const teamData = ref<TeamEfficiencyResponse | null>(null)
+const alertsData = ref<AlertsResponse | null>(null)
+const decisionData = ref<DecisionSupportResponse | null>(null)
+
+// ========== 数据加载 ==========
+async function fetchHealthMetrics() {
+  if (!canViewDashboard.value) return
+
+  healthLoading.value = true
+  try {
+    const response = await getHealthMetrics({
+      period: selectedPeriod.value,
+      compare_to: compareTo.value,
+    })
+    healthData.value = response
+  } catch (error) {
+    console.error('Failed to fetch health metrics:', error)
+    message.error('加载经营健康度数据失败')
+  } finally {
+    healthLoading.value = false
   }
-  return items.map((item) => ({
-    status: statusLabels[item.status] || item.status,
-    count: item.count,
-    percent: Math.round((item.count / maxCount) * 100),
-  }))
-})
-
-// Supplier ranking columns
-const supplierColumns: DataTableColumns<SupplierRankingItem> = [
-  {
-    title: '排名',
-    key: 'rank',
-    width: 60,
-    render: (_, index) => index + 1,
-  },
-  {
-    title: '名称',
-    key: 'supplier_name',
-  },
-  {
-    title: '类型',
-    key: 'type',
-    width: 80,
-  },
-  {
-    title: '评分',
-    key: 'rating',
-    width: 80,
-    render: (row) => row.rating.toFixed(1),
-  },
-  {
-    title: '评价数',
-    key: 'evaluation_count',
-    width: 80,
-  },
-]
-
-// Schedule heatmap computed
-const currentMonth = computed(() => {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-})
-
-const heatmapGrid = computed(() => {
-  if (!heatmapData.value) return { weeks: [] as { days: { date: string; count: number; dayOfMonth: number; isCurrentMonth: boolean }[] }[], totalMax: 0 }
-  const month = heatmapData.value.month
-  const [year, mon] = month.split('-').map(Number)
-  const firstDay = new Date(year, mon - 1, 1)
-  const lastDay = new Date(year, mon, 0)
-  const startDow = firstDay.getDay() // 0=Sun
-  const daysInMonth = lastDay.getDate()
-
-  const countMap = new Map<string, number>()
-  let maxCount = 0
-  for (const item of heatmapData.value.heatmap) {
-    countMap.set(item.date, item.count)
-    if (item.count > maxCount) maxCount = item.count
-  }
-
-  const weeks: { days: { date: string; count: number; dayOfMonth: number; isCurrentMonth: boolean }[] }[] = []
-  let currentWeek: { date: string; count: number; dayOfMonth: number; isCurrentMonth: boolean }[] = []
-
-  // Pad start of first week
-  for (let i = 0; i < startDow; i++) {
-    currentWeek.push({ date: '', count: 0, dayOfMonth: 0, isCurrentMonth: false })
-  }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${month}-${String(d).padStart(2, '0')}`
-    const count = countMap.get(dateStr) || 0
-    currentWeek.push({ date: dateStr, count, dayOfMonth: d, isCurrentMonth: true })
-    if (currentWeek.length === 7) {
-      weeks.push({ days: currentWeek })
-      currentWeek = []
-    }
-  }
-  // Pad remaining days of last week
-  if (currentWeek.length > 0) {
-    while (currentWeek.length < 7) {
-      currentWeek.push({ date: '', count: 0, dayOfMonth: 0, isCurrentMonth: false })
-    }
-    weeks.push({ days: currentWeek })
-  }
-
-  return { weeks, totalMax: maxCount }
-})
-
-function getHeatmapColor(count: number, max: number): string {
-  if (count === 0) return '#f5f5f5'
-  const intensity = Math.ceil((count / Math.max(max, 1)) * 4)
-  const colors = ['#c6e6c6', '#7dbd7d', '#3d9d3d', '#1a7a1a']
-  return colors[Math.min(intensity, 4) - 1] || colors[3]
 }
 
-const weekDays = ['日', '一', '二', '三', '四', '五', '六']
+async function fetchCashflowData() {
+  if (!canViewDashboard.value || !canViewFinance.value) return
 
-// Payment method labels
-const paymentMethodLabels: Record<string, string> = {
-  bank_transfer: '银行转账',
-  wechat: '微信支付',
-  alipay: '支付宝',
-  cash: '现金',
-  card: '银行卡',
-  other: '其他',
+  cashflowLoading.value = true
+  try {
+    const response = await getCashflowData({
+      period: selectedPeriod.value,
+    })
+    cashflowData.value = response
+  } catch (error) {
+    console.error('Failed to fetch cashflow data:', error)
+    message.error('加载现金流数据失败')
+  } finally {
+    cashflowLoading.value = false
+  }
 }
 
-async function fetchPeriodData() {
-  overviewLoading.value = true
-  salesLoading.value = true
-  financeLoading.value = true
-  const period = selectedPeriod.value
-  const results = await Promise.allSettled([
-    getOverview({ period }),
-    getSalesRanking({ period }),
-    getFinanceSummary({ period }),
+async function fetchTeamEfficiency() {
+  if (!canViewDashboard.value) return
+
+  teamLoading.value = true
+  try {
+    const response = await getTeamEfficiency({
+      period: selectedPeriod.value,
+      page: 1,
+      page_size: 20,
+    })
+    teamData.value = response
+  } catch (error) {
+    console.error('Failed to fetch team efficiency:', error)
+    message.error('加载团队效能数据失败')
+  } finally {
+    teamLoading.value = false
+  }
+}
+
+async function fetchAlerts() {
+  if (!canViewDashboard.value) return
+
+  alertsLoading.value = true
+  try {
+    const response = await getAlerts({
+      level: 'all',
+      limit: 20,
+    })
+    alertsData.value = response
+  } catch (error) {
+    console.error('Failed to fetch alerts:', error)
+    message.error('加载风险预警失败')
+  } finally {
+    alertsLoading.value = false
+  }
+}
+
+async function fetchDecisionSupport() {
+  if (!canViewDecisionSupport.value) return
+
+  decisionLoading.value = true
+  try {
+    const response = await getDecisionSupport({
+      period: selectedPeriod.value,
+      dimension: 'source',
+    })
+    decisionData.value = response
+  } catch (error) {
+    console.error('Failed to fetch decision support:', error)
+    message.error('加载决策支撑数据失败')
+  } finally {
+    decisionLoading.value = false
+  }
+}
+
+async function fetchAllData() {
+  // 并行请求所有模块数据
+  await Promise.allSettled([
+    fetchHealthMetrics(),
+    fetchCashflowData(),
+    fetchTeamEfficiency(),
+    fetchAlerts(),
+    fetchDecisionSupport(),
   ])
-
-  const [overviewRes, salesRes, financeRes] = results
-
-  if (overviewRes.status === 'fulfilled') {
-    overview.value = overviewRes.value
-  }
-  overviewLoading.value = false
-
-  if (salesRes.status === 'fulfilled') {
-    salesRanking.value = salesRes.value.ranking
-  }
-  salesLoading.value = false
-
-  if (financeRes.status === 'fulfilled') {
-    financeData.value = financeRes.value
-  }
-  financeLoading.value = false
 }
 
-async function fetchStaticData() {
-  funnelLoading.value = true
-  heatmapLoading.value = true
-  supplierLoading.value = true
-  eventsLoading.value = true
-  const monthParam = currentMonth.value
-  const results = await Promise.allSettled([
-    getConversionFunnel(),
-    getScheduleHeatmap({ month: monthParam }),
-    getSupplierRanking(),
-    getEventList({ page_size: 5 }),
-  ])
-
-  const [funnelRes, heatmapRes, supplierRes, eventsRes] = results
-
-  if (funnelRes.status === 'fulfilled') {
-    funnelData.value = funnelRes.value
+// ========== 自动刷新 ==========
+function startAutoRefresh() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
   }
-  funnelLoading.value = false
-
-  if (heatmapRes.status === 'fulfilled') {
-    heatmapData.value = heatmapRes.value
+  if (autoRefresh.value) {
+    refreshTimer = setInterval(() => {
+      fetchAllData()
+    }, refreshInterval)
   }
-  heatmapLoading.value = false
-
-  if (supplierRes.status === 'fulfilled') {
-    supplierRanking.value = supplierRes.value.ranking
-  }
-  supplierLoading.value = false
-
-  if (eventsRes.status === 'fulfilled') {
-    recentEvents.value = eventsRes.value.items
-  }
-  eventsLoading.value = false
 }
 
-// Watch period changes and refetch period-dependent data
-watch(selectedPeriod, () => {
-  fetchPeriodData()
+function stopAutoRefresh() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+}
+
+watch(autoRefresh, () => {
+  if (autoRefresh.value) {
+    startAutoRefresh()
+  } else {
+    stopAutoRefresh()
+  }
 })
 
+// ========== 周期切换 ==========
+watch([selectedPeriod, compareTo], () => {
+  fetchAllData()
+})
+
+// ========== 预警处理 ==========
+async function handleAlertResolved(alertId: string) {
+  // 重新加载预警列表
+  await fetchAlerts()
+  message.success('预警已标记为已处理')
+}
+
+// ========== 生命周期 ==========
 onMounted(() => {
-  fetchPeriodData()
-  fetchStaticData()
+  if (!canViewDashboard.value) {
+    message.warning('您没有查看工作台的权限')
+    return
+  }
+  fetchAllData()
+  startAutoRefresh()
+})
+
+onUnmounted(() => {
+  stopAutoRefresh()
 })
 </script>
 
 <template>
   <div>
-    <!-- Period selector -->
-    <NSpace justify="end" style="margin-bottom: 16px">
-      <NSelect
-        v-model:value="selectedPeriod"
-        :options="periodOptions"
-        style="width: 120px"
+    <!-- 权限检查 -->
+    <NAlert v-if="!canViewDashboard" type="warning" style="margin-bottom: 16px">
+      您没有查看工作台的权限，请联系管理员
+    </NAlert>
+
+    <template v-else>
+      <!-- 顶部全局筛选器 -->
+      <NCard style="margin-bottom: 16px">
+        <NSpace justify="space-between" align="center">
+          <NSpace>
+            <span style="font-size: 14px; color: #666">统计周期</span>
+            <NSelect
+              v-model:value="selectedPeriod"
+              :options="periodOptions"
+              style="width: 120px"
+            />
+            <NSelect
+              v-model:value="compareTo"
+              :options="compareToOptions"
+              style="width: 120px"
+            />
+          </NSpace>
+          <NSpace align="center">
+            <span style="font-size: 14px; color: #666">自动刷新</span>
+            <NSwitch v-model:value="autoRefresh" />
+          </NSpace>
+        </NSpace>
+      </NCard>
+
+      <!-- 核心卡片区：经营健康度 -->
+      <HealthMetrics
+        :loading="healthLoading"
+        :metrics="healthData?.metrics"
+        style="margin-bottom: 16px"
       />
-    </NSpace>
 
-    <!-- Top statistic cards -->
-    <NGrid :x-gap="16" :y-gap="16" :cols="4">
-      <NGi>
-        <NCard>
-          <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else label="客户总数" :value="overview?.customers.total ?? 0">
-            <template #suffix>人</template>
-          </NStatistic>
-        </NCard>
-      </NGi>
-      <NGi>
-        <NCard>
-          <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else :label="`${periodLabel}订单`" :value="overview?.orders.count ?? 0">
-            <template #suffix>单</template>
-          </NStatistic>
-        </NCard>
-      </NGi>
-      <NGi>
-        <NCard>
-          <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else :label="`${periodLabel}营收`" :value="formatAmount(overview?.orders.total_amount ?? 0)" />
-        </NCard>
-      </NGi>
-      <NGi>
-        <NCard>
-          <NSkeleton v-if="overviewLoading" text :repeat="2" />
-          <NStatistic v-else label="待执行活动" :value="overview?.upcoming_events ?? 0">
-            <template #suffix>场</template>
-          </NStatistic>
-        </NCard>
-      </NGi>
-    </NGrid>
-
-    <!-- Sales ranking + Conversion funnel -->
-    <NGrid :x-gap="16" :y-gap="16" :cols="2" style="margin-top: 16px">
-      <NGi>
-        <NCard title="销售排行">
-          <NSkeleton v-if="salesLoading" text :repeat="5" />
-          <NDataTable
-            v-else
-            :columns="salesColumns"
-            :data="salesRanking"
-            :bordered="false"
-            size="small"
-            :pagination="false"
+      <!-- 第二行：现金流 + 团队效能 -->
+      <NGrid :x-gap="16" :y-gap="16" :cols="2" style="margin-bottom: 16px" responsive="screen">
+        <NGi v-if="canViewFinance">
+          <CashflowPanel
+            :loading="cashflowLoading"
+            :data="cashflowData"
           />
-        </NCard>
-      </NGi>
-      <NGi>
-        <NCard title="转化漏斗">
-          <NSkeleton v-if="funnelLoading" text :repeat="5" />
-          <template v-else>
-            <NSpace vertical :size="16">
-              <div v-for="stage in funnelStages" :key="stage.status">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
-                  <span style="font-size: 14px">{{ stage.status }}</span>
-                  <span style="font-size: 14px; color: #999">{{ stage.count }} 人</span>
-                </div>
-                <NProgress
-                  type="line"
-                  :percentage="stage.percent"
-                  :show-indicator="false"
-                  :height="20"
-                  :color="'#18a058'"
-                  :rail-color="'#f0f0f0'"
-                />
-              </div>
-              <div v-if="funnelStages.length === 0" style="text-align: center; color: #999; padding: 20px 0">
-                暂无数据
-              </div>
-            </NSpace>
-          </template>
-        </NCard>
-      </NGi>
-    </NGrid>
+        </NGi>
+        <NGi>
+          <TeamEfficiencyPanel
+            :loading="teamLoading"
+            :data="teamData"
+          />
+        </NGi>
+      </NGrid>
 
-    <!-- Finance summary + Schedule heatmap -->
-    <NGrid :x-gap="16" :y-gap="16" :cols="2" style="margin-top: 16px">
-      <NGi>
-        <NCard title="财务汇总">
-          <NSkeleton v-if="financeLoading" text :repeat="5" />
-          <template v-else>
-            <NSpace vertical :size="16">
-              <NGrid :x-gap="12" :y-gap="12" :cols="3">
-                <NGi>
-                  <NStatistic label="总额" :value="formatAmount(financeData?.total_amount ?? 0)" />
-                </NGi>
-                <NGi>
-                  <NStatistic label="已收" :value="formatAmount(financeData?.total_paid ?? 0)" />
-                </NGi>
-                <NGi>
-                  <NStatistic label="应收" :value="formatAmount(financeData?.receivable ?? 0)" />
-                </NGi>
-              </NGrid>
-              <div v-if="financeData?.payment_method_breakdown" style="margin-top: 8px">
-                <div style="font-size: 13px; color: #666; margin-bottom: 8px">付款方式</div>
-                <NSpace>
-                  <NTag
-                    v-for="(amount, method) in financeData.payment_method_breakdown"
-                    :key="method"
-                    type="info"
-                    size="small"
-                  >
-                    {{ paymentMethodLabels[method] || method }}: {{ formatAmount(amount) }}
-                  </NTag>
-                </NSpace>
-              </div>
-            </NSpace>
-          </template>
-        </NCard>
-      </NGi>
-      <NGi>
-        <NCard title="排期热力图">
-          <template #header-extra>
-            <span style="font-size: 13px; color: #999">{{ currentMonth }}</span>
-          </template>
-          <NSkeleton v-if="heatmapLoading" text :repeat="6" />
-          <template v-else>
-            <div style="overflow-x: auto">
-              <!-- Week day headers -->
-              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px">
-                <div
-                  v-for="day in weekDays"
-                  :key="day"
-                  style="text-align: center; font-size: 12px; color: #999; padding: 2px 0"
-                >
-                  {{ day }}
-                </div>
-              </div>
-              <!-- Calendar grid -->
-              <div
-                v-for="(week, wi) in heatmapGrid.weeks"
-                :key="wi"
-                style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px"
-              >
-                <div
-                  v-for="(cell, di) in week.days"
-                  :key="di"
-                  :style="{
-                    textAlign: 'center',
-                    fontSize: '12px',
-                    padding: '6px 2px',
-                    borderRadius: '4px',
-                    backgroundColor: cell.isCurrentMonth ? getHeatmapColor(cell.count, heatmapGrid.totalMax) : 'transparent',
-                    color: cell.isCurrentMonth ? (cell.count > 0 ? '#fff' : '#666') : 'transparent',
-                    cursor: 'default',
-                    position: 'relative',
-                  }"
-                  :title="cell.isCurrentMonth ? `${cell.date}: ${cell.count} 场活动` : ''"
-                >
-                  {{ cell.dayOfMonth || '' }}
-                </div>
-              </div>
-            </div>
-          </template>
-        </NCard>
-      </NGi>
-    </NGrid>
-
-    <!-- Supplier ranking -->
-    <NCard title="供应商排行" style="margin-top: 16px">
-      <NSkeleton v-if="supplierLoading" text :repeat="5" />
-      <NDataTable
-        v-else
-        :columns="supplierColumns"
-        :data="supplierRanking"
-        :bordered="false"
-        size="small"
-        :pagination="false"
+      <!-- 第三行：风险预警 -->
+      <AlertsPanel
+        :loading="alertsLoading"
+        :data="alertsData"
+        @resolved="handleAlertResolved"
+        style="margin-bottom: 16px"
       />
-    </NCard>
 
-    <!-- Recent events -->
-    <NCard title="最近活动" style="margin-top: 16px">
-      <NSkeleton v-if="eventsLoading" text :repeat="4" />
-      <NList v-else>
-        <NListItem v-for="event in recentEvents" :key="event.id">
-          <NThing :title="event.title">
-            <template #description>
-              <NSpace size="small">
-                <NTag size="small">{{ event.event_date }}</NTag>
-                <NTag size="small" type="info">{{ event.status }}</NTag>
-              </NSpace>
-            </template>
-          </NThing>
-        </NListItem>
-        <NListItem v-if="recentEvents.length === 0">
-          <NThing title="暂无排期" />
-        </NListItem>
-      </NList>
-    </NCard>
+      <!-- 第四行：决策支撑 -->
+      <DecisionSupportPanel
+        v-if="canViewDecisionSupport"
+        :loading="decisionLoading"
+        :data="decisionData"
+      />
+    </template>
   </div>
 </template>
