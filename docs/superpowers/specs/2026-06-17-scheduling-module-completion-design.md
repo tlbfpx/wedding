@@ -2,7 +2,7 @@
 
 **日期**: 2026-06-17
 **作者**: Brainstorming session (Superpowers Phase 1)
-**状态**: Confirmed by user, reviewed by oracle (1 fix round applied) — 待写入 OpenSpec
+**状态**: Confirmed by user, reviewed by oracle (2 fix rounds applied) — 待写入 OpenSpec
 
 ---
 
@@ -158,7 +158,7 @@ async with db.begin():
 |---|---|
 | `test_delete_draft_event_success` | 删 draft event，记录消失，StaffSchedule+EventResource 级联清理 |
 | `test_delete_non_draft_event_conflict` | 删 confirmed event → 409，提示用 PUT 取消 |
-| `test_create_staff_schedule_success` | 创建成功 → 201，DB 有记录 |
+| `test_create_staff_schedule_success` | 创建成功 → 200，DB 有记录 |
 | `test_create_staff_schedule_same_day_conflict` | 同 staff 同日跨 event → 409，body 含冲突 event 信息 |
 | `test_create_staff_schedule_invalid_event_status` | draft/cancelled event 上创建排班 → 400 |
 
@@ -167,7 +167,7 @@ async with db.begin():
 | 测试名 | 覆盖 |
 |---|---|
 | `test_delete_venue_with_references_conflict` | 有 Event 引用 → 409，body 含 referenced_count + sample_event_ids |
-| `test_delete_venue_without_references_success` | 无引用 → 204，DB 中消失 |
+| `test_delete_venue_without_references_success` | 无引用 → 200，DB 中消失 |
 
 ### 5.3 权限测试
 
