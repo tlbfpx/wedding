@@ -2,7 +2,7 @@
 
 **日期**: 2026-06-17
 **作者**: Brainstorming session (Superpowers Phase 1)
-**状态**: Confirmed by user — 待写入 OpenSpec
+**状态**: Confirmed by user, reviewed by oracle (1 fix round applied) — 待写入 OpenSpec
 
 ---
 
@@ -40,16 +40,27 @@
 **语义**：
 - 仅允许 `status='draft'` 的事件被删除
 - 非草稿状态（confirmed / executing / completed / cancelled）→ 返回 **409 Conflict**，body 提示用 `PUT /events/{id}` 改 `status='cancelled'`
-- 草稿事件硬删除，**级联清理**其 StaffSchedule、EventResource 记录
+- 草稿事件硬删除
 
-**权限**：`events.delete`（新建权限点）
+**级联清理（事务内手动删除）**：
+现有 `EventResource.event_id` 和 `StaffSchedule.event_id` 的 ForeignKey 无 `ondelete` 子句，ORM relationship 也无 `cascade="all, delete-orphan"`。**采用事务内手动删除**（不修改 schema，避免迁移风险）：
+```python
+async with db.begin():
+    await db.execute(delete(EventResource).where(EventResource.event_id == event_id))
+    await db.execute(delete(StaffSchedule).where(StaffSchedule.event_id == event_id))
+    await db.delete(event)
+```
+
+**成功响应**：返回 **200 OK** + `{"message": "event deleted", "id": <id>}`（与现有 `remove_resource` 风格一致）
+
+**权限**：`require_permission("schedule", "delete")`（新建 2-arg 权限，与现有 `("schedule","read")` / `("schedule","write")` 模式一致）
 
 **事件总线**：不发布（草稿无业务影响）
 
 ### 3.2 `DELETE /api/v1/venues/{id}` — 引用保护硬删除
 
 **语义**：
-- 先查 `count(Event.venue_id == venue.id)` （任何 status）
+- 先查 `count(Event.venue_id == venue.id)` （**包含所有 status，包括 cancelled**，以保护历史审计记录）
 - 引用数 > 0 → **409 Conflict**，body：
   ```json
   {
@@ -58,9 +69,14 @@
     "sample_event_ids": [12, 34, 56]
   }
   ```
+  `sample_event_ids`：最多 3 个，按 `Event.date DESC` 排序（最近的）
 - 引用数 == 0 → 硬删除
 
-**权限**：`venues.delete`（新建权限点）
+**成功响应**：返回 **200 OK** + `{"message": "venue deleted", "id": <id>}`（与 events 一致）
+
+**权限**：`require_permission("schedule", "delete")`（与 events.delete 复用同一权限点）
+
+**实现位置**：现有 `venues.py` router 是 inline 实现（无 VenueService）。本次保持 inline，不引入 VenueService（YAGNI）。
 
 ### 3.3 `POST /api/v1/events/{id}/staff-schedule` — 单条排班创建
 
@@ -68,20 +84,54 @@
 ```json
 {
   "staff_id": 7,
-  "role": "planner",
+  "role": "策划师",
   "date": "2026-07-15"
 }
 ```
 
-**语义**：
-1. 校验 event 存在 + status ∈ {confirmed, executing}（draft/cancelled/completed 拒绝）
-2. 校验 staff_id 是合法 User
-3. **冲突检测**：`StaffSchedule.staff_id == body.staff_id AND date == body.date AND event_id != body.event_id AND status='assigned'`
-   - 命中 → **409 Conflict**，body 含 `{ "conflict_event_id": N, "conflict_event_title": "..." }`
-4. 插入 StaffSchedule（status='assigned'），返回 **201 Created** + 创建的记录
-5. 发布事件总线 `STAFF_ASSIGNED`，handler 通知该 staff（与现有 `EVENT_CREATED` 模式一致）
+**字段约束**：
+- `role`：自由字符串，max 30 字符，无枚举（与现有 `StaffSchedule.role String(30)` 一致；现有测试用 `"策划师"` / `"司仪"`）
+- `date`：可独立于 `Event.date`（允许排班到 prep day / post day，不强制等于事件日期）
 
-**权限**：`events.manage`（复用现有）
+**语义**：
+1. 校验 event 存在 + `status ∈ {confirmed, executing}`（draft/cancelled/completed 返回 400 拒绝）
+2. 校验 staff_id 是合法 User（否则 400）
+3. **冲突检测**：
+   ```python
+   conflict = await db.execute(
+       select(StaffSchedule, Event).join(Event, Event.id == StaffSchedule.event_id)
+       .where(
+           StaffSchedule.staff_id == body.staff_id,
+           StaffSchedule.date == body.date,
+           StaffSchedule.event_id != body.event_id,
+           StaffSchedule.status.in_(["assigned", "confirmed"])  # 不包含 completed
+       )
+   )
+   ```
+   - 命中 → **409 Conflict**，body 含 `{ "conflict_event_id": N, "conflict_event_title": "..." }`
+   - **`completed` 状态不阻塞**（历史记录，staff 当天实际已完成且现在空闲）
+4. 插入 StaffSchedule（status='assigned'），返回 **200 OK** + 创建的记录（与现有 `create_event`/`add_resource` 返回 200 一致）
+5. **事件总线发布**（详见 §3.3.1）
+
+**权限**：`require_permission("schedule", "write")`（复用现有，不新建）
+
+#### 3.3.1 STAFF_ASSIGNED 事件总线
+
+- 在 `app/events/event_types.py` 新增常量：`STAFF_ASSIGNED = "staff_assigned"`
+- 在 `app/events/handlers.py` 新增 handler `on_staff_assigned(payload)`：
+  - payload 形状（与 EVENT_CREATED 不同，因为是 staff-centric）：
+    ```python
+    {
+      "staff_id": 7,
+      "staff_name": "张三",
+      "event_id": 12,
+      "event_title": "王先生婚礼",
+      "role": "策划师",
+      "date": "2026-07-15"
+    }
+    ```
+  - 调用 `NotificationService.notify_user(staff_id, ...)` 生成 `schedule` 类型通知（与现有 `on_event_created` 调用 NotificationService 的方式一致）
+- 在 `app/events/event_bus.py`（或 main.py 启动注册处）注册 `STAFF_ASSIGNED → on_staff_assigned`
 
 ---
 
@@ -123,15 +173,23 @@
 
 每个新端点加一个 403 用例（无权限用户访问）。
 
+**前置工作**：现有 `tests/conftest.py` 无 low-privilege user fixture（test_events.py 历史 0 个 403 测试）。需扩展 conftest：
+- 新增 `low_priv_user` fixture：授予 `("schedule","read")` 但不授 `("schedule","write")` / `("schedule","delete")`
+- 新增对应 auth client fixture（参考现有 admin client 的构造方式）
+
 ---
 
 ## 6. 数据迁移
 
-新增 2 个权限点种子数据：
-- `events.delete`
-- `venues.delete`
+新增 1 个权限点（两个 DELETE 端点共用）：
+- module=`schedule`, action=`delete` (code=`schedule.delete`)
 
-通过 Alembic data migration 注入到默认角色（`admin` 默认拥有，`manager` 视情况）。
+通过 Alembic data migration 注入。**确定性种子**：
+- `admin` 角色 → 授予 `schedule.delete` ✅
+- `manager` 角色 → **不授予**（DELETE 是破坏性操作，admin-only 更安全）
+- `sales` / `planner` 角色 → 不授予
+
+Alembic migration 文件路径：`wedding-backend/alembic/versions/<rev>_add_schedule_delete_permission.py`（具体 rev id 由 alembic revision 生成）。同时在权限初始化的 seed 脚本（若有 `scripts/init_permissions.py` 或类似）中追加该权限点。
 
 ---
 
