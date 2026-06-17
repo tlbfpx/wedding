@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目蓝图 - 婚礼策划管理系统</title>
+<!-- 生成时间: 2026-06-04 | 分析深度: standard | 分析范围: 全项目 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true, actorMargin: 50, messageMargin: 35 },
+    er: { useMaxWidth: true },
+    stateDiagram: { useMaxWidth: true }
+  });
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sidebar-w: 260px; --color-primary: #2563eb; --color-primary-light: #dbeafe;
+    --color-bg: #f8fafc; --color-surface: #ffffff; --color-text: #1e293b;
+    --color-text-secondary: #64748b; --color-border: #e2e8f0;
+    --color-success: #16a34a; --color-warning: #d97706; --color-danger: #dc2626;
+    --color-code-bg: #1e293b; --radius: 8px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--color-text); background: var(--color-bg); line-height: 1.7; font-size: 15px; }
+  nav { position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; background: var(--color-surface); border-right: 1px solid var(--color-border); overflow-y: auto; z-index: 100; padding: 24px 0; }
+  nav .nav-title { font-size: 18px; font-weight: 700; color: var(--color-primary); padding: 0 20px 16px; border-bottom: 1px solid var(--color-border); margin-bottom: 12px; }
+  nav a { display: block; padding: 8px 20px; color: var(--color-text-secondary); text-decoration: none; font-size: 13.5px; transition: all 0.15s; border-left: 3px solid transparent; }
+  nav a:hover, nav a.active { color: var(--color-primary); background: var(--color-primary-light); border-left-color: var(--color-primary); }
+  nav .nav-section { padding: 12px 20px 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); }
+  main { margin-left: var(--sidebar-w); max-width: 960px; padding: 32px 48px 80px; }
+  .hero { background: linear-gradient(135deg, var(--color-primary), #7c3aed); color: white; border-radius: var(--radius); padding: 32px 40px; margin-bottom: 40px; }
+  .hero h1 { font-size: 28px; margin-bottom: 8px; }
+  .hero .meta { font-size: 13px; opacity: 0.85; display: flex; gap: 20px; flex-wrap: wrap; }
+  .quick-start { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 40px; }
+  .quick-start h2 { font-size: 20px; margin-bottom: 20px; color: var(--color-primary); }
+  .quick-start ol { counter-reset: qs; list-style: none; }
+  .quick-start li { counter-increment: qs; padding: 10px 0 10px 48px; position: relative; border-bottom: 1px solid var(--color-border); }
+  .quick-start li:last-child { border-bottom: none; }
+  .quick-start li::before { content: counter(qs); position: absolute; left: 0; top: 10px; width: 32px; height: 32px; background: var(--color-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+  .quick-start li strong { color: var(--color-text); }
+  .section { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 32px; }
+  .section h2 { font-size: 20px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--color-primary-light); color: var(--color-text); }
+  .section h2 .section-number { color: var(--color-primary); margin-right: 8px; }
+  .section h3 { font-size: 16px; margin: 24px 0 12px; color: var(--color-text); }
+  .diagram-container { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 24px; margin: 16px 0; overflow-x: auto; }
+  .diagram-container .mermaid { display: flex; justify-content: center; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 16px 0; }
+  table thead { background: var(--color-primary); color: white; }
+  table th { padding: 10px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+  table td { padding: 9px 14px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+  table tbody tr:nth-child(even) { background: #f8fafc; }
+  table tbody tr:hover { background: var(--color-primary-light); }
+  code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: "JetBrains Mono", "Fira Code", monospace; }
+  pre { background: var(--color-code-bg); color: #e2e8f0; padding: 20px; border-radius: var(--radius); overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 12px 0; font-family: "JetBrains Mono", "Fira Code", monospace; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  .badge-info { background: #dbeafe; color: #1e40af; }
+  .risk-card { border-left: 4px solid; padding: 14px 18px; margin: 12px 0; border-radius: 0 var(--radius) var(--radius) 0; background: var(--color-bg); }
+  .risk-card.high { border-color: var(--color-danger); }
+  .risk-card.medium { border-color: var(--color-warning); }
+  .risk-card.low { border-color: var(--color-success); }
+  footer { text-align: center; padding: 24px; color: var(--color-text-secondary); font-size: 13px; border-top: 1px solid var(--color-border); margin-top: 48px; }
+  @media (max-width: 900px) { nav { display: none; } main { margin-left: 0; padding: 20px; } .hero { padding: 24px; } .section { padding: 20px; } }
+  @media print { nav { display: none !important; } main { margin-left: 0; padding: 0; max-width: 100%; } .section { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ddd; } .diagram-container { border: 1px solid #ddd; } body { font-size: 12px; } }
+</style>
+</head>
+<body>
+
+<!-- ========== 侧边栏导航 ========== -->
+<nav>
+  <div class="nav-title">📋 项目蓝图</div>
+  <div class="nav-section">概览</div>
+  <a href="#quick-start">快速入门</a>
+  <div class="nav-section">架构</div>
+  <a href="#tech-arch">1. 技术架构图</a>
+  <a href="#biz-arch">2. 业务架构图</a>
+  <a href="#deps">3. 依赖关系图</a>
+  <div class="nav-section">领域</div>
+  <a href="#ddd">4. DDD 领域模型</a>
+  <a href="#database">5. 数据库设计</a>
+  <a href="#data-dict">6. 数据字典</a>
+  <div class="nav-section">接口</div>
+  <a href="#api">7. API 接口清单</a>
+  <a href="#flow">8. 业务流程</a>
+  <a href="#state">9. 状态机</a>
+  <a href="#sequence">10. 时序图</a>
+  <div class="nav-section">规则</div>
+  <a href="#rules">11. 业务规则</a>
+  <a href="#jobs">12. 定时任务</a>
+  <a href="#glossary">13. 名词解释</a>
+  <div class="nav-section">运维</div>
+  <a href="#config">14. 配置项说明</a>
+  <a href="#risks">15. 风险与债务</a>
+</nav>
+
+<!-- ========== 主内容 ========== -->
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>婚礼策划管理系统 — 项目蓝图</h1>
+    <div class="meta">
+      <span>📅 生成时间：2026-06-04</span>
+      <span>🔍 分析深度：standard</span>
+      <span>🎯 分析范围：全项目</span>
+      <span>💻 Python FastAPI + Vue 3 + MySQL</span>
+    </div>
+  </div>
+
+  <!-- 快速入门 -->
+  <div class="quick-start" id="quick-start">
+    <h2>🚀 快速入门（新人必读 Top 10）</h2>
+    <p style="color:var(--color-text-secondary); margin-bottom:16px;">这 10 条信息能让新人在 30 分钟内建立项目基本认知</p>
+    <ol>
+      <li><strong>一句话定位</strong>：面向婚礼策划公司的全流程业务管理系统，覆盖客户跟进、档期管理、订单合同、财务核算、供应商协作等核心业务</li>
+      <li><strong>技术栈</strong>：后端 Python 3.13 + FastAPI 0.115 + SQLAlchemy 2.0 async + MySQL 8 + Redis 7；前端 Vue 3.5 + TypeScript + Naive UI + Pinia</li>
+      <li><strong>项目结构</strong>：Monorepo 双服务拓扑 — <code>wedding-backend/</code>（后端）+ <code>wedding-frontend/</code>（前端），后端采用 DDD 四层架构</li>
+      <li><strong>如何启动</strong>：<code>docker compose up -d</code> 启动全部服务（MySQL + Redis + Backend + Frontend），或分别 <code>uvicorn app.main:app</code> 和 <code>npm run dev</code></li>
+      <li><strong>核心业务</strong>：CRM 客户跟进 → 档期/资源调度 → 订单合同签订 → 财务应收/退款/发票 → 供应商协作，全程审批流驱动</li>
+      <li><strong>数据模型</strong>：25 张 MySQL 表，核心聚合根为 Customer、Order、Event，支撑 7 种角色、4 个团队的业务协作</li>
+      <li><strong>外部依赖</strong>：MySQL 8（主存储）、Redis 7（缓存/JWT 黑名单/限流/事件总线）、Sentry（错误监控）、Prometheus（指标采集）</li>
+      <li><strong>部署方式</strong>：Docker Compose 编排 4 个服务（frontend/nginx、backend/uvicorn、mysql、redis），支持健康检查和资源限制</li>
+      <li><strong>关键配置</strong>：<code>DATABASE_URL</code>、<code>REDIS_URL</code>、<code>JWT_SECRET</code>、<code>JWT_ACCESS_TOKEN_EXPIRE_MINUTES</code>（120min）、<code>BCRYPT_ROUNDS</code>（12）</li>
+      <li><strong>常见坑点</strong>：JWT 双 Token 机制（access + refresh）、异步 SQLAlchemy 需注意 session 生命周期、RBAC 权限粒度为 module+action+scope 三维</li>
+    </ol>
+  </div>
+
+  <!-- §1 技术架构图 -->
+  <div class="section" id="tech-arch">
+    <h2><span class="section-number">01</span>技术架构图</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+graph TB
+    subgraph 客户端
+        Browser["Web 浏览器<br/>Vue 3 + Naive UI"]
+    end
+    subgraph 反向代理
+        Nginx["Nginx<br/>静态资源 / API 代理"]
+    end
+    subgraph 应用服务
+        FastAPI["FastAPI 应用<br/>Uvicorn ASGI"]
+        MW["中间件链<br/>RequestID → Logging → CORS<br/>RateLimit → Metrics → CSRF"]
+        Router["21 个 Router<br/>认证/用户/客户/订单/档期<br/>财务/供应商/通知/审批..."]
+        EventBus["事件总线<br/>EventBus / RedisEventBus"]
+    end
+    subgraph DDD模块
+        Finance["Finance 模块<br/>domain/application/infrastructure/interfaces"]
+        Dashboard["Dashboard 模块<br/>domain/application/infrastructure/interfaces"]
+        Legacy["传统模块<br/>models/ + routers/"]
+    end
+    subgraph 数据层
+        MySQL[("MySQL 8<br/>25 张表")]
+        Redis[("Redis 7<br/>缓存/JWT黑名单/限流")]
+    end
+    subgraph 监控
+        Sentry["Sentry 错误监控"]
+        Prometheus["Prometheus 指标"]
+    end
+
+    Browser --> Nginx
+    Nginx --> FastAPI
+    FastAPI --> MW --> Router
+    Router --> Finance
+    Router --> Dashboard
+    Router --> Legacy
+    Finance --> MySQL
+    Finance --> Redis
+    Dashboard --> MySQL
+    Legacy --> MySQL
+    Legacy --> Redis
+    EventBus -.-> Redis
+    FastAPI -.-> Sentry
+    FastAPI -.-> Prometheus
+      </pre>
+    </div>
+    <h3>技术栈清单</h3>
+    <table>
+      <thead><tr><th>分类</th><th>技术</th><th>版本</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>后端语言</td><td>Python</td><td>3.13</td><td>后端业务逻辑</td></tr>
+        <tr><td>Web 框架</td><td>FastAPI</td><td>0.115.0</td><td>RESTful API 服务</td></tr>
+        <tr><td>ORM</td><td>SQLAlchemy</td><td>2.0 (async)</td><td>异步数据库访问</td></tr>
+        <tr><td>数据库</td><td>MySQL</td><td>8.0</td><td>主数据存储（asyncmy 驱动）</td></tr>
+        <tr><td>缓存</td><td>Redis</td><td>7.x</td><td>缓存 / JWT 黑名单 / 限流 / 事件总线</td></tr>
+        <tr><td>数据库迁移</td><td>Alembic</td><td>1.14+</td><td>Schema 版本管理</td></tr>
+        <tr><td>前端框架</td><td>Vue</td><td>3.5</td><td>SPA 前端应用</td></tr>
+        <tr><td>前端语言</td><td>TypeScript</td><td>6.0</td><td>类型安全的前端开发</td></tr>
+        <tr><td>UI 组件库</td><td>Naive UI</td><td>2.44</td><td>Vue 3 组件库</td></tr>
+        <tr><td>状态管理</td><td>Pinia</td><td>3.0</td><td>Vue 3 状态管理</td></tr>
+        <tr><td>HTTP 客户端</td><td>Axios</td><td>1.7+</td><td>API 请求</td></tr>
+        <tr><td>路由</td><td>Vue Router</td><td>4.6</td><td>前端路由管理</td></tr>
+        <tr><td>认证</td><td>JWT + bcrypt</td><td>-</td><td>双 Token 认证（access 120min + refresh 7d）</td></tr>
+        <tr><td>容器化</td><td>Docker Compose</td><td>-</td><td>4 服务编排（frontend/backend/mysql/redis）</td></tr>
+        <tr><td>错误监控</td><td>Sentry</td><td>-</td><td>异常追踪与告警</td></tr>
+        <tr><td>指标采集</td><td>Prometheus</td><td>-</td><td>应用指标监控</td></tr>
+        <tr><td>测试</td><td>pytest + Playwright</td><td>-</td><td>195 后端测试 + 59 E2E 测试</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §2 业务架构图 -->
+  <div class="section" id="biz-arch">
+    <h2><span class="section-number">02</span>业务架构图</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+graph TB
+    subgraph 销售域["销售域"]
+        CRM["客户关系管理<br/>潜在客户 → 跟进 → 意向 → 签约"]
+        FollowUp["跟进记录<br/>电话/微信/面谈/其他"]
+    end
+    subgraph 策划域["策划域"]
+        Event["档期管理<br/>创建 → 确认 → 进行中 → 完成"]
+        Schedule["人员排班<br/>空闲/已排/请假"]
+        Resource["资源调度<br/>场地/人员/设备/物料/其他"]
+    end
+    subgraph 订单域["订单域"]
+        Order["订单管理<br/>意向 → 签约 → 执行中 → 完成/取消"]
+        Contract["合同管理<br/>生成/签署/归档"]
+        Approval["审批流<br/>创建 → 审批中 → 通过/拒绝"]
+    end
+    subgraph 财务域["财务域"]
+        Receivable["应收管理<br/>待收款/部分收款/已收款/已取消"]
+        Refund["退款管理<br/>待退款/已退款/已拒绝/已取消"]
+        Invoice["发票管理<br/>待开票/已开票/已作废/已红冲"]
+        Expense["费用管理<br/>6 类费用核算"]
+    end
+    subgraph 供应商域["供应商域"]
+        Supplier["供应商管理<br/>7 类供应商"]
+        Eval["供应商评价"]
+    end
+    subgraph 系统域["系统域"]
+        Auth["认证授权<br/>JWT + RBAC"]
+        Notify["通知系统<br/>系统/审批/提醒/事件"]
+        Log["操作日志"]
+    end
+
+    CRM --> |签约客户| Order
+    Order --> |关联档期| Event
+    Order --> |触发审批| Approval
+    Order --> |生成应收| Receivable
+    Approval --> |审批通过| Refund
+    Order --> |关联合同| Contract
+    Event --> |资源需求| Resource
+    Event --> |人员调度| Schedule
+    Order --> |供应商服务| Supplier
+    Supplier --> Eval
+      </pre>
+    </div>
+    <h3>业务域说明</h3>
+    <table>
+      <thead><tr><th>业务域</th><th>核心能力</th><th>关键实体</th><th>负责模块</th></tr></thead>
+      <tbody>
+        <tr><td>销售域</td><td>客户全生命周期管理，从潜在客户到签约</td><td>Customer, FollowUp, CustomerSource</td><td>customer</td></tr>
+        <tr><td>策划域</td><td>婚礼档期安排、场地/人员/资源调度</td><td>Event, Venue, StaffSchedule, EventResource</td><td>event</td></tr>
+        <tr><td>订单域</td><td>订单/合同/审批全流程管理</td><td>Order, OrderItem, Contract, Approval</td><td>order</td></tr>
+        <tr><td>财务域</td><td>应收/退款/发票/费用四大核算</td><td>Receivable, Refund, Invoice, Expense</td><td>finance (DDD)</td></tr>
+        <tr><td>供应商域</td><td>供应商信息管理与评价</td><td>Supplier, SupplierService, SupplierEvaluation</td><td>supplier</td></tr>
+        <tr><td>系统域</td><td>认证授权、通知、日志</td><td>User, Role, Notification, OperationLog</td><td>auth/user/notification/log</td></tr>
+        <tr><td>数据域</td><td>仪表盘统计与数据可视化</td><td>-</td><td>dashboard (DDD)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §3 依赖关系图 -->
+  <div class="section" id="deps">
+    <h2><span class="section-number">03</span>依赖关系图</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+graph LR
+    subgraph 前端
+        FE["Vue 3 前端"]
+    end
+    subgraph 后端模块
+        Auth["auth<br/>认证授权"]
+        User["user<br/>用户管理"]
+        Customer["customer<br/>客户管理"]
+        Order["order<br/>订单管理"]
+        EventMod["event<br/>档期管理"]
+        Supplier["supplier<br/>供应商"]
+        Notification["notification<br/>通知"]
+        Finance["finance (DDD)<br/>财务核算"]
+        Dashboard["dashboard (DDD)<br/>数据仪表盘"]
+    end
+    subgraph 基础设施
+        EventBusMod["events<br/>事件总线"]
+        DB[("MySQL")]
+        Redis[("Redis")]
+    end
+
+    FE --> Auth
+    FE --> User
+    FE --> Customer
+    FE --> Order
+    FE --> EventMod
+    FE --> Supplier
+    FE --> Finance
+    FE --> Dashboard
+
+    Customer --> |签约| Order
+    Order --> |关联| EventMod
+    Order --> |供应商| Supplier
+    Order --> |触发| Finance
+    Order --> |触发| EventBusMod
+    Auth --> User
+    EventBusMod --> Notification
+    EventBusMod --> Finance
+    Finance --> EventBusMod
+
+    Customer --> DB
+    Order --> DB
+    EventMod --> DB
+    Finance --> DB
+    Auth --> Redis
+    EventBusMod --> Redis
+    Dashboard --> DB
+      </pre>
+    </div>
+    <h3>模块间同步调用关系</h3>
+    <table>
+      <thead><tr><th>调用方</th><th>被调用方</th><th>调用方式</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>order</td><td>customer</td><td>Service 接口</td><td>创建订单时关联客户</td></tr>
+        <tr><td>order</td><td>event</td><td>Service 接口</td><td>订单关联档期/资源</td></tr>
+        <tr><td>order</td><td>supplier</td><td>Service 接口</td><td>订单关联供应商服务</td></tr>
+        <tr><td>order</td><td>finance</td><td>异步事件</td><td>order_created → 自动创建应收</td></tr>
+        <tr><td>auth</td><td>user</td><td>Service 接口</td><td>认证时查询用户信息</td></tr>
+        <tr><td>finance</td><td>order</td><td>异步事件</td><td>approval_approved → 处理退款</td></tr>
+        <tr><td>events</td><td>notification</td><td>异步事件</td><td>事件触发通知推送</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §4 DDD 领域模型 -->
+  <div class="section" id="ddd">
+    <h2><span class="section-number">04</span>DDD 领域模型</h2>
+    <h3>Finance 领域模型（已 DDD 化）</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+classDiagram
+    class Receivable {
+        +UUID id
+        +UUID order_id
+        +UUID customer_id
+        +Decimal amount
+        +Decimal paid_amount
+        +ReceivableStatus status
+        +date due_date
+        +create_payment()
+        +mark_completed()
+        +cancel()
+    }
+    class Refund {
+        +UUID id
+        +UUID order_id
+        +UUID receivable_id
+        +Decimal amount
+        +RefundStatus status
+        +str reason
+        +approve()
+        +reject()
+        +process()
+    }
+    class Invoice {
+        +UUID id
+        +UUID order_id
+        +InvoiceType invoice_type
+        +InvoiceStatus status
+        +str invoice_number
+        +Decimal amount
+        +issue()
+        +void()
+        +red_flush()
+    }
+    class Expense {
+        +UUID id
+        +UUID order_id
+        +ExpenseCategory category
+        +Decimal amount
+        +str description
+        +approve()
+    }
+    class Transaction {
+        +UUID id
+        +TransactionType type
+        +Decimal amount
+        +UUID order_id
+        +str payment_method
+    }
+    class ReceivableStatus {
+        &lt;&lt;enum&gt;&gt;
+        PENDING
+        PARTIAL
+        COMPLETED
+        CANCELLED
+    }
+    class RefundStatus {
+        &lt;&lt;enum&gt;&gt;
+        PENDING
+        APPROVED
+        REJECTED
+        CANCELLED
+    }
+    class InvoiceStatus {
+        &lt;&lt;enum&gt;&gt;
+        PENDING
+        ISSUED
+        VOIDED
+        RED_FLUSHED
+    }
+
+    Receivable --> ReceivableStatus
+    Receivable "1" --o "*" Refund : has
+    Receivable "1" --o "*" Transaction : records
+    Refund --> RefundStatus
+    Invoice --> InvoiceStatus
+    Expense "1" --o "1" Order : belongs to
+      </pre>
+    </div>
+    <h3>领域对象清单</h3>
+    <table>
+      <thead><tr><th>类型</th><th>名称</th><th>所属聚合</th><th>职责</th><th>所在文件</th></tr></thead>
+      <tbody>
+        <tr><td>聚合根</td><td>Receivable</td><td>应收</td><td>管理应收款项的生命周期</td><td>finance/domain/entities/receivable.py</td></tr>
+        <tr><td>聚合根</td><td>Refund</td><td>退款</td><td>管理退款申请与审批流程</td><td>finance/domain/entities/refund.py</td></tr>
+        <tr><td>聚合根</td><td>Invoice</td><td>发票</td><td>管理发票开具/作废/红冲</td><td>finance/domain/entities/invoice.py</td></tr>
+        <tr><td>聚合根</td><td>Expense</td><td>费用</td><td>管理各类费用核算</td><td>finance/domain/entities/expense.py</td></tr>
+        <tr><td>值对象</td><td>ReceivableStatus</td><td>应收</td><td>应收状态枚举</td><td>finance/domain/entities/enums.py</td></tr>
+        <tr><td>值对象</td><td>RefundStatus</td><td>退款</td><td>退款状态枚举</td><td>finance/domain/entities/enums.py</td></tr>
+        <tr><td>值对象</td><td>InvoiceStatus</td><td>发票</td><td>发票状态枚举</td><td>finance/domain/entities/enums.py</td></tr>
+        <tr><td>值对象</td><td>ExpenseCategory</td><td>费用</td><td>费用类别枚举（6 类）</td><td>finance/domain/entities/enums.py</td></tr>
+        <tr><td>值对象</td><td>TransactionType</td><td>交易</td><td>交易类型枚举（收入/支出）</td><td>finance/domain/entities/enums.py</td></tr>
+        <tr><td>领域事件</td><td>order_created</td><td>应收</td><td>订单创建 → 自动生成应收</td><td>finance/domain/events/event_types.py</td></tr>
+        <tr><td>领域事件</td><td>order_cancelled</td><td>退款</td><td>订单取消 → 触发退款流程</td><td>finance/domain/events/event_types.py</td></tr>
+        <tr><td>领域事件</td><td>approval_approved</td><td>退款</td><td>审批通过 → 执行退款</td><td>finance/domain/events/event_types.py</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §5 数据库设计 -->
+  <div class="section" id="database">
+    <h2><span class="section-number">05</span>数据库设计</h2>
+    <div class="diagram-container">
+      <pre class="mermaid">
+erDiagram
+    Customer ||--o{ Order : "places"
+    Customer ||--o{ FollowUp : "has"
+    Customer ||--o{ CustomerSource : "from"
+    Order ||--o{ OrderItem : "contains"
+    Order ||--o{ Payment : "has"
+    Order ||--|| Contract : "signed"
+    Order ||--o{ Approval : "requires"
+    Order ||--o{ Receivable : "generates"
+    Order ||--o{ Refund : "may_need"
+    Order ||--o{ Invoice : "issues"
+    Order ||--o{ Expense : "incurs"
+    Order }o--|| Event : "scheduled_at"
+    Event ||--o{ EventResource : "uses"
+    Event ||--o{ StaffSchedule : "assigns"
+    Event }o--|| Venue : "held_at"
+    Supplier ||--o{ SupplierService : "provides"
+    Supplier ||--o{ SupplierEvaluation : "reviewed"
+    User ||--o{ OperationLog : "operates"
+    User ||--o{ Notification : "receives"
+    Role ||--o{ User : "assigned_to"
+
+    Customer {
+        uuid id PK
+        string name
+        string phone
+        string status "potential/following/intention/signed/lost"
+        uuid assigned_to FK
+        uuid source_id FK
+    }
+    Order {
+        uuid id PK
+        uuid customer_id FK
+        uuid event_id FK
+        decimal total_amount
+        string status "intention/signed/executing/completed/cancelled"
+    }
+    Event {
+        uuid id PK
+        string title
+        datetime event_date
+        string status "draft/confirmed/in_progress/completed/cancelled"
+        uuid venue_id FK
+    }
+      </pre>
+    </div>
+    <h3>表清单</h3>
+    <table>
+      <thead><tr><th>表名</th><th>用途</th><th>所属模块</th><th>关键索引</th></tr></thead>
+      <tbody>
+        <tr><td>customers</td><td>客户信息与状态管理</td><td>customer</td><td>phone (unique), status, assigned_to</td></tr>
+        <tr><td>follow_ups</td><td>客户跟进记录</td><td>customer</td><td>customer_id, follow_up_date</td></tr>
+        <tr><td>customer_sources</td><td>客户来源渠道</td><td>customer</td><td>-</td></tr>
+        <tr><td>orders</td><td>订单主表</td><td>order</td><td>customer_id, status, event_id</td></tr>
+        <tr><td>order_items</td><td>订单明细（7 种类型）</td><td>order</td><td>order_id</td></tr>
+        <tr><td>payments</td><td>支付记录（5 种方式）</td><td>order</td><td>order_id</td></tr>
+        <tr><td>contracts</td><td>合同管理</td><td>order</td><td>order_id (unique)</td></tr>
+        <tr><td>approvals</td><td>审批流程</td><td>order</td><td>order_id, status, approval_type</td></tr>
+        <tr><td>events</td><td>档期/活动管理</td><td>event</td><td>event_date, status, venue_id</td></tr>
+        <tr><td>event_resources</td><td>活动资源分配</td><td>event</td><td>event_id, resource_type</td></tr>
+        <tr><td>staff_schedules</td><td>人员排班</td><td>event</td><td>staff_id, event_id, status</td></tr>
+        <tr><td>venues</td><td>场地管理</td><td>event</td><td>name</td></tr>
+        <tr><td>users</td><td>用户/员工信息</td><td>user</td><td>username (unique), team</td></tr>
+        <tr><td>roles</td><td>角色与权限（JSON permissions）</td><td>user</td><td>name (unique)</td></tr>
+        <tr><td>suppliers</td><td>供应商信息（7 类）</td><td>supplier</td><td>type, cooperation_status</td></tr>
+        <tr><td>supplier_services</td><td>供应商服务项目</td><td>supplier</td><td>supplier_id</td></tr>
+        <tr><td>supplier_evaluations</td><td>供应商评价</td><td>supplier</td><td>supplier_id</td></tr>
+        <tr><td>notifications</td><td>系统通知（4 类）</td><td>notification</td><td>user_id, type, is_read</td></tr>
+        <tr><td>operation_logs</td><td>操作审计日志</td><td>log</td><td>user_id, module, action</td></tr>
+        <tr><td>receivables</td><td>应收款项</td><td>finance</td><td>order_id, customer_id, status</td></tr>
+        <tr><td>transactions</td><td>交易流水</td><td>finance</td><td>order_id, type</td></tr>
+        <tr><td>expenses</td><td>费用记录</td><td>finance</td><td>order_id, category</td></tr>
+        <tr><td>refunds</td><td>退款管理</td><td>finance</td><td>order_id, receivable_id, status</td></tr>
+        <tr><td>invoices</td><td>发票管理</td><td>finance</td><td>order_id, status, invoice_number</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §6 数据字典 -->
+  <div class="section" id="data-dict">
+    <h2><span class="section-number">06</span>数据字典</h2>
+
+    <h3>customers — 客户表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>name</td><td>String(100)</td><td>是</td><td>-</td><td>客户姓名</td><td>-</td></tr>
+        <tr><td>phone</td><td>String(20)</td><td>是</td><td>-</td><td>联系电话</td><td>唯一约束</td></tr>
+        <tr><td>email</td><td>String(100)</td><td>否</td><td>null</td><td>邮箱</td><td>-</td></tr>
+        <tr><td>status</td><td>Enum</td><td>是</td><td>potential</td><td>客户状态</td><td>potential/following/intention/signed/lost</td></tr>
+        <tr><td>source_id</td><td>UUID</td><td>否</td><td>null</td><td>来源渠道</td><td>FK → customer_sources.id</td></tr>
+        <tr><td>assigned_to</td><td>UUID</td><td>否</td><td>null</td><td>负责人</td><td>FK → users.id</td></tr>
+        <tr><td>budget</td><td>Decimal</td><td>否</td><td>null</td><td>预算</td><td>-</td></tr>
+        <tr><td>wedding_date</td><td>Date</td><td>否</td><td>null</td><td>婚期</td><td>-</td></tr>
+        <tr><td>remark</td><td>Text</td><td>否</td><td>null</td><td>备注</td><td>-</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+        <tr><td>updated_at</td><td>DateTime</td><td>是</td><td>now</td><td>更新时间</td><td>onupdate=now</td></tr>
+      </tbody>
+    </table>
+
+    <h3>orders — 订单表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>order_no</td><td>String(50)</td><td>是</td><td>自动生成</td><td>订单编号</td><td>唯一约束</td></tr>
+        <tr><td>customer_id</td><td>UUID</td><td>是</td><td>-</td><td>客户</td><td>FK → customers.id</td></tr>
+        <tr><td>event_id</td><td>UUID</td><td>否</td><td>null</td><td>关联档期</td><td>FK → events.id</td></tr>
+        <tr><td>total_amount</td><td>Decimal(10,2)</td><td>是</td><td>0</td><td>订单总额</td><td>-</td></tr>
+        <tr><td>status</td><td>Enum</td><td>是</td><td>intention</td><td>订单状态</td><td>intention/signed/executing/completed/cancelled</td></tr>
+        <tr><td>created_by</td><td>UUID</td><td>是</td><td>-</td><td>创建人</td><td>FK → users.id</td></tr>
+        <tr><td>remark</td><td>Text</td><td>否</td><td>null</td><td>备注</td><td>-</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+        <tr><td>updated_at</td><td>DateTime</td><td>是</td><td>now</td><td>更新时间</td><td>onupdate=now</td></tr>
+      </tbody>
+    </table>
+
+    <h3>events — 档期表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>title</td><td>String(200)</td><td>是</td><td>-</td><td>活动标题</td><td>-</td></tr>
+        <tr><td>event_date</td><td>DateTime</td><td>是</td><td>-</td><td>活动日期</td><td>索引</td></tr>
+        <tr><td>venue_id</td><td>UUID</td><td>否</td><td>null</td><td>场地</td><td>FK → venues.id</td></tr>
+        <tr><td>status</td><td>Enum</td><td>是</td><td>draft</td><td>档期状态</td><td>draft/confirmed/in_progress/completed/cancelled</td></tr>
+        <tr><td>customer_id</td><td>UUID</td><td>否</td><td>null</td><td>关联客户</td><td>FK → customers.id</td></tr>
+        <tr><td>planner_id</td><td>UUID</td><td>否</td><td>null</td><td>策划师</td><td>FK → users.id</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+        <tr><td>updated_at</td><td>DateTime</td><td>是</td><td>now</td><td>更新时间</td><td>onupdate=now</td></tr>
+      </tbody>
+    </table>
+
+    <h3>users — 用户表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>username</td><td>String(50)</td><td>是</td><td>-</td><td>用户名</td><td>唯一约束</td></tr>
+        <tr><td>hashed_password</td><td>String(200)</td><td>是</td><td>-</td><td>密码哈希</td><td>bcrypt (12 rounds)</td></tr>
+        <tr><td>real_name</td><td>String(50)</td><td>否</td><td>null</td><td>真实姓名</td><td>-</td></tr>
+        <tr><td>phone</td><td>String(20)</td><td>否</td><td>null</td><td>手机号</td><td>-</td></tr>
+        <tr><td>team</td><td>Enum</td><td>是</td><td>-</td><td>所属团队</td><td>sales/planning/finance/management</td></tr>
+        <tr><td>role_id</td><td>UUID</td><td>是</td><td>-</td><td>角色</td><td>FK → roles.id</td></tr>
+        <tr><td>is_active</td><td>Boolean</td><td>是</td><td>true</td><td>是否启用</td><td>-</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+      </tbody>
+    </table>
+
+    <h3>roles — 角色表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>name</td><td>String(50)</td><td>是</td><td>-</td><td>角色名</td><td>唯一约束</td></tr>
+        <tr><td>description</td><td>String(200)</td><td>否</td><td>null</td><td>角色描述</td><td>-</td></tr>
+        <tr><td>permissions</td><td>JSON</td><td>是</td><td>-</td><td>权限配置</td><td>格式: {module: {action: scope}}</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+      </tbody>
+    </table>
+
+    <h3>approvals — 审批表</h3>
+    <table>
+      <thead><tr><th>字段名</th><th>类型</th><th>必填</th><th>默认值</th><th>含义</th><th>约束/备注</th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>UUID</td><td>是</td><td>uuid4</td><td>主键</td><td>-</td></tr>
+        <tr><td>approval_type</td><td>String(50)</td><td>是</td><td>-</td><td>审批类型</td><td>-</td></tr>
+        <tr><td>order_id</td><td>UUID</td><td>否</td><td>null</td><td>关联订单</td><td>FK → orders.id</td></tr>
+        <tr><td>title</td><td>String(200)</td><td>是</td><td>-</td><td>审批标题</td><td>-</td></tr>
+        <tr><td>description</td><td>Text</td><td>否</td><td>null</td><td>审批说明</td><td>-</td></tr>
+        <tr><td>status</td><td>String(20)</td><td>是</td><td>pending</td><td>审批状态</td><td>pending/approved/rejected</td></tr>
+        <tr><td>applicant_id</td><td>UUID</td><td>是</td><td>-</td><td>申请人</td><td>FK → users.id</td></tr>
+        <tr><td>approver_id</td><td>UUID</td><td>否</td><td>null</td><td>审批人</td><td>FK → users.id</td></tr>
+        <tr><td>approval_remark</td><td>Text</td><td>否</td><td>null</td><td>审批备注</td><td>-</td></tr>
+        <tr><td>created_at</td><td>DateTime</td><td>是</td><td>now</td><td>创建时间</td><td>-</td></tr>
+        <tr><td>updated_at</td><td>DateTime</td><td>是</td><td>now</td><td>更新时间</td><td>onupdate=now</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §7 API 接口清单 -->
+  <div class="section" id="api">
+    <h2><span class="section-number">07</span>API 接口清单</h2>
+    <table>
+      <thead><tr><th>模块</th><th>前缀</th><th>方法</th><th>路径</th><th>用途</th><th>认证</th></tr></thead>
+      <tbody>
+        <tr><td>认证</td><td>/api/v1/auth</td><td>POST</td><td>/login</td><td>用户登录</td><td>否</td></tr>
+        <tr><td>认证</td><td>/api/v1/auth</td><td>POST</td><td>/refresh</td><td>刷新 Token</td><td>是</td></tr>
+        <tr><td>认证</td><td>/api/v1/auth</td><td>POST</td><td>/logout</td><td>用户登出</td><td>是</td></tr>
+        <tr><td>认证</td><td>/api/v1/auth</td><td>POST</td><td>/change-password</td><td>修改密码</td><td>是</td></tr>
+        <tr><td>用户</td><td>/api/v1/users</td><td>GET</td><td>/</td><td>用户列表</td><td>是</td></tr>
+        <tr><td>用户</td><td>/api/v1/users</td><td>POST</td><td>/</td><td>创建用户</td><td>是</td></tr>
+        <tr><td>用户</td><td>/api/v1/users</td><td>GET</td><td>/{id}</td><td>用户详情</td><td>是</td></tr>
+        <tr><td>用户</td><td>/api/v1/users</td><td>PUT</td><td>/{id}</td><td>更新用户</td><td>是</td></tr>
+        <tr><td>用户</td><td>/api/v1/users</td><td>DELETE</td><td>/{id}</td><td>删除用户</td><td>是</td></tr>
+        <tr><td>角色</td><td>/api/v1/roles</td><td>GET</td><td>/</td><td>角色列表</td><td>是</td></tr>
+        <tr><td>角色</td><td>/api/v1/roles</td><td>POST</td><td>/</td><td>创建角色</td><td>是</td></tr>
+        <tr><td>角色</td><td>/api/v1/roles</td><td>PUT</td><td>/{id}</td><td>更新角色</td><td>是</td></tr>
+        <tr><td>客户</td><td>/api/v1/customers</td><td>GET</td><td>/</td><td>客户列表（分页/筛选）</td><td>是</td></tr>
+        <tr><td>客户</td><td>/api/v1/customers</td><td>POST</td><td>/</td><td>创建客户</td><td>是</td></tr>
+        <tr><td>客户</td><td>/api/v1/customers</td><td>GET</td><td>/{id}</td><td>客户详情</td><td>是</td></tr>
+        <tr><td>客户</td><td>/api/v1/customers</td><td>PUT</td><td>/{id}</td><td>更新客户</td><td>是</td></tr>
+        <tr><td>客户</td><td>/api/v1/customers</td><td>DELETE</td><td>/{id}</td><td>删除客户</td><td>是</td></tr>
+        <tr><td>跟进</td><td>/api/v1/follow-ups</td><td>GET</td><td>/</td><td>跟进记录列表</td><td>是</td></tr>
+        <tr><td>跟进</td><td>/api/v1/follow-ups</td><td>POST</td><td>/</td><td>创建跟进记录</td><td>是</td></tr>
+        <tr><td>订单</td><td>/api/v1/orders</td><td>GET</td><td>/</td><td>订单列表</td><td>是</td></tr>
+        <tr><td>订单</td><td>/api/v1/orders</td><td>POST</td><td>/</td><td>创建订单</td><td>是</td></tr>
+        <tr><td>订单</td><td>/api/v1/orders</td><td>GET</td><td>/{id}</td><td>订单详情</td><td>是</td></tr>
+        <tr><td>订单</td><td>/api/v1/orders</td><td>PUT</td><td>/{id}</td><td>更新订单</td><td>是</td></tr>
+        <tr><td>订单</td><td>/api/v1/orders</td><td>PATCH</td><td>/{id}/status</td><td>更新订单状态</td><td>是</td></tr>
+        <tr><td>档期</td><td>/api/v1/events</td><td>GET</td><td>/</td><td>档期列表</td><td>是</td></tr>
+        <tr><td>档期</td><td>/api/v1/events</td><td>POST</td><td>/</td><td>创建档期</td><td>是</td></tr>
+        <tr><td>档期</td><td>/api/v1/events</td><td>GET</td><td>/{id}</td><td>档期详情</td><td>是</td></tr>
+        <tr><td>档期</td><td>/api/v1/events</td><td>PUT</td><td>/{id}</td><td>更新档期</td><td>是</td></tr>
+        <tr><td>场地</td><td>/api/v1/venues</td><td>GET</td><td>/</td><td>场地列表</td><td>是</td></tr>
+        <tr><td>场地</td><td>/api/v1/venues</td><td>POST</td><td>/</td><td>创建场地</td><td>是</td></tr>
+        <tr><td>供应商</td><td>/api/v1/suppliers</td><td>GET</td><td>/</td><td>供应商列表</td><td>是</td></tr>
+        <tr><td>供应商</td><td>/api/v1/suppliers</td><td>POST</td><td>/</td><td>创建供应商</td><td>是</td></tr>
+        <tr><td>供应商</td><td>/api/v1/suppliers</td><td>GET</td><td>/{id}</td><td>供应商详情</td><td>是</td></tr>
+        <tr><td>供应商</td><td>/api/v1/suppliers</td><td>PUT</td><td>/{id}</td><td>更新供应商</td><td>是</td></tr>
+        <tr><td>审批</td><td>/api/v1/approvals</td><td>GET</td><td>/</td><td>审批列表</td><td>是</td></tr>
+        <tr><td>审批</td><td>/api/v1/approvals</td><td>POST</td><td>/</td><td>创建审批</td><td>是</td></tr>
+        <tr><td>审批</td><td>/api/v1/approvals</td><td>PATCH</td><td>/{id}/approve</td><td>通过审批</td><td>是</td></tr>
+        <tr><td>审批</td><td>/api/v1/approvals</td><td>PATCH</td><td>/{id}/reject</td><td>拒绝审批</td><td>是</td></tr>
+        <tr><td>通知</td><td>/api/v1/notifications</td><td>GET</td><td>/</td><td>通知列表</td><td>是</td></tr>
+        <tr><td>通知</td><td>/api/v1/notifications</td><td>PATCH</td><td>/{id}/read</td><td>标记已读</td><td>是</td></tr>
+        <tr><td>通知</td><td>/api/v1/notifications</td><td>GET</td><td>/unread-count</td><td>未读数量</td><td>是</td></tr>
+        <tr><td>财务-应收</td><td>/api/v1/finance/receivables</td><td>GET</td><td>/</td><td>应收列表</td><td>是</td></tr>
+        <tr><td>财务-应收</td><td>/api/v1/finance/receivables</td><td>POST</td><td>/</td><td>创建应收</td><td>是</td></tr>
+        <tr><td>财务-应收</td><td>/api/v1/finance/receivables</td><td>GET</td><td>/{id}</td><td>应收详情</td><td>是</td></tr>
+        <tr><td>财务-退款</td><td>/api/v1/finance/refunds</td><td>GET</td><td>/</td><td>退款列表</td><td>是</td></tr>
+        <tr><td>财务-退款</td><td>/api/v1/finance/refunds</td><td>POST</td><td>/</td><td>创建退款申请</td><td>是</td></tr>
+        <tr><td>财务-发票</td><td>/api/v1/finance/invoices</td><td>GET</td><td>/</td><td>发票列表</td><td>是</td></tr>
+        <tr><td>财务-发票</td><td>/api/v1/finance/invoices</td><td>POST</td><td>/</td><td>开具发票</td><td>是</td></tr>
+        <tr><td>财务-费用</td><td>/api/v1/finance/expenses</td><td>GET</td><td>/</td><td>费用列表</td><td>是</td></tr>
+        <tr><td>财务-费用</td><td>/api/v1/finance/expenses</td><td>POST</td><td>/</td><td>创建费用</td><td>是</td></tr>
+        <tr><td>仪表盘</td><td>/api/v1/dashboard</td><td>GET</td><td>/overview</td><td>概览统计</td><td>是</td></tr>
+        <tr><td>仪表盘</td><td>/api/v1/dashboard</td><td>GET</td><td>/sales-funnel</td><td>销售漏斗</td><td>是</td></tr>
+        <tr><td>仪表盘</td><td>/api/v1/dashboard</td><td>GET</td><td>/order-status</td><td>订单状态分布</td><td>是</td></tr>
+        <tr><td>仪表盘</td><td>/api/v1/dashboard</td><td>GET</td><td>/upcoming-events</td><td>近期档期</td><td>是</td></tr>
+        <tr><td>操作日志</td><td>/api/v1/operation-logs</td><td>GET</td><td>/</td><td>操作日志列表</td><td>是</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §8 业务流程 -->
+  <div class="section" id="flow">
+    <h2><span class="section-number">08</span>业务流程</h2>
+
+    <h3>客户签约流程</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart TD
+    A["潜在客户录入"] --> B["销售跟进<br/>电话/微信/面谈"]
+    B --> C{"客户意向?"}
+    C -->|有意向| D["状态 → 意向<br/>创建意向订单"]
+    C -->|无意向| E["状态 → 流失"]
+    C -->|继续跟进| B
+    D --> F["确认档期<br/>创建 Event"]
+    F --> G["签订合同<br/>状态 → 签约"]
+    G --> H["订单状态 → 签约<br/>触发 order_created 事件"]
+    H --> I["自动创建应收记录<br/>设置 30 天回款期限"]
+      </pre>
+    </div>
+
+    <h3>订单全生命周期</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart TD
+    A["创建意向订单<br/>status=intention"] --> B{"签订合同?"}
+    B -->|是| C["status → signed<br/>触发 order_created"]
+    B -->|取消| D["status → cancelled"]
+    C --> E["执行婚礼服务<br/>status → executing"]
+    E --> F["服务完成<br/>status → completed"]
+    C -->|需要取消| G["提交取消审批"]
+    G --> H{"审批通过?"}
+    H -->|是| D
+    H -->|否| C
+    C --> I["财务核算"]
+    I --> J["应收收款"]
+    I --> K["发票开具"]
+    I --> L["费用记录"]
+      </pre>
+    </div>
+
+    <h3>审批流程</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart TD
+    A["发起审批申请"] --> B["创建审批记录<br/>status=pending"]
+    B --> C["通知相关审批人"]
+    C --> D{"审批决定"}
+    D -->|通过| E["status → approved<br/>触发 approval_approved 事件"]
+    D -->|拒绝| F["status → rejected<br/>触发 approval_rejected 事件"]
+    E --> G["执行审批后动作<br/>退款/取消订单等"]
+    E --> H["通知申请人审批通过"]
+    F --> I["通知申请人审批拒绝"]
+      </pre>
+    </div>
+
+    <h3>财务应收流程</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+flowchart TD
+    A["订单创建事件"] --> B["自动创建应收记录<br/>status=pending"]
+    B --> C["设置到期日<br/>创建后 30 天"]
+    C --> D{"收到付款?"}
+    D -->|部分| E["status → partial<br/>更新已收金额"]
+    D -->|全额| F["status → completed"]
+    E --> G{"继续收款?"}
+    G -->|全额| F
+    G -->|取消| H["status → cancelled"]
+    F --> I["生成交易流水<br/>Transaction 记录"]
+      </pre>
+    </div>
+  </div>
+
+  <!-- §9 状态机 -->
+  <div class="section" id="state">
+    <h2><span class="section-number">09</span>状态机</h2>
+
+    <h3>Customer 客户状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> potential : 新建客户
+    potential --> following : 开始跟进
+    following --> intention : 确认意向
+    following --> lost : 客户流失
+    intention --> signed : 签订合同
+    intention --> lost : 客户流失
+    signed --> [*]
+    lost --> following : 重新激活
+      </pre>
+    </div>
+    <table>
+      <thead><tr><th>状态</th><th>含义</th><th>可流转到</th><th>触发条件</th></tr></thead>
+      <tbody>
+        <tr><td>potential</td><td>潜在客户</td><td>following</td><td>首次跟进记录创建</td></tr>
+        <tr><td>following</td><td>跟进中</td><td>intention, lost</td><td>确认有合作意向或标记流失</td></tr>
+        <tr><td>intention</td><td>有意向</td><td>signed, lost</td><td>签订合同或标记流失</td></tr>
+        <tr><td>signed</td><td>已签约</td><td>（终态）</td><td>合同签署完成</td></tr>
+        <tr><td>lost</td><td>已流失</td><td>following</td><td>重新激活跟进</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Order 订单状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> intention : 创建订单
+    intention --> signed : 签订合同
+    intention --> cancelled : 取消
+    signed --> executing : 开始执行
+    signed --> cancelled : 审批取消
+    executing --> completed : 服务完成
+    executing --> cancelled : 审批取消
+    completed --> [*]
+    cancelled --> [*]
+      </pre>
+    </div>
+    <table>
+      <thead><tr><th>状态</th><th>含义</th><th>可流转到</th><th>触发条件</th></tr></thead>
+      <tbody>
+        <tr><td>intention</td><td>意向订单</td><td>signed, cancelled</td><td>合同签订或主动取消</td></tr>
+        <tr><td>signed</td><td>已签约</td><td>executing, cancelled</td><td>服务启动或审批取消</td></tr>
+        <tr><td>executing</td><td>执行中</td><td>completed, cancelled</td><td>服务完成或审批取消</td></tr>
+        <tr><td>completed</td><td>已完成</td><td>（终态）</td><td>婚礼服务全部完成</td></tr>
+        <tr><td>cancelled</td><td>已取消</td><td>（终态）</td><td>审批通过取消</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Event 档期状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> draft : 创建档期
+    draft --> confirmed : 确认档期
+    confirmed --> in_progress : 活动开始
+    in_progress --> completed : 活动结束
+    draft --> cancelled : 取消
+    confirmed --> cancelled : 取消
+      </pre>
+    </div>
+    <table>
+      <thead><tr><th>状态</th><th>含义</th><th>可流转到</th><th>触发条件</th></tr></thead>
+      <tbody>
+        <tr><td>draft</td><td>草稿</td><td>confirmed, cancelled</td><td>确认档期或取消</td></tr>
+        <tr><td>confirmed</td><td>已确认</td><td>in_progress, cancelled</td><td>活动日到达或取消</td></tr>
+        <tr><td>in_progress</td><td>进行中</td><td>completed</td><td>活动结束</td></tr>
+        <tr><td>completed</td><td>已完成</td><td>（终态）</td><td>-</td></tr>
+        <tr><td>cancelled</td><td>已取消</td><td>（终态）</td><td>-</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Approval 审批状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending : 提交审批
+    pending --> approved : 审批通过
+    pending --> rejected : 审批拒绝
+    approved --> [*]
+    rejected --> [*]
+      </pre>
+    </div>
+
+    <h3>Receivable 应收状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending : 创建应收
+    pending --> partial : 部分收款
+    pending --> completed : 全额收款
+    pending --> cancelled : 取消
+    partial --> completed : 全额收款
+    partial --> cancelled : 取消
+    completed --> [*]
+    cancelled --> [*]
+      </pre>
+    </div>
+
+    <h3>Refund 退款状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending : 申请退款
+    pending --> approved : 审批通过
+    pending --> rejected : 审批拒绝
+    pending --> cancelled : 取消申请
+    approved --> [*]
+    rejected --> [*]
+    cancelled --> [*]
+      </pre>
+    </div>
+
+    <h3>Invoice 发票状态</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending : 申请开票
+    pending --> issued : 开具发票
+    issued --> voided : 作废
+    issued --> red_flushed : 红冲
+    voided --> [*]
+    red_flushed --> [*]
+      </pre>
+    </div>
+  </div>
+
+  <!-- §10 时序图 -->
+  <div class="section" id="sequence">
+    <h2><span class="section-number">10</span>时序图</h2>
+
+    <h3>用户登录认证</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+sequenceDiagram
+    participant C as 客户端
+    participant A as Auth API
+    participant DB as MySQL
+    participant R as Redis
+
+    C->>A: POST /api/v1/auth/login {username, password}
+    A->>DB: 查询用户 (username)
+    DB-->>A: User 对象
+    A->>A: bcrypt 验证密码
+    A->>A: 检查账户锁定状态
+    A->>A: 生成 access_token (120min)
+    A->>A: 生成 refresh_token (7d)
+    A->>R: 存储 refresh_token
+    A-->>C: {access_token, refresh_token, user}
+
+    Note over C,R: Token 过期后刷新
+    C->>A: POST /api/v1/auth/refresh {refresh_token}
+    A->>R: 验证 refresh_token
+    A->>A: 生成新 access_token
+    A-->>C: {access_token}
+      </pre>
+    </div>
+
+    <h3>创建订单全流程</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+sequenceDiagram
+    participant C as 客户端
+    participant O as Order API
+    participant DB as MySQL
+    participant EB as EventBus
+    participant F as Finance Handler
+    participant N as Notification Handler
+
+    C->>O: POST /api/v1/orders {customer_id, items...}
+    O->>DB: 验证客户存在
+    O->>DB: 创建 Order + OrderItems
+    O->>EB: 发布 order_created 事件
+    O-->>C: 201 Created
+
+    EB->>F: order_created 事件
+    F->>DB: 创建 Receivable (amount=订单总额)
+    F->>DB: 设置 due_date = now + 30天
+
+    EB->>N: order_created 事件
+    N->>DB: 创建通知（通知销售/策划）
+      </pre>
+    </div>
+
+    <h3>审批通过 → 退款处理</h3>
+    <div class="diagram-container">
+      <pre class="mermaid">
+sequenceDiagram
+    participant M as 经理
+    participant A as Approval API
+    participant DB as MySQL
+    participant EB as EventBus
+    participant FH as Finance Handler
+    participant OH as Order Handler
+
+    M->>A: PATCH /api/v1/approvals/{id}/approve
+    A->>DB: 更新 approval.status = approved
+    A->>EB: 发布 approval_approved 事件
+    A-->>M: 200 OK
+
+    EB->>FH: approval_approved (退款审批)
+    FH->>DB: 更新 Refund.status = approved
+    FH->>DB: 执行退款（扣减应收）
+
+    EB->>OH: approval_approved (取消订单审批)
+    OH->>DB: 更新 Order.status = cancelled
+      </pre>
+    </div>
+  </div>
+
+  <!-- §11 业务规则 -->
+  <div class="section" id="rules">
+    <h2><span class="section-number">11</span>业务规则</h2>
+    <table>
+      <thead><tr><th>编号</th><th>规则名称</th><th>所属领域</th><th>规则描述</th><th>实现位置</th><th>优先级</th></tr></thead>
+      <tbody>
+        <tr><td>BR-001</td><td>账户锁定</td><td>认证</td><td>连续 5 次登录失败后锁定账户 30 分钟</td><td>auth router</td><td>高</td></tr>
+        <tr><td>BR-002</td><td>JWT 双 Token</td><td>认证</td><td>Access Token 120min 过期，Refresh Token 7 天过期，登出时加入黑名单</td><td>auth service</td><td>高</td></tr>
+        <tr><td>BR-003</td><td>RBAC 权限</td><td>授权</td><td>基于 require_permission(module, action) 的权限检查，支持 scope（all/own/team/none），admin 绕过</td><td>middleware</td><td>高</td></tr>
+        <tr><td>BR-004</td><td>自动创建应收</td><td>财务</td><td>订单创建（order_created 事件）时自动创建应收记录，金额 = 订单总额</td><td>finance event handler</td><td>高</td></tr>
+        <tr><td>BR-005</td><td>30 天回款期限</td><td>财务</td><td>订单状态变更为 signed 时，设置应收到期日为当前日期 + 30 天</td><td>finance event handler</td><td>中</td></tr>
+        <tr><td>BR-006</td><td>审批触发退款</td><td>财务</td><td>退款审批通过（approval_approved）时自动执行退款，更新应收已收金额</td><td>finance event handler</td><td>高</td></tr>
+        <tr><td>BR-007</td><td>订单取消审批</td><td>订单</td><td>已签约/执行中的订单取消需经审批流程，审批通过后才能取消</td><td>approval handlers</td><td>高</td></tr>
+        <tr><td>BR-008</td><td>通知推送</td><td>通知</td><td>审批创建时通知相关审批人，审批结果通知申请人，档期变更通知销售/策划师</td><td>event handlers</td><td>中</td></tr>
+        <tr><td>BR-009</td><td>接口限流</td><td>系统</td><td>全局速率限制，基于 Redis 实现</td><td>middleware</td><td>中</td></tr>
+        <tr><td>BR-010</td><td>CSRF 防护</td><td>安全</td><td>CSRF Token 中间件保护状态变更请求</td><td>middleware</td><td>中</td></tr>
+      </tbody>
+    </table>
+    <h3>关键计算公式</h3>
+    <pre>应收余额 = 应收金额 - 已收金额 - 退款金额
+应收状态：
+  pending    (已收 = 0)
+  partial    (0 &lt; 已收 &lt; 应收)
+  completed  (已收 = 应收)
+  cancelled  (手动取消)
+
+订单利润 = 订单总额 - SUM(费用.金额) - SUM(供应商服务.成本)
+密码哈希 = bcrypt(password, rounds=12)
+Access Token 有效期 = 120 分钟
+Refresh Token 有效期 = 7 天
+应收到期日 = 订单签约日期 + 30 天</pre>
+  </div>
+
+  <!-- §12 定时任务 -->
+  <div class="section" id="jobs">
+    <h2><span class="section-number">12</span>定时任务 / Jobs</h2>
+    <table>
+      <thead><tr><th>任务名</th><th>调度方式</th><th>执行频率</th><th>功能描述</th><th>关键逻辑</th><th>所在文件</th><th>失败策略</th></tr></thead>
+      <tbody>
+        <tr><td>账户自动解锁</td><td>应用内定时</td><td>每次登录检查</td><td>锁定 30 分钟后自动解锁</td><td>检查 locked_until 字段是否过期</td><td>auth router</td><td>自动恢复</td></tr>
+        <tr><td>JWT 黑名单清理</td><td>Redis TTL</td><td>自动过期</td><td>登出的 Token 加入 Redis 黑名单，随 Token 过期自动清理</td><td>SET key with TTL = token 剩余有效期</td><td>auth service</td><td>TTL 自动清理</td></tr>
+        <tr><td>应收逾期提醒</td><td>未实现</td><td>建议每日</td><td>检查超过 due_date 的应收记录，发送提醒通知</td><td>-</td><td>-</td><td>-</td></tr>
+        <tr><td>数据库备份</td><td>Docker Compose</td><td>可选</td><td>MySQL 定时备份（backup 服务）</td><td>mysqldump</td><td>docker-compose.yml</td><td>保留多份备份</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §13 名词解释 -->
+  <div class="section" id="glossary">
+    <h2><span class="section-number">13</span>名词解释</h2>
+    <table>
+      <thead><tr><th>术语</th><th>英文</th><th>定义</th><th>在项目中的具体含义</th></tr></thead>
+      <tbody>
+        <tr><td>档期</td><td>Event</td><td>婚礼活动的具体日期安排</td><td>events 表，包含活动标题、日期、场地、人员调度等</td></tr>
+        <tr><td>意向客户</td><td>Intention Customer</td><td>明确表达合作意向的客户</td><td>customer.status = intention，可创建意向订单</td></tr>
+        <tr><td>意向订单</td><td>Intention Order</td><td>客户有意向但尚未签约的订单</td><td>order.status = intention，尚未签订合同</td></tr>
+        <tr><td>应收</td><td>Receivable</td><td>客户应支付的款项</td><td>finance 模块核心实体，记录待收金额和已收金额</td></tr>
+        <tr><td>红冲</td><td>Red Flush</td><td>对已开具发票进行红字冲销</td><td>invoice.status = red_flushed，财务合规要求</td></tr>
+        <tr><td>跟进记录</td><td>Follow Up</td><td>销售与客户的沟通记录</td><td>follow_ups 表，类型：电话/微信/面谈/其他</td></tr>
+        <tr><td>场地</td><td>Venue</td><td>婚礼举办的物理场所</td><td>venues 表，与 event 关联</td></tr>
+        <tr><td>订单明细</td><td>Order Item</td><td>订单中的具体服务项目</td><td>order_items 表，7 种类型：场地/司仪/化妆/摄影/摄像/花艺/其他</td></tr>
+        <tr><td>资源</td><td>Resource</td><td>活动所需的人力/物力</td><td>event_resources 表，5 种类型：场地/人员/设备/物料/其他</td></tr>
+        <tr><td>供应商</td><td>Supplier</td><td>为婚礼提供外部服务的商家</td><td>suppliers 表，7 种类型：场地/司仪/化妆/摄影/摄像/花艺/其他</td></tr>
+        <tr><td>审批流</td><td>Approval Flow</td><td>需要上级确认的业务操作</td><td>approvals 表，用于订单取消、退款等需要确认的场景</td></tr>
+        <tr><td>操作日志</td><td>Operation Log</td><td>用户操作的审计记录</td><td>operation_logs 表，记录谁在何时对什么做了什么</td></tr>
+        <tr><td>权限域</td><td>Scope</td><td>数据可见范围</td><td>all（全部）/ own（自己）/ team（团队）/ none（无），RBAC 的粒度控制</td></tr>
+        <tr><td>事件总线</td><td>Event Bus</td><td>模块间异步通信机制</td><td>In-process EventBus（默认）/ RedisEventBus（可扩展），解耦模块依赖</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §14 配置项说明 -->
+  <div class="section" id="config">
+    <h2><span class="section-number">14</span>配置项说明</h2>
+    <h3>环境变量</h3>
+    <table>
+      <thead><tr><th>变量名</th><th>必填</th><th>默认值</th><th>含义</th><th>示例</th></tr></thead>
+      <tbody>
+        <tr><td>DATABASE_URL</td><td>是</td><td>-</td><td>MySQL 连接字符串</td><td>mysql+asyncmy://user:pass@localhost:3306/wedding</td></tr>
+        <tr><td>REDIS_URL</td><td>是</td><td>-</td><td>Redis 连接字符串</td><td>redis://localhost:6379/0</td></tr>
+        <tr><td>JWT_SECRET</td><td>是</td><td>-</td><td>JWT 签名密钥</td><td>your-secret-key-here</td></tr>
+        <tr><td>JWT_ACCESS_TOKEN_EXPIRE_MINUTES</td><td>否</td><td>120</td><td>Access Token 过期时间（分钟）</td><td>120</td></tr>
+        <tr><td>JWT_REFRESH_TOKEN_EXPIRE_DAYS</td><td>否</td><td>7</td><td>Refresh Token 过期时间（天）</td><td>7</td></tr>
+        <tr><td>BCRYPT_ROUNDS</td><td>否</td><td>12</td><td>密码哈希轮次</td><td>12</td></tr>
+        <tr><td>ACCOUNT_LOCKOUT_THRESHOLD</td><td>否</td><td>5</td><td>登录失败锁定阈值</td><td>5</td></tr>
+        <tr><td>ACCOUNT_LOCKOUT_DURATION_MINUTES</td><td>否</td><td>30</td><td>账户锁定时长（分钟）</td><td>30</td></tr>
+        <tr><td>CORS_ORIGINS</td><td>否</td><td>*</td><td>允许的跨域来源</td><td>http://localhost:3000</td></tr>
+        <tr><td>SENTRY_DSN</td><td>否</td><td>-</td><td>Sentry 错误监控 DSN</td><td>https://xxx@sentry.io/123</td></tr>
+        <tr><td>ENVIRONMENT</td><td>否</td><td>development</td><td>运行环境</td><td>production / staging / development</td></tr>
+        <tr><td>LOG_LEVEL</td><td>否</td><td>INFO</td><td>日志级别</td><td>DEBUG / INFO / WARNING / ERROR</td></tr>
+        <tr><td>DEBUG</td><td>否</td><td>false</td><td>调试模式</td><td>true / false</td></tr>
+      </tbody>
+    </table>
+    <h3>配置文件</h3>
+    <table>
+      <thead><tr><th>文件路径</th><th>用途</th><th>关键配置项</th></tr></thead>
+      <tbody>
+        <tr><td>wedding-backend/app/config.py</td><td>Pydantic BaseSettings，所有配置的单一来源</td><td>DatabaseConfig, RedisConfig, JWTConfig, SecurityConfig</td></tr>
+        <tr><td>docker-compose.yml</td><td>Docker Compose 服务编排</td><td>4 服务 + 可选备份服务，端口映射，资源限制</td></tr>
+        <tr><td>wedding-backend/Dockerfile</td><td>后端容器镜像构建</td><td>Python 3.13-slim，uvicorn 启动</td></tr>
+        <tr><td>wedding-frontend/Dockerfile</td><td>前端容器镜像构建</td><td>Node 构建 + Nginx 运行</td></tr>
+        <tr><td>wedding-frontend/nginx.conf</td><td>Nginx 反向代理配置</td><td>静态资源 + /api 代理到后端</td></tr>
+        <tr><td>wedding-backend/alembic.ini</td><td>数据库迁移配置</td><td>数据库连接、迁移脚本路径</td></tr>
+        <tr><td>.env</td><td>环境变量文件（不入库）</td><td>所有敏感配置项</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §15 风险与技术债务 -->
+  <div class="section" id="risks">
+    <h2><span class="section-number">15</span>风险与技术债务</h2>
+    <h3>高风险项</h3>
+    <div class="risk-card high">
+      <strong>事件总线单点故障</strong><br/>
+      <span style="color:var(--color-text-secondary)">默认使用 In-process EventBus，应用重启时未处理事件丢失。RedisEventBus 已实现但未启用。建议：生产环境启用 RedisEventBus 并配置消息持久化。</span>
+    </div>
+    <div class="risk-card high">
+      <strong>JWT Secret 硬编码风险</strong><br/>
+      <span style="color:var(--color-text-secondary)">JWT_SECRET 必须通过环境变量注入，不可硬编码或使用默认值。建议：启动时检测 JWT_SECRET 是否为默认值并拒绝启动。</span>
+    </div>
+    <h3>中风险项</h3>
+    <div class="risk-card medium">
+      <strong>DDD 改造不完整</strong><br/>
+      <span style="color:var(--color-text-secondary)">仅 finance 和 dashboard 模块完成了 DDD 四层改造，其他模块（customer/order/event/supplier）仍使用传统 models/ + routers/ 扁平结构，架构风格不统一。</span>
+    </div>
+    <div class="risk-card medium">
+      <strong>应收逾期无自动提醒</strong><br/>
+      <span style="color:var(--color-text-secondary)">应收到期日已设置（+30 天），但缺少定时任务自动检测逾期并发送通知，需人工关注。</span>
+    </div>
+    <h3>技术债务</h3>
+    <table>
+      <thead><tr><th>编号</th><th>债务描述</th><th>所在模块</th><th>清理建议</th><th>优先级</th></tr></thead>
+      <tbody>
+        <tr><td>TD-001</td><td>传统模块未 DDD 化（customer/order/event/supplier）</td><td>全局</td><td>逐步将传统模块迁移到 DDD 四层架构</td><td>中</td></tr>
+        <tr><td>TD-002</td><td>测试使用 SQLite 内存库而非真实 MySQL</td><td>后端测试</td><td>CI 环境添加 MySQL 服务容器，使用 TestContainers</td><td>中</td></tr>
+        <tr><td>TD-003</td><td>MockRedis 与真实 Redis 行为可能不一致</td><td>后端测试</td><td>CI 环境使用真实 Redis 实例</td><td>低</td></tr>
+        <tr><td>TD-004</td><td>前端路由权限映射硬编码</td><td>前端</td><td>从后端动态获取权限配置</td><td>低</td></tr>
+        <tr><td>TD-005</td><td>供应商评价模型未与实际评价流程对接</td><td>supplier</td><td>实现评价提交 API 和计算逻辑</td><td>中</td></tr>
+        <tr><td>TD-006</td><td>缺少 API 版本迁移策略</td><td>全局</td><td>规划 v2 API 版本迁移方案</td><td>低</td></tr>
+      </tbody>
+    </table>
+    <h3>已废弃模式</h3>
+    <table>
+      <thead><tr><th>模式</th><th>替代方案</th><th>迁移进度</th></tr></thead>
+      <tbody>
+        <tr><td>传统 models/ + routers/ 扁平结构</td><td>DDD 四层架构（domain/application/infrastructure/interfaces）</td><td><span class="badge badge-warning">进行中</span> finance + dashboard 已完成，其余待迁移</td></tr>
+        <tr><td>In-process EventBus</td><td>RedisEventBus（支持水平扩展）</td><td><span class="badge badge-info">已实现未启用</span> 代码已就绪，需配置切换</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>由 Project Blueprint 自动生成 | 2026-06-04 | 分析深度：standard</p>
+    <p style="margin-top:4px;">本文档基于代码静态分析生成，建议结合实际运行动态验证</p>
+  </footer>
+
+</main>
+
+</body>
+</html>

@@ -23,5 +23,9 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Codegraph daemon runtime
+.codegraph/daemon.pid
+.codegraph/daemon.log
+
 # Uploads
 wedding-backend/uploads/
